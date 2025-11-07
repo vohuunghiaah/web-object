@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Account Detail</title>
+    <!-- Preload hero image để tránh flash -->
+    <link rel="preload" href="./assets/img/hero-main.jpg" as="image" />
+    <link rel="stylesheet" href="user.css" />
+    <link rel="stylesheet" href="account-detail.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.css"
+      integrity="sha512-kJlvECunwXftkPwyvHbclArO8wszgBGisiLeuDFwNM8ws+wKIw0sv1os3ClWZOcrEB2eRXULYUsm8OVRGJKwGA=="
+      crossorigin="anonymous" 
+      referrerpolicy="no-referrer"
+    />
+</head>
+<body>
+    <header>
+      <div class="header__top">
+        <div class="logo">Xtray</div>
+        <div class="search-bar">
+          <input
+            id="search-input"
+            class="search-bar__input"
+            type="text"
+            placeholder="Nhập phụ kiện cần tìm..."
+          />
+          <button id="search-btn" class="search-bar__btn">
+            <i class="ri-search-line"></i>
+          </button>
+        </div>
+        <nav id="main-nav">
+  <span id="user-info" style="display: none; color: white;">👋 Xin chào, <strong id="username-display"></strong></span>
+
+  <a href="#" data-action="open-modal" data-target="login-modal" id="login-link">👤 Đăng nhập</a>
+  <a href="#" data-action="open-modal" data-target="signup-modal" id="signup-link">➕ Đăng ký</a>
+
+  <a href="#" id="cart-link" data-action="open-modal" data-target="cart-modal">
+    🛒 Giỏ hàng
+  </a>
+
+  <a href="#" id="logout-link" style="display: none;">🚪 Đăng xuất</a>
+</nav>
+      </div>
+      <div class="header__bottom">
+        <nav class="header__bottom__nav">
+          <ul>
+            <li><a href="index.html#home">Trang chủ</a></li>
+            <li><a href="index.html#about">Giới thiệu</a></li>
+            <li>
+              <a href="index.html#products"> Sản phẩm <i class="ri-arrow-down-s-line"></i> </a>
+              <nav class="header__bottom__dropdown">
+                <ul>
+                  <li><a href="index.html?category=mouse#products">Chuột</a></li>
+                  <li><a href="index.html?category=keyboard#products">Bàn phím</a></li>
+                  <li><a href="index.html?category=headphone#products">Tai nghe</a></li>
+                  <li><a href="index.html?category=powerbank#products">Sạc dự phòng</a></li>
+                </ul>
+              </nav>
+            </li>
+            <li><a href="index.html#contact">Liên hệ</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+  
+    <main class="main-account-detail">
+       <div class="account-detail-top">
+           <div class="account-detail-top-avatar">
+              <div class="account-detail-top-avatar-img">
+                    <img src="./assets/img/avt-demo.jpg" alt="User Avatar" />
+              </div>
+           </div>
+           <div class="account-detail-top-info">
+               <h1>Nguyễn Văn A</h1>
+               <p>Đam mê công nghệ và phụ kiện điện tử cao cấp</p>
+           </div>
+       </div>
+       <div class="account-detail-bottom">
+           <div class="account-detail-bottom-nav">
+              <button class="nav-tab active" data-tab="info"><i class="ri-user-line"></i>Thông tin</button>
+              <button class="nav-tab" data-tab="security"><i class="ri-lock-line"></i>Bảo mật</button>
+              <button class="nav-tab" data-tab="order"><i class="ri-draggable"></i></i>Đơn hàng</button>
+           </div>
+           <div class="account-detail-bottom-info tab-content active" id="info-tab">
+               <div class="account-detail-bottom-info-title">
+                 <div class="account-detail-bottom-info-title1">
+                   <h2>Thông tin cá nhân</h2>
+                   <p>Quản lý thông tin tài khoản của bạn</p>
+                 </div>
+                 <button><i class="ri-pencil-line"></i>Chỉnh sửa</button>
+               </div>
+               <div class="account-detail-bottom-info-wrapper">
+                 <div class="account-detail-bottom-info-item">
+                     <span class="info-label">Họ và tên:</span>
+                     <input class="info-value" value="Nguyễn Văn A" disabled />
+                 </div>
+                 <div class="account-detail-bottom-info-item">
+                     <span class="info-label">Email:</span>
+                     <input class="info-value" value="nguyenvana@example.com" disabled/>
+                 </div>
+                 <div class="account-detail-bottom-info-item">
+                     <span class="info-label">Số điện thoại:</span>
+                     <input class="info-value" value="0912 345 678" disabled />
+                 </div>
+                 <div class="account-detail-bottom-info-item">
+                      <span class="info-label">Địa chỉ: </span>
+                      <input class="info-value" value="123 Đường ABC, Quận XYZ, TP. HCM" disabled>
+                 </div> 
+               </div>
+               <div class="account-detail-bottom-info-about">
+                   <span class="info-label">Giới thiệu: </span>
+                   <textarea class="info-value" disabled>Tôi là một người đam mê công nghệ và luôn tìm kiếm những sản phẩm tốt nhất.</textarea>
+               </div>
+           </div>
+           <div class="account-detail-bottom-security tab-content" id="security-tab" >
+              <div class="account-detail-bottom-security-container">
+                <div class="account-detail-bottom-security-title">
+                   <div class="account-detail-bottom-security-title01">
+                     <h2>Bảo mật</h2>
+                     <p>Quản lý mật khẩu và bảo vệ tài khoản của bạn</p>
+                   </div>
+                </div>
+                <div class="account-detail-bottom-security-wrapper">
+                     <div class="account-detail-bottom-security-item">
+                       <span class="security-label">Mật khẩu hiện tại:</span>
+                       <div class="password-input-wrapper">
+                         <input type="password" class="security-value" id="current-password" placeholder="Nhập mật khẩu hiện tại"/>
+                         <i class="ri-eye-off-line toggle-password" data-target="current-password"></i>
+                       </div>
+                   </div>
+                     <div class="account-detail-bottom-security-item">
+                       <span class="security-label">Mật khẩu mới:</span>
+                       <div class="password-input-wrapper">
+                         <input type="password" class="security-value" id="new-password" placeholder="Nhập mật khẩu mới (tối thiểu 6 ký tự)"/>
+                         <i class="ri-eye-off-line toggle-password" data-target="new-password"></i>
+                       </div>
+                   </div>
+                     <div class="account-detail-bottom-security-item">
+                       <span class="security-label">Xác nhận mật khẩu mới:</span>
+                       <div class="password-input-wrapper">
+                         <input type="password" class="security-value" id="confirm-password" placeholder="Nhập lại mật khẩu mới"/>
+                         <i class="ri-eye-off-line toggle-password" data-target="confirm-password"></i>
+                       </div>
+                   </div>
+                </div>
+                <button class="account-detail-bottom-security-button" id="change-password-btn">
+                  <i class="ri-lock-password-line"></i> Cập nhật mật khẩu
+                </button>
+              </div>
+           </div>
+           <div class="account-detail-bottom-order tab-content" id="order-tab">
+            
+           </div>
+        </div>
+        </main>
+   <!-- footer -->
+
+    <footer>
+      <div class="footer__top">
+        <div class="footer__top-slogan">
+          <i class="ri-truck-line"></i>
+          <div class="footer__top-slogan-text">
+            <span class="footer__top-slogan-text-01">Miễn phí vận chuyển</span>
+            <span class="footer__top-slogan-text-02"
+              >Cho đơn hàng trên 100.000đ</span
+            >
+          </div>
+        </div>
+        <div class="footer__top-slogan">
+          <i class="ri-shield-check-line"></i>
+          <div class="footer__top-slogan-text">
+            <span class="footer__top-slogan-text-01">Bảo hành 12 tháng</span>
+            <span class="footer__top-slogan-text-02">Cho tất cả sản phẩm</span>
+          </div>
+        </div>
+        <div class="footer__top-slogan">
+          <i class="ri-wallet-line"></i>
+          <div class="footer__top-slogan-text">
+            <span class="footer__top-slogan-text-01">Thanh toán đa dạng</span>
+            <span class="footer__top-slogan-text-02">COD, ATM, Visa...</span>
+          </div>
+        </div>
+        <div class="footer__top-slogan">
+          <i class="ri-customer-service-line"></i>
+          <div class="footer__top-slogan-text">
+            <span class="footer__top-slogan-text-01">Hỗ trợ 24/7</span>
+            <span class="footer__top-slogan-text-02">Cho tất cả sản phẩm</span>
+          </div>
+        </div>
+      </div>
+      <div class="footer__bottom">
+        <div class="footer__bottom-box01">
+          <h1>XTray</h1>
+          <p>
+            Xtray là địa chỉ uy tín hàng đầu chuyên cung cấp phụ kiện <br />
+            kiện tử chính hãng với chất lượng tốt nhất. Chúng tôi cam kết <br />
+            hàng đến trải nghiệm mua sắm tuyệt vời nhất cho khách hàng.
+          </p>
+
+          <h2>Kết nối với chúng tôi</h2>
+          <div class="footer__bottom-social">
+            <a href="https://facebook.com"><i class="ri-facebook-fill"></i></a>
+            <a href="https://github.com"><i class="ri-github-line"></i></a>
+            <a href="https://twitter.com"><i class="ri-twitter-x-line"></i></a>
+          </div>
+        </div>
+        <div class="footer__bottom-box02">
+          <a href="index.html#home">Trang chủ</a>
+          <a href="index.html#about">Giới thiệu</a>
+          <a href="index.html#products">Sản phẩm</a>
+          <div class="footer__bottom-box02-contact">
+            <a class="footer__bottom-box02-contact-a-special" href="index.html#contact"
+              >Liên hệ</a
+            >
+            <div class="footer__bottom-box02-contact-item">
+              <i class="ri-phone-line"></i><span>1900 1234</span>
+            </div>
+            <div class="footer__bottom-box02-contact-item">
+              <i class="ri-mail-line"></i><span>xtray@gmail.com</span>
+            </div>
+            <div class="footer__bottom-box02-contact-item">
+              <i class="ri-map-pin-line"></i
+              ><span>123 Đường ABC, Quận XYZ, TP. HCM</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Link to external JavaScript file -->
+    <script src="account-detail.js"></script>
+    <script src="products.js"></script>
+</body>
+</html>

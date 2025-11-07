@@ -1,0 +1,384 @@
+.main-account-detail {
+  width: 100%;
+}
+
+.main-account-detail .account-detail-top {
+  width: 100%;
+  height: 40rem;
+  background-color: #000;
+
+  background-image: repeating-linear-gradient(
+      0deg,
+      rgba(255, 215, 0, 0.2) 0px,
+      rgba(255, 215, 0, 0.2) 1px,
+      transparent 1px,
+      transparent 60px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      rgba(255, 215, 0, 0.2) 0px,
+      rgba(255, 215, 0, 0.2) 1px,
+      transparent 1px,
+      transparent 60px
+    ),
+    linear-gradient(
+      to bottom,
+      /* Hướng gradient-to-b */ rgba(255, 215, 0, 0.1),
+      /* from-[#FFD700]/10 */ #000000,
+      /* via-black */ #000000 /* to-black */
+    );
+    display: flex;
+    align-items: center;
+    padding-top: 10rem;
+
+}
+.main-account-detail .account-detail-top .account-detail-top-avatar .account-detail-top-avatar-img {
+    width: 12.8rem;
+    height: 12.8rem;
+    margin: 0 auto;
+    margin-top: 2.4rem;
+    overflow: hidden;
+    margin-left: 4rem;
+    margin-right: 4rem;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.main-account-detail .account-detail-top .account-detail-top-avatar .account-detail-top-avatar-img:hover {
+    transform: scale(1.05);
+}
+
+.main-account-detail .account-detail-top .account-detail-top-avatar .account-detail-top-avatar-img img {
+    width: 12.8rem;
+    height: 12.8rem;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 5px solid #FFD700;
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+    transition: all 0.3s ease;
+}
+
+/* Avatar Overlay */
+.avatar-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.account-detail-top-avatar-img:hover .avatar-overlay {
+    opacity: 1;
+}
+
+.avatar-overlay i {
+    font-size: 3rem;
+    color: #FFD700;
+}
+
+.avatar-overlay span {
+    font-size: 1.2rem;
+    color: #fff;
+    font-weight: 600;
+}
+
+.main-account-detail .account-detail-top .account-detail-top-info h1 {
+  font-size: 1.6rem;
+  color: #fff;
+}
+.main-account-detail .account-detail-top .account-detail-top-info p {
+  font-size: 1.6rem;
+  color: #99A1AF;
+}
+.main-account-detail .account-detail-bottom {
+  background-color: #000;
+  padding: 4rem 2rem;
+}
+.main-account-detail .account-detail-bottom .account-detail-bottom-nav {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+  border: 1px solid #27272A;
+  border-radius: 14px;
+  padding: 0.2rem;
+  width: 30.6rem;
+  background-color: rgba(24, 24, 27, 0.5);
+}
+.main-account-detail .account-detail-bottom .account-detail-bottom-nav button {
+  padding: 0.5rem 1rem;
+  background-color: #FFD700;
+  border: none;
+  border-radius: 14px;
+  color: #000;
+  font-size: 1.4rem;
+}
+.main-account-detail .account-detail-bottom .account-detail-bottom-nav button:last-child {
+  margin-left: 0.4rem;
+}
+.main-account-detail .account-detail-bottom .account-detail-bottom-info {
+  background-color: rgba(24, 24, 27, 0.5);
+  margin-top: 2rem;
+  border-radius: 10px;
+  padding: 2rem;
+}
+.main-account-detail .account-detail-bottom .account-detail-bottom-info .account-detail-bottom-info-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between
+}
+.main-account-detail .account-detail-bottom .account-detail-bottom-info .account-detail-bottom-info-title button {
+  padding: 1rem 1.5rem;
+  border: 1px solid rgba(255, 215, 0, 0.3);
+  border-radius: 8px;
+  color: #FFD700;
+  background-color: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+.main-account-detail .account-detail-bottom .account-detail-bottom-info .account-detail-bottom-info-title .account-detail-bottom-info-title1 {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.main-account-detail .account-detail-bottom .account-detail-bottom-info .account-detail-bottom-info-title .account-detail-bottom-info-title1 h2 {
+  font-size: 1.6rem;
+  color: #fff;
+}
+.main-account-detail .account-detail-bottom .account-detail-bottom-info .account-detail-bottom-info-title .account-detail-bottom-info-title1 p {
+  font-size: 1.4rem;
+  color: #A0A0A0;
+}
+.main-account-detail .account-detail-bottom .account-detail-bottom-info .account-detail-bottom-info-wrapper {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+
+}
+.main-account-detail .account-detail-bottom .account-detail-bottom-info .account-detail-bottom-info-wrapper .account-detail-bottom-info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  margin-top: 1.5rem;
+}
+.main-account-detail .account-detail-bottom .account-detail-bottom-info .account-detail-bottom-info-wrapper .account-detail-bottom-info-item .info-label {
+  font-size: 1.4rem;
+  color: #99A1AF;
+}
+.main-account-detail .account-detail-bottom .account-detail-bottom-info .account-detail-bottom-info-wrapper .account-detail-bottom-info-item input {
+  width: 58rem;
+  height: 3.6rem; 
+  border-radius: 8px;
+  background-color: rgba(24, 24, 27, 0.5);
+  border: 1px solid #3F3F46;
+  color: #fff;
+}
+.main-account-detail .account-detail-bottom .account-detail-bottom-info .account-detail-bottom-info-about {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  margin-top: 2.5rem;
+}
+.main-account-detail .account-detail-bottom .account-detail-bottom-info .account-detail-bottom-info-about .info-label {
+  font-size: 1.4rem;
+  color: #99A1AF;
+}
+.main-account-detail .account-detail-bottom .account-detail-bottom-info .account-detail-bottom-info-about .info-value {
+  width: 100%;
+  height: 10rem;
+  background-color: rgba(24, 24, 27, 0.5);
+  border: 1px solid #3F3F46;
+  color: #fff;
+  resize: none;
+}
+
+/* Tab Navigation */
+.account-detail-bottom-nav .nav-tab {
+  position: relative;
+  opacity: 0.6;
+  transition: all 0.3s ease;
+}
+
+.account-detail-bottom-nav .nav-tab.active {
+  opacity: 1;
+  color: #FFD700;
+}
+
+/* Tab Content */
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Edit Mode Styles */
+.account-detail-bottom-info .info-value:not(:disabled) {
+  cursor: text;
+  background-color: rgba(24, 24, 27, 0.8);
+}
+
+.account-detail-bottom-info .info-value:not(:disabled):focus {
+  outline: none;
+  border-color: #FFD700;
+  box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.1);
+}
+.account-detail-bottom-security-container {
+  margin-top: 2rem;
+  padding: 2rem;
+  background-color: #0C0C0E;
+  border-radius: 20px;
+  width: 42%;
+  margin-left: 42rem;
+}
+.account-detail-bottom-security .account-detail-bottom-security-container .account-detail-bottom-security-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-left: 0.5rem;
+  margin-top: 2rem;
+}
+.account-detail-bottom-security .account-detail-bottom-security-container .account-detail-bottom-security-title01 {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.account-detail-bottom-security .account-detail-bottom-security-container .account-detail-bottom-security-title .account-detail-bottom-security-title01 h2 {
+  color: #fff;
+  font-size: 2rem;
+}
+.account-detail-bottom-security .account-detail-bottom-security-container .account-detail-bottom-security-title .account-detail-bottom-security-title01 p {
+  color: #A0A0A0;
+  font-size: 1.6rem;
+}
+.account-detail-bottom-security-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 2rem;
+  align-items: center;
+}
+.account-detail-bottom-security-container .account-detail-bottom-security-wrapper .account-detail-bottom-security-item {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.5rem;
+}
+.account-detail-bottom-security-container .account-detail-bottom-security-wrapper .account-detail-bottom-security-item span {
+  color: #99A1AF;
+  font-size: 1.4rem;
+}
+
+/* Password Input Wrapper */
+.password-input-wrapper {
+  position: relative;
+  width: 58rem;
+  display: flex;
+  align-items: center;
+}
+
+.password-input-wrapper input {
+  width: 100%;
+  height: 3.6rem;
+  padding-right: 4rem;
+  border: 1px solid #3F3F46;
+  background-color: rgba(24,24,27,0.5);
+  color: #fff;
+  font-size: 1.4rem;
+  padding-left: 1rem;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.password-input-wrapper input:focus {
+  outline: none;
+  border-color: #FFD700;
+  background-color: rgba(24,24,27,0.8);
+}
+
+.password-input-wrapper .toggle-password {
+  position: absolute;
+  right: 1.2rem;
+  font-size: 2rem;
+  color: #99A1AF;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  user-select: none;
+}
+
+.password-input-wrapper .toggle-password:hover {
+  color: #FFD700;
+}
+
+.password-input-wrapper .toggle-password:active {
+  transform: scale(0.95);
+}
+
+/* Legacy support for non-wrapper inputs */
+.account-detail-bottom-security-container .account-detail-bottom-security-wrapper .account-detail-bottom-security-item input:not(.password-input-wrapper input){
+  width: 58rem;
+  height: 3.6rem;
+  border: 1px solid #3F3F46;
+  background-color: rgba(24,24,27,0.5);
+  color: #fff;
+}
+.account-detail-bottom-security-container .account-detail-bottom-security-wrapper .account-detail-bottom-security-item input:not(.password-input-wrapper input):focus {
+  outline: none;
+  border-color: #FFD700;
+}
+.account-detail-bottom-security .account-detail-bottom-security-container .account-detail-bottom-security-button {
+  padding: 1rem 1.5rem;
+  border: 1px solid rgba(255, 215, 0, 0.3);
+  border-radius: 8px;
+  color: #FFD700;
+  background-color: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-left: 43.5rem;
+  margin-top: 4.5rem;
+  cursor: pointer;
+  font-size: 1.4rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.account-detail-bottom-security .account-detail-bottom-security-container .account-detail-bottom-security-button:hover {
+  background-color: #FFD700;
+  color: #000;
+  border-color: #FFD700;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
+}
+
+.account-detail-bottom-security .account-detail-bottom-security-container .account-detail-bottom-security-button:active {
+  transform: translateY(0);
+}

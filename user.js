@@ -744,6 +744,7 @@ function updateUserUI() {
   const userInfo = document.getElementById("user-info");
   const usernameDisplay = document.getElementById("username-display");
   const cartLink = document.getElementById("cart-link");
+  const accountLink = document.getElementById("account-link");
 
   if (!window.router) {
     console.warn("Router chưa sẵn, bỏ qua updateUserUI()");
@@ -758,12 +759,14 @@ function updateUserUI() {
     signupLink.style.display = "none";
     logoutLink.style.display = "inline-block";
     cartLink.style.display = "inline-block";
+    if (accountLink) accountLink.style.display = "inline-block";
   } else {
     // Chưa đăng nhập
     userInfo.style.display = "none";
     loginLink.style.display = "inline-block";
     signupLink.style.display = "inline-block";
     logoutLink.style.display = "none";
+    if (accountLink) accountLink.style.display = "none";
   }
 }
 
@@ -907,12 +910,32 @@ function checkPendingBuyNow() {
 //Hàm
 // === 1 DOMCONTENTLOADED DUY NHẤT — chèn ở cuối file, xóa 3 listener cũ ===
 document.addEventListener("DOMContentLoaded", () => {
-  // 1) Khởi tạo router SPA trước (bắt buộc)
+  // 1.1) Xử lý hash trong URL TRƯỚC KHI khởi tạo - để tránh flash
+  const hash = window.location.hash.replace('#', '') || 'home';
+  
+  if (hash !== 'home') {
+    // Ẩn view home và hiển thị view được chọn NGAY LẬP TỨC
+    const homeView = document.getElementById('view-home');
+    const targetView = document.getElementById('view-' + hash);
+    if (homeView && targetView) {
+      homeView.classList.remove('active');
+      targetView.classList.add('active');
+    }
+  } else {
+    // Đảm bảo view-home có class active khi refresh homepage
+    const homeView = document.getElementById('view-home');
+    if (homeView && !homeView.classList.contains('active')) {
+      homeView.classList.add('active');
+    }
+  }
+  
+  // 1.2) Khởi tạo router SPA sau
   window.router = new SPARouter();
   window.spaRouter = window.router;
+  
   // 2) Khởi tạo các module liên quan tới giỏ hàng / đơn hàng
-  // renderCart();
-  // renderCheckout();
+  renderCart();
+  renderCheckout();
 
   const backBtn = document.getElementById("back-to-shop");
   if (backBtn) {
@@ -1013,6 +1036,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // 6) Cuộn lên đầu an toàn 1 lần
   requestAnimationFrame(() => window.scrollTo(0, 0));
+  
+  // 7) Lắng nghe sự thay đổi localStorage từ tab/page khác
+  window.addEventListener("storage", (e) => {
+    if (e.key === "loggedInUser") {
+      updateUserUI();
+    }
+  });
 
   console.log("✅ App initialized (single DOMContentLoaded).");
 });

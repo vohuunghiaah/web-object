@@ -223,25 +223,76 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
-    // 3. Tạo các nút số trang mới
-    for (let i = 1; i <= totalPages; i++) {
+    // 3. Tạo các nút số trang mới với Ellipsis
+    const maxPagesToShow = 5; // Số trang hiển thị tối đa
+    const pages = [];
+
+    if (totalPages <= maxPagesToShow + 2) {
+      // Nếu tổng số trang ít, hiển thị tất cả
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      // Luôn hiển thị trang đầu
+      pages.push(1);
+
+      // Tính toán các trang ở giữa
+      let startPage = Math.max(2, currentPage - 1);
+      let endPage = Math.min(totalPages - 1, currentPage + 1);
+
+      // Điều chỉnh nếu currentPage ở gần đầu hoặc cuối
+      if (currentPage <= 3) {
+        endPage = Math.min(4, totalPages - 1);
+      } else if (currentPage >= totalPages - 2) {
+        startPage = Math.max(totalPages - 3, 2);
+      }
+
+      // Thêm ellipsis đầu nếu cần
+      if (startPage > 2) {
+        pages.push("...");
+      }
+
+      // Thêm các trang ở giữa
+      for (let i = startPage; i <= endPage; i++) {
+        pages.push(i);
+      }
+
+      // Thêm ellipsis cuối nếu cần
+      if (endPage < totalPages - 1) {
+        pages.push("...");
+      }
+
+      // Luôn hiển thị trang cuối
+      pages.push(totalPages);
+    }
+
+    // Render các nút trang
+    pages.forEach((page) => {
       const pageLinkWrapper = document.createElement("div");
       pageLinkWrapper.className =
         "products__pagination__cover__links__link__link";
-      pageLinkWrapper.style.cursor = "pointer";
 
-      if (i === currentPage) pageLinkWrapper.classList.add("active");
+      if (page === "...") {
+        // Tạo ellipsis (không click được)
+        pageLinkWrapper.innerHTML = `<span>...</span>`;
+        pageLinkWrapper.style.cursor = "default";
+        pageLinkWrapper.classList.add("ellipsis");
+      } else {
+        // Tạo nút số trang bình thường
+        pageLinkWrapper.style.cursor = "pointer";
+        if (page === currentPage) pageLinkWrapper.classList.add("active");
 
-      pageLinkWrapper.innerHTML = `<span>${i}</span>`;
-      pageLinkWrapper.addEventListener("click", () => {
-        currentPage = i;
-        if (typeof filterProductsFromActiveCategories === "function")
-          filterProductsFromActiveCategories();
-        scrollToTop();
-      });
+        pageLinkWrapper.innerHTML = `<span>${page}</span>`;
+        pageLinkWrapper.addEventListener("click", () => {
+          currentPage = page;
+          if (typeof filterProductsFromActiveCategories === "function")
+            filterProductsFromActiveCategories();
+          scrollToTop();
+        });
+      }
 
       paginationLinksContainer.appendChild(pageLinkWrapper);
-    }
+    });
 
     // 4. Cập nhật trạng thái cho các nút mũi tên (ẩn/hiện hoặc vô hiệu hóa)
     if (prevButton) {
@@ -382,6 +433,24 @@ document.addEventListener("DOMContentLoaded", function () {
       filterProductsFromActiveCategories();
     });
   });
+  
+  // XỬ LÝ URL PARAMETER - Kiểm tra category từ URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const categoryFromURL = urlParams.get('category');
+  
+  if (categoryFromURL) {
+    // Nếu có category trong URL, tự động chọn category đó
+    categoryLinks.forEach(link => {
+      const linkCategory = link.getAttribute('data-category');
+      if (linkCategory === categoryFromURL) {
+        // Bỏ active khỏi "all"
+        categoryLinks.forEach(l => l.classList.remove('active'));
+        // Thêm active vào category được chọn
+        link.classList.add('active');
+      }
+    });
+  }
+  
   filterProductsFromActiveCategories();
   // Sự kiện cho các checkbox Mức giá
   priceCheckboxes.forEach((checkbox) => {
