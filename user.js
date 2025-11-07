@@ -246,17 +246,6 @@ function showAddToCartSuccess(name) {
 // ================= Thêm sản phẩm vào giỏ =================
 // Thay vì kiểm tra theo name, nên kiểm tra theo ID hoặc làm mềm điều kiện
 function addToCart(name, price, image, quantity = 1) {
-  const user = JSON.parse(localStorage.getItem("loggedInUser"));
-  if (!user) {
-    const pendingProduct = { name, price, image, quantity };
-    localStorage.setItem("pendingCartItem", JSON.stringify(pendingProduct));
-    alert("Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng!");
-    if (window.router && typeof window.router.openModal === "function") {
-      router.openModal("login-modal");
-    }
-    return;
-  }
-
   // ✅ CẢI TIẾN: Kiểm tra tồn kho với điều kiện linh hoạt hơn
   const products = JSON.parse(localStorage.getItem("products")) || [];
   const productInStock = products.find(
@@ -456,6 +445,16 @@ document.querySelectorAll('input[name="pay"]').forEach(radio => {
 // ================= Thanh toán =================
 // === SỬA LỖI 2: THAY THẾ TOÀN BỘ HÀM NÀY ===
 function checkoutOrder() {
+  // Kiểm tra đăng nhập trước khi lấy thông tin giao hàng
+  const user = JSON.parse(localStorage.getItem("loggedInUser"));
+  if (!user) {
+    alert("Vui lòng đăng nhập để tiếp tục thanh toán!");
+    if (window.router && typeof window.router.openModal === "function") {
+      router.openModal("login-modal");
+    }
+    return;
+  }
+
   if (cart.length === 0) {
     alert("Giỏ hàng trống!");
     return;
@@ -555,7 +554,11 @@ function checkoutOrder() {
   billPay.innerText = payMethod.toUpperCase();
   // SỬA: Hiển thị ngày tháng đúng
   dateEl.innerText = new Date(order.date).toLocaleString('vi-VN'); 
-  billAddress.innerText = `${name}, ${address}, ${ward}, ${district}, ${city}, SĐT: ${phone}`;
+  billAddress.innerHTML = `
+    <p><strong>Người đặt:</strong> ${name}</p>
+    <p><strong>Địa chỉ:</strong> ${address}, ${ward}, ${district}, ${city}</p>
+    <p><strong>SĐT:</strong> ${phone}</p>
+  `;
 
   //  === Xóa giỏ hàng ===
   cart = [];
@@ -773,8 +776,14 @@ function updateUserUI() {
 // Cho phép mở giỏ hàng nếu đã login
 function allowCartAccess(e) {
   e.preventDefault();
-  if (window.router && typeof window.router.openModal === "function") {
-    window.router.openModal("cart-modal");
+  // Bỏ kiểm tra đăng nhập
+  const modalContainer = document.getElementById("modal-container");
+  const cartModal = document.getElementById("cart-modal"); 
+  
+  if (modalContainer && cartModal) {
+    modalContainer.classList.add("active");
+    cartModal.classList.add("active");
+    document.body.style.overflow = "hidden";
   }
 }
 
@@ -968,37 +977,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Gắn handler cho cartLink an toàn (1 lần)
     if (cartLink) {
-      safeReplaceHandler(cartLink, "click", (e) => {
-        const user = JSON.parse(localStorage.getItem("loggedInUser"));
-        if (!user) {
-          e.preventDefault();
-          alert("Vui lòng đăng nhập để xem giỏ hàng!");
-
-          const modalContainer = document.getElementById("modal-container");
-          const loginModal = document.getElementById("login-modal");
-          if (modalContainer && loginModal) {
-            modalContainer.classList.add("active");
-            loginModal.classList.add("active");
-            document.body.style.overflow = "hidden";
-          }
-        } else {
-          // Nếu đã login, mở modal giỏ hàng qua router (nếu có)
-          e.preventDefault();
-          if (window.router && typeof window.router.openModal === "function") {
-            window.router.openModal("cart-modal");
-          } else {
-            // fallback: show modal directly
-            const modalContainer = document.getElementById("modal-container");
-            const cartModal = document.getElementById("cart-modal");
-            if (modalContainer && cartModal) {
-              modalContainer.classList.add("active");
-              cartModal.classList.add("active");
-              document.body.style.overflow = "hidden";
-            }
-          }
-        }
-      });
+  safeReplaceHandler(cartLink, "click", (e) => {
+    e.preventDefault();
+    // Bỏ phần kiểm tra user đăng nhập 
+    if (window.router && typeof window.router.openModal === "function") {
+      window.router.openModal("cart-modal"); 
+    } else {
+      // fallback: show modal directly
+      const modalContainer = document.getElementById("modal-container");
+      const cartModal = document.getElementById("cart-modal");
+      if (modalContainer && cartModal) {
+        modalContainer.classList.add("active");
+        cartModal.classList.add("active");
+        document.body.style.overflow = "hidden";
+      }
     }
+  });
+}
     // Gắn click vào userInfo để mở profile modal (an toàn)
     if (userInfo) {
       safeReplaceHandler(userInfo, "click", (e) => {

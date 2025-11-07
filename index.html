@@ -35,7 +35,6 @@
           <span id="user-info" style="display: none; color: white; font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;">👋 Xin chào, <strong id="username-display"></strong></span>
           <a href="#" data-action="open-modal" data-target="login-modal" id="login-link">👤 Đăng nhập</a>
           <a href="#" data-action="open-modal" data-target="signup-modal" id="signup-link">➕ Đăng ký</a>
-          <a href="account-detail.html" id="account-link" style="display: none;">👤 Tài khoản</a>
           <a href="#" id="cart-link" style="display: none;">🛒 Giỏ hàng</a>
           <a href="#" id="logout-link" >🚪 Đăng xuất</a>
         </nav>
@@ -751,17 +750,7 @@
       <p><strong>Tổng tiền:</strong> <span class="bill-total">0 đ</span></p>
       <p><strong>Phương thức:</strong> <span class="bill-pay">COD</span></p>
       <p><strong>Ngày đặt hàng:</strong> <span id="date"></span></p>
-      <p><strong>Địa chỉ giao hàng:</strong> <span class="bill-address"></span></p>
-    </div>
-    <div class="history">
-      <h3>Lịch sử mua hàng gần đây</h3>
-      <table>
-        <thead><tr><th>Sản phẩm</th><th>Giá</th><th>Trạng thái</th></tr></thead>
-        <tbody id="order-history">
-          <!-- <tr><td>iPhone 16 Pro</td><td>35.990.000 đ</td><td>Đã giao</td></tr>
-          <tr><td>Ốp lưng trong suốt</td><td>350.000 đ</td><td>Đang giao</td></tr> -->
-        </tbody>
-      </table>
+      <div class="bill-address"></div>
     </div>
     <a class="btn-nav" onclick="showPage('cart-page')">← Quay lại giỏ hàng</a>
   </div>
