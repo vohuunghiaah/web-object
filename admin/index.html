@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Admin Products Page" />
+    <title>Admin</title>
+    <link rel="stylesheet" href="../assets/css/admin.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/3.5.0/remixicon.css"
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+    <script>
+      //Lấy người dùng hiện tại từ localStorage
+      const currentAdmin = JSON.parse(localStorage.getItem('currentAdmin'));
+
+      if (!currentAdmin || currentAdmin.role !== 'admin') {
+        alert('Bạn không có quyền truy cập trang này. Vui lòng đăng nhập với tư cách admin.');
+        window.location.href = 'login.html';
+      }
+    </script>
+  </head>
+  <body>
+    <div id="admin-wrapper">
+      <header class="main-header">
+        <div class="header-left">
+          <span class="brand-title">Admin</span>
+          <button class="close-btn" id="close-btn">&times;</button>
+        </div>
+
+        <div class="header-divider"></div>
+
+        <div class="header-right">
+          <div class="actions">
+            <div class="header_box">
+             <button id="toggle-sidebar-btn" class="btn btn-icon">
+              <i class="fas fa-bars"></i>
+            </button>
+              <h2>ADMIN PAGE</h2>
+                <button id="logout-btn" class="btn btn-logout">
+                    Đăng xuất <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+          </div> </header>
+      <div class="admin-main">
+        <aside id="sidebar" class="sidebar">
+          <ul>
+            <li>
+              <button onclick="navigateSPA('dashboard')" id="menu-dashboard">
+                <i class="fas fa-home"></i> Dashboard
+              </button>
+            </li>
+            <li>
+              <button onclick="navigateSPA('orders')" id="menu-orders">
+                <i class="fas fa-shopping-cart"></i> Customers and Orders
+              </button>
+            </li>
+            <li>
+              <button
+                onclick="navigateSPA('products')"
+                id="menu-products"  
+              >
+                <i class="fas fa-box"></i> Products
+              </button>
+            </li>
+            <li>
+              <button onclick="navigateSPA('imports')" id="menu-imports">
+                <i class="fas fa-file-import"></i> Import management
+              </button>
+            </li>
+            <li>
+              <button onclick="navigateSPA('reports')" id="menu-reports">
+                <i class="fas fa-chart-bar"></i> Reports
+              </button>
+            </li>
+          </ul>
+        </aside>
+        <section id="content" class="admin-content">
+          
+          <div id="dashboard" class="page">
+            <p>Tính năng đang phát triển...</p>
+          </div>
+
+          <div id="products" class="page" style="display: none"></div>
+          
+          <div id="orders" class="page" style="display: none">
+            <div class="linear_box">
+              <div class="items_linear"> <button class="button_linear" data-mode="users">QL Người dùng</button>
+                <button class="button_linear" data-mode="orders">QL Đơn hàng</button>
+                <button class="button_linear" data-mode="products">QL Hàng hóa</button>
+              </div>
+            </div>
+
+            <div class="main_box">
+              <div class="scroll_bar" id="sidebar1">
+                  <div style="margin-top: 20px; text-align:center; opacity:0.8;">
+              </div>
+              </div>
+
+              <div class="content_box" id="content1">
+                <h2>Chào mừng đến trang quản trị!</h2>
+                <p style="height:1200px; color:white">* Hãy chọn một chức năng để QL *</p>
+              </div>
+            </div>
+
+            <div class="popup_overlay" id="popup">
+              <div class="popup_form" id="popupForm">
+                <h3 id="popupTitle">Thêm dữ liệu</h3>
+                <div id="popupFields"> </div>
+                <div style="display:flex;justify-content:space-between;">
+                  <button id="saveBtn">Lưu</button>
+                  <button class="cancel" id="cancelBtn1">Hủy</button>
+                </div>
+              </div>
+            </div>
+            </div>
+
+          <div id="imports" class="page" style="display: none"></div>
+          
+          <div id="invoices" class="page" style="display: none">
+            <p>Tính năng đang phát triển...</p>
+          </div>
+
+          <div id="finance" class="page" style="display: none">
+            <p>Tính năng đang phát triển...</p>
+          </div>
+
+          <div id="discounts" class="page" style="display: none">
+            <p>Tính năng đang phát triển...</p>
+          </div>
+
+          <div id="reports" class="page" style="display: none">
+            <p>Tính năng đang phát triển...</p>
+          </div>
+
+          <div id="settings" class="page" style="display: none">
+            <p>Tính năng đang phát triển...</p>
+          </div>
+
+        </section> </div> </div> <footer>
+      <div class="footer__top">
+        <div class="footer__top-slogan">
+          <i class="ri-truck-line"></i>
+          <div class="footer__top-slogan-text">
+            <span class="footer__top-slogan-text-01">Miễn phí vận chuyển</span>
+            <span class="footer__top-slogan-text-02"
+              >Cho đơn hàng trên 100.000đ</span
+            >
+          </div>
+        </div>
+        <div class="footer__top-slogan">
+          <i class="ri-shield-check-line"></i>
+          <div class="footer__top-slogan-text">
+            <span class="footer__top-slogan-text-01">Bảo hành 12 tháng</span>
+            <span class="footer__top-slogan-text-02">Cho tất cả sản phẩm</span>
+          </div>
+        </div>
+        <div class="footer__top-slogan">
+          <i class="ri-wallet-line"></i>
+          <div class="footer__top-slogan-text">
+            <span class="footer__top-slogan-text-01">Thanh toán đa dạng</span>
+            <span class="footer__top-slogan-text-02">COD, ATM, Visa...</span>
+          </div>
+        </div>
+        <div class="footer__top-slogan">
+          <i class="ri-customer-service-line"></i>
+          <div class="footer__top-slogan-text">
+            <span class="footer__top-slogan-text-01">Hỗ trợ 24/7</span>
+            <span class="footer__top-slogan-text-02">Cho tất cả sản phẩm</span>
+          </div>
+        </div>
+      </div>
+      <div class="footer__bottom">
+        <div class="footer__bottom-box01">
+          <h1>XTray</h1>
+          <p>
+            Xtray là địa chỉ uy tín hàng đầu chuyên cung cấp phụ kiện <br />
+            kiện tử chính hãng với chất lượng tốt nhất. Chúng tôi cam kết <br />
+            hàng đến trải nghiệm mua sắm tuyệt vời nhất cho khách hàng.
+          </p>
+
+          <h2>Kết nối với chúng tôi</h2>
+          <div class="footer__bottom-social">
+            <a href="#"><i class="ri-facebook-fill"></i></a>
+            <a href="#"><i class="ri-github-line"></i></a>
+            <a href="#"><i class="ri-twitter-x-line"></i></a>
+          </div>
+        </div>
+        <div class="footer__bottom-box02">
+          <a href="#">Trang chủ</a>
+          <a href="#">Giới thiệu</a>
+          <a href="#">Sản phẩm</a>
+          <div class="footer__bottom-box02-contact">
+            <a class="footer__bottom-box02-contact-a-special" href="#"
+              >Liên hệ</a
+            >
+            <div class="footer__bottom-box02-contact-item">
+              <i class="ri-phone-line"></i><span>1900 1234</span>
+            </div>
+            <div class="footer__bottom-box02-contact-item">
+              <i class="ri-mail-line"></i><span>xtray@gmail.com</span>
+            </div>
+            <div class="footer__bottom-box02-contact-item">
+              <i class="ri-map-pin-line"></i
+              ><span>123 Đường ABC, Quận XYZ, TP. HCM</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+    <script type="module" src="../database.js"></script>
+    <script src="../js/admin.js" type="module"></script>
+    <script>
+      if(!window.location.pathname.startsWith("/admin")){
+        window.location.href = "index.html";
+      }
+    </script>
+  </body>
+</html>

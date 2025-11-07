@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>User Page</title>
+    <!-- Preload hero image để tránh flash -->
+    <link rel="preload" href="./assets/img/hero-main.jpg" as="image" />
+    <link rel="stylesheet" href="user.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.css"
+      integrity="sha512-kJlvECunwXftkPwyvHbclArO8wszgBGisiLeuDFwNM8ws+wKIw0sv1os3ClWZOcrEB2eRXULYUsm8OVRGJKwGA=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+  </head>
+  <body>
+ <!-- HEADER -->
+  <header>
+    <div class="header__top">
+      <div class="logo">Xtray</div>
+        <div class="search-bar">
+          <input
+            id="search-input"
+            class="search-bar__input"
+            type="text"
+            placeholder="Nhập phụ kiện cần tìm..."
+          />
+          <button id="search-btn" class="search-bar__btn">
+            <i class="ri-search-line"></i>
+          </button>
+      </div>
+        <nav id="main-nav">
+          <span id="user-info" style="display: none; color: white; font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;">👋 Xin chào, <strong id="username-display"></strong></span>
+          <a href="#" data-action="open-modal" data-target="login-modal" id="login-link">👤 Đăng nhập</a>
+          <a href="#" data-action="open-modal" data-target="signup-modal" id="signup-link">➕ Đăng ký</a>
+          <a href="#" id="cart-link" style="display: none;">🛒 Giỏ hàng</a>
+          <a href="#" id="logout-link" >🚪 Đăng xuất</a>
+        </nav>
+    </div>
+    <div class="header__bottom">
+        <nav class="header__bottom__nav">
+          <ul>
+            <li><a href="#" data-view="home">Trang chủ</a></li>
+            <li><a href="#" data-view="about">Giới thiệu</a></li>
+            <li>
+            <a href="#" data-view="products"> Sản phẩm <i class="ri-arrow-down-s-line"></i> </a>
+              <nav class="header__bottom__dropdown">
+                <ul>
+                  <li><a href="#" data-view="products" data-category="mouse">Chuột</a></li>
+                  <li><a href="#" data-view="products" data-category="keyboard">Bàn phím</a></li>
+                  <li><a href="#" data-view="products" data-category="headphone">Tai nghe</a></li>
+                  <li><a href="#" data-view="products" data-category="powerbank">Sạc dự phòng</a></li>
+                </ul>
+              </nav>
+            </li>
+            <li><a href="#" data-view="contact">Liên hệ</a></li>
+          </ul>
+        </nav>
+      </div>
+  </header>
+
+    <div id="app-content">
+      <section id="view-home" class="spa-view active">
+        <main class="hero">
+          <div class="hero__wrapper">
+            <h1>Enhance your Tech</h1>
+            <p>
+              Find everything you need for your laptop – premium, durable, and
+              smartly <br />
+              designed accessories.
+            </p>
+            <a href="#" class="hero--btn">Shop now</a>
+          </div>
+        </main>
+        <section class="main-section">
+          <div class="category-feature">
+                 <div class="category-feature-title">
+                   <h3>Danh mục nổi bật</h3>
+                   <p>Khám phá các dòng sản phẩm chất lượng cao được tuyển chọn kỹ lưỡng</p>
+                 </div>
+                 <div class="category-feature-container">
+                     <div class="category-feature-container-overflow">
+                       <div class="category-feature-item category-feature-item1" data-view="products" data-category="mouse">
+                           <div class="category-feature-item-title"> <i class="ri-mouse-line"></i> <h4>Chuột</h4></div>
+                       </div>
+                     </div>
+                     <div class="category-feature-container-overflow">
+                       <div class="category-feature-item category-feature-item2" data-view="products" data-category="keyboard">
+                           <div class="category-feature-item-title"> <i class="ri-keyboard-line"></i> <h4>Bàn phím</h4></div>
+                       </div>
+                     </div>
+                     <div class="category-feature-container-overflow">
+                       <div class="category-feature-item category-feature-item3" data-view="products" data-category="headphone">
+                           <div class="category-feature-item-title"> <i class="ri-headphone-line"></i> <h4>Tai nghe</h4></div>
+                       </div>
+                     </div>
+                     <div class="category-feature-container-overflow">
+                       <div class="category-feature-item category-feature-item4" data-view="products" data-category="powerbank">
+                           <div class="category-feature-item-title"> <i class="ri-power-line"></i> <h4>Sạc dự phòng</h4></div>
+                       </div>
+                     </div>
+                 </div>
+          </div>
+    <section class="product-hottest"> 
+         <div class="product-hot-title">
+              <span><i class="ri-arrow-right-up-long-fill"></i>Sản phẩm hot nhất</span>
+               <h4>Best Sellers</h4>
+               <p>Những sản phẩm được yêu thích và lựa chọn nhiều nhất bởi khách hàng</p>
+         </div>
+               <div class="product-hottest-container">
+                     <a class="product-hottest-item">
+                     <div class="product-hottest-item--img"><img src="./assets/img/Keyboard/keyboard_06.jpg">
+                    <button class="product-hottest-item--img__cart"><i class="ri-shopping-cart-2-line"></i>Thêm vào giỏ</button></div>
+                     <div class="product-hottest-item--describe">
+                       <span class="product-hottest-item--installment">Trả góp 0%</span>
+                       <div class="product-hottest-item--discount"><span class="product-hottest-item--discount1">8.500.000đ</span> <span class="product-hottest-item--discount2"> -40%</span></div>
+                       <span class="product-hottest-item--price">5.100.000đ</span>
+                       <span class="product-hottest-item--priceDiscount">Giảm 3.400.000đ</span>
+                       <span class="product-hottest-item--name">Bàn phím cơ Corsair K95 RGB Platinum</span>
+                     </div>
+                 </a>
+                     <a class="product-hottest-item">
+                     <div class="product-hottest-item--img"><img src="./assets/img/HEADPHONE/headphone_40.jpg">
+                    <button class="product-hottest-item--img__cart"><i class="ri-shopping-cart-2-line"></i>Thêm vào giỏ</button></div>
+                     <div class="product-hottest-item--describe">
+                       <span class="product-hottest-item--installment">Trả góp 0%</span>
+                       <div class="product-hottest-item--discount"><span class="product-hottest-item--discount1">20.000.000đ</span> <span class="product-hottest-item--discount2"> -6%</span></div>
+                       <span class="product-hottest-item--price">18.800.000đ</span>
+                       <span class="product-hottest-item--priceDiscount">Giảm 1.200.000đ</span>
+                       <span class="product-hottest-item--name">Tai nghe gaming Audeze LCD-XC</span>
+                     </div>
+                 </a>
+                     <a class="product-hottest-item">
+                     <div class="product-hottest-item--img"><img src="./assets/img/Mouse/mouse_37.jpg">
+                    <button class="product-hottest-item--img__cart"><i class="ri-shopping-cart-2-line"></i>Thêm vào giỏ</button></div>
+                     <div class="product-hottest-item--describe">
+                       <span class="product-hottest-item--installment">Trả góp 0%</span>
+                       <div class="product-hottest-item--discount"><span class="product-hottest-item--discount1">1.500.000đ</span> <span class="product-hottest-item--discount2"> -20%</span></div>
+                       <span class="product-hottest-item--price">1.200.000</span>
+                       <span class="product-hottest-item--priceDiscount">Giảm 300.000đ</span>
+                       <span class="product-hottest-item--name">Chuột gaming BenQ Zowie ZA12+-C</span>
+                     </div>
+                 </a>
+                     <a class="product-hottest-item">
+                     <div class="product-hottest-item--img"><img src="./assets/img/Keyboard/keyboard_07.jpg">
+                    <button class="product-hottest-item--img__cart"><i class="ri-shopping-cart-2-line"></i>Thêm vào giỏ</button></div>
+                     <div class="product-hottest-item--describe">
+                       <span class="product-hottest-item--installment">Trả góp 0%</span>
+                       <div class="product-hottest-item--discount"><span class="product-hottest-item--discount1">8.500.000đ</span> <span class="product-hottest-item--discount2"> -18%</span></div>
+                       <span class="product-hottest-item--price">2.200.000đ</span>
+                       <span class="product-hottest-item--priceDiscount">Giảm 1.804.000đ</span>
+                       <span class="product-hottest-item--name">Bàn phím cơ HyperX Alloy Elite 2</span>
+                     </div>
+                 </a>
+               </div>
+              <button class="product-hottest--btn" data-view="products">Xem tất cả sản phẩm</button>
+    </section>
+       <section class="why-choose">
+           <div class="why-choose-title">
+               <span>Tại sao chọn Xtray</span>
+               <h5>Những giá trị cốt lõi tạo nên sự khác biệt</h5>
+               <p>Xtray cam kết mang đến trải nghiệm mua sắm trọn vẹn với chất lượng sản phẩm và dịch vụ hàng đầu</p>
+           </div>
+           <div class="why-choose-container">
+               <div class="why-choose-item">
+                  <i class="ri-shield-line"></i>
+                  <p>Bảo hành chính hãng</p>
+                  <span>Tất cả sản phẩm đều được bảo hành chính hãng 12-24 tháng</span>
+               </div>
+               <div class="why-choose-item">
+                  <i class="ri-truck-line"></i>
+                  <p>Giao hàng nhanh</p>
+                  <span>Miễn phí vận chuyển cho đơn hàng trên 500k</span>
+               </div>
+               <div class="why-choose-item">
+                  <i class="ri-customer-service-line"></i>
+                  <p>Hỗ trợ 24/7</p>
+                  <span>Đội ngũ tư vấn nhiệt tình luôn sẵn sàng hỗ trợ bạn mọi lúc</span>
+               </div>
+               <div class="why-choose-item">
+                  <i class="ri-award-line"></i>
+                  <p>Chất lượng đảm bảo</p>
+                  <span>Sản phẩm chính hãng 100%, cam kết hoàn tiền nếu phát hiện hàng giả</span>
+               </div>
+               <div class="why-choose-item">
+                  <i class="ri-flashlight-line"></i>
+                  <p>Công nghệ tiên tiến</p>
+                  <span>Cập nhật liên tục các sản phẩm công nghệ mới nhất trên thị trường</span>
+               </div>
+               <div class="why-choose-item">
+                  <i class="ri-gift-line"></i>
+                  <p>Ưu đãi hấp dẫn</p>
+                  <span>Chương trình khuyến mãi và tích điểm đổi quà cho khách hàng thân thiết</span>
+               </div>
+              
+           </div>
+       </section>
+      </section>
+      </section>
+      </section>
+
+      <section id="view-about" class="spa-view">
+        <div class="content-box about-page"> 
+          <div class="about-top">
+             <div class="about-top-container">
+                <span>Về chúng tôi</span>
+                <h4>Câu chuyện về Xtray</h4>
+                <p>Hành trình 6 năm xây dựng thương hiệu phụ kiện điện tử uy tín hàng đầu Việt Nam, mang đến<br>giải pháp công nghệ chất lượng cao cho hơn 50,000 khách hàng trên toàn quốc.</p>
+                <div class="about-top-container-button">
+                  <button class="about-top-container-button-01" data-view="contact">Liên hệ với chúng tôi</button>
+                  <button class="about-top-container-button-02">Xem sản phẩm</button>
+                </div>
+             </div>
+          </div>
+          <div class="about-statist">
+             <div class="about-statist-container">
+               <div class="about-statis-container-wrapper">
+                 <i class="ri-group-line"></i>
+                 <p class="about-statist-container-number">50,000+</p>
+                 <span class="about-statist-container-text">Khách hàng tin tưởng</span>
+               </div>
+               <div class="about-statis-container-wrapper">
+                 <i class="ri-award-line"></i>
+                 <p class="about-statist-container-number">15,000+</p>
+                 <span class="about-statist-container-text">Sản phẩm chất lượng</span>
+               </div>
+               <div class="about-statis-container-wrapper">
+                 <i class="ri-star-line"></i>
+                 <p class="about-statist-container-number">98%</p>
+                 <span class="about-statist-container-text">Tỷ lệ hài lòng</span>
+               </div>
+               <div class="about-statis-container-wrapper">
+                 <i class="ri-global-line"></i>
+                 <p class="about-statist-container-number">200+</p>
+                 <span class="about-statist-container-text">Đối tác thương hiệu</span>
+               </div>
+             </div>
+          </div>
+          <div class="about-story">
+             <div class="about-story-left">
+                <span>Câu chuyện thương hiệu</span>
+                <h4>Từ khởi đầu đến thành công</h4>
+                <p class="about-story-left-p1">Xtray được thành lập vào năm 2018 với mục tiêu trở thành địa chỉ tin cậy hàng <br> đầu cho những ai đam mê công nghệ và phụ kiện điện tử chất lượng cao.</p>
+                <p class="about-story-left-p2">Chúng tôi bắt đầu với một nhóm nhỏ những người đam mê công nghệ, cùng nhau <br> xây dựng một cửa hàng trực tuyến cung cấp các sản phẩm phụ kiện đa dạng và <br> chất lượng. Qua từng năm, Xtray không ngừng phát triển, mở rộng danh mục sản <br> phẩm và nâng cao trải nghiệm mua sắm cho khách hàng.</p>
+                <p class="about-story-left-p3">Ngày nay, Xtray tự hào là một trong những thương hiệu phụ kiện điện tử uy tín <br> nhất tại Việt Nam, với hơn 50,000 khách hàng tin tưởng và hàng ngàn sản phẩm <br> chất lượng cao được bán ra mỗi năm. Chúng tôi cam kết tiếp tục mang đến những <br> giải pháp công nghệ tiên tiến và dịch vụ khách hàng xuất sắc.</p>
+                <div class="about-story-left-award">
+                  <div class="about-story-left-award-item">
+                    <i class="ri-checkbox-circle-line"></i>
+                    <span>Sản phẩm chính hãng 100%</span>
+                  </div>
+                  <div class="about-story-left-award-item">
+                   <i class="ri-checkbox-circle-line"></i>
+                    <span>Bảo hành uy tín</span>
+                  </div>
+                  <div class="about-story-left-award-item">
+                    <i class="ri-checkbox-circle-line"></i>
+                    <span>Tư vấn chuyên nghiệp</span>
+                </div>
+             </div>
+          </div>
+           <div class="about-story-right">
+                 <img src="./assets/img/AboutUS-Story.jpg" alt="Câu chuyện thương hiệu">
+             </div>
+    </div>
+      <div class="about-value">
+        <div class="about-value-top">
+            <span>Giá trị cốt lõi</span>
+            <h4>Những giá trị định hướng Xtray</h4>
+            <p>Chúng tôi xây dựng mọi hoạt động dựa trên những giá trị cốt lõi vững chắc</p>
+        </div>
+        <div class="about-value-bottom">
+          <div class="about-value-bottom-item">
+            <i class="ri-shield-line"></i>
+            <h4>Chất lượng đảm bảo</h4>
+            <p>Cam kết 100% sản phẩm chính hãng,<br>có tem chống hàng giả và giấy tờ đầy<br>đủ từ nhà phân phối</p>
+          </div>
+          <div class="about-value-bottom-item">
+            <i class="ri-service-fill"></i>
+            <h4>Khách hàng là trung tâm</h4>
+            <p>Chúng tôi luôn lắng nghe và thấu hiểu nhu cầu của khách hàng,<br>đem đến những sản phẩm và dịch vụ tốt nhất.</p>
+          </div>
+          <div class="about-value-bottom-item">
+           <i class="ri-flashlight-line"></i>
+            <h4>Đổi mới không ngừng</h4>
+            <p>Chúng tôi cam kết không ngừng cải tiến và đổi mới,<br>đem đến những sản phẩm và dịch vụ tốt nhất cho khách hàng.</p>
+          </div>
+          <div class="about-value-bottom-item">
+            <i class="ri-arrow-right-up-long-line"></i>
+            <h4>Phát triển bền vững</h4>
+            <p>Chúng tôi cam kết 100% sản phẩm chính hãng,<br>có tem chống hàng giả và giấy tờ đầy<br>đủ từ nhà phân phối</p>
+          </div>
+        </div>
+      </div>
+      </section>
+
+      <section id="view-products" class="spa-view">
+        <div class="content-box">
+           <main class="main-product">
+           <div class="title"> 
+              <div class="title__left">
+                <div class="breadcrumb">
+                  <a href="#" data-view="home">Trang chủ</a> <span class="breadcrumb-sep">&gt;</span> 
+                  <a href="#" data-view="products">Sản phẩm</a> <span class="breadcrumb-sep">&gt;</span> 
+                  <span id="breadcrumb-product-name"></span>
+                </div>
+                <h1 class="title__left__name">Tất cả sản phẩm</h1>
+              </div>
+          </div>
+          <section class="products">
+             <div class="products__category">
+                  <div class="products__category__wrapper">
+                       <div class="products__category__wrapper__title"><div class="products__category__wrapper__title__wrapper"><h2>Bộ lọc tìm kiếm</h2> <a href="#" id="reset-filters">Đặt lại</a></div></div>
+                       <div class="products__category__items">
+                           <p>Danh mục</p>
+                           <div class="products__category__items--cover" id="category-filters"> 
+                               <a href="#" class="products__category__items--details" data-category="all">
+                                  <img src="./assets/img/HEADPHONE/headphone__51.png">
+                                  <span>Tất cả</span>
+                                  <button><i class="ri-check-fill"></i></button>
+                               </a>
+                               <a href="#" class="products__category__items--details" data-category="mouse">
+                                 <img src="./assets/img/Mouse/mouse_50.png">
+                                 <span>Chuột</span>
+                                 <button><i class="ri-check-fill"></i></button>
+                               </a>
+                               <a href="#" class="products__category__items--details" data-category="keyboard">
+                                  <img src="./assets/img/Keyboard/keyboard_46.png">
+                                  <span>Bàn phím</span>
+                                  <button><i class="ri-check-fill"></i></button>
+                               </a>
+                               <a href="#" class="products__category__items--details" data-category="headphone">
+                                  <img src="./assets/img/HEADPHONE/Items-headphone.png">
+                                  <span>Tai nghe</span>
+                                  <button><i class="ri-check-fill"></i></button>
+                               </a>
+                               <a href="#" class="products__category__items--details" data-category="powerbank">
+                                  <img src="./assets/img/SACDUPHONG/Items-battery.png">
+                                  <span>Sạc dự phòng</span>
+                                  <button><i class="ri-check-fill"></i></button>
+                               </a>
+                           </div>                  
+                       </div>
+                       <form>
+                         <div class="form__budget"><span>Mức giá</span></div>
+                         <div class="form__budget__checkbox">
+                           <div>
+                             <input type="checkbox" id="all" name="price" value="all" checked>
+                             <label for="all">Tất cả</label>
+                           </div>
+                           <div>
+                             <input type="checkbox" id="under500k" name="price" value="under500k">
+                             <label for="under500k">Dưới 500 nghìn</label>
+                           </div>
+                           <div>
+                             <input type="checkbox" id="500k-1m" name="price" value="500k-1m">
+                             <label for="500k-1m">Từ 500 nghìn - 1 triệu</label>
+                           </div>
+                           <div>
+                             <input type="checkbox" id="1m-2m" name="price" value="1m-2m">
+                             <label for="1m-2m">Từ 1 - 2 triệu</label>
+                           </div> 
+                           <div>
+                             <input type="checkbox" id="2m-3m" name="price" value="2m-3m">
+                             <label for="2m-3m">Từ 2 - 3 triệu</label>
+                           </div>
+                           <div>
+                             <input type="checkbox" id="over3m" name="price" value="over3m">
+                             <label for="over3m">Trên 3 triệu</label>
+                           </div>
+                         </div>
+                       </form>
+                  </div>
+             </div>
+             <template id="product-template">
+                 <a href="#" class="products__list__item product-link" data-view="product-details">
+                      <div class="products__list__item--img"><img src="./assets/img/Keyboard/keyboard_01.jpg">
+                        <button class="products__list__item--img__cart"><i class="ri-shopping-cart-2-line"></i>Thêm vào giỏ</button>
+                      </div>
+                      <div class="products__list__item--describe">
+                        <span class="products__list__item--installment">Trả góp 0%</span>
+                        <div class="products__list__item--discount"><span class="products__list__item--discount1">10.000.000đ</span> <span class="products__list__item--discount2"> -52%</span></div>
+                        <span class="products__list__item--price">4.800.000đ</span>
+                        <span class="products__list__item--priceDiscount">Giảm 5.200.000đ</span>
+                        <span class="products__list__item--name">Bàn phím cơ không dây AULA F75</span>
+                      </div>
+                  </a> 
+             </template>
+              <div class="products__list">
+                  <div class="products__list__header">
+                      <h3>Kết quả tìm thấy:</h3>
+                       <div class="products__list__header__button__cover">
+                        <select name="typesort" id="sort-select">
+                          <option value="default">Mặc định</option> 
+                          <option value="price-asc">Giá thấp đến cao</option>
+                          <option value="price-desc">Giá cao đến thấp</option>
+                        </select>
+                       </div>
+                  </div>
+                  <!-- Container chứa các sản phẩm -->
+                  <div id="product-list-container"></div>
+                  
+                  <!-- Pagination -->
+                  <div id="pagination" class="products__pagination">
+                    <div class="products__pagination__cover">
+                      <div class="products__pagination__cover__arr-cover">
+                        <div class="products__pagination__cover__arr-cover__arrow" id="pagination-prev"><i class="ri-arrow-left-s-line"></i></div>
+                      </div>
+                      <div class="products__pagination__cover__links">
+                        <div class="products__pagination__cover__links__link" id="pagination-links">
+                          <div class="products__pagination__cover__links__link__link"><span>1</span></div>
+                          <div class="products__pagination__cover__links__link__link"><span>2</span></div>
+                          <div class="products__pagination__cover__links__link__link"><span>3</span></div>
+                        </div>
+                      </div>
+                      <div class="products__pagination__cover__arr-cover">
+                        <div class="products__pagination__cover__arr-cover__arrow" id="pagination-next"><i class="ri-arrow-right-s-line"></i></div>
+                      </div>
+                    </div>
+                  </div>
+              </div>
+          </section>
+         </main>
+        </div>
+
+      </section>
+
+      <section id="view-contact" class="spa-view">
+        
+         <section class="contact-section">
+  <h2>Liên hệ với chúng tôi</h2>
+  <p>Hãy để lại thông tin, chúng tôi sẽ phản hồi sớm nhất!</p>
+
+  <div class="contact-container">
+    <!-- Form liên hệ -->
+    <form class="contact-form">
+      <div class="form-group">
+        <label for="name">Họ và tên</label>
+        <input type="text" id="name" placeholder="Nhập họ tên của bạn" required />
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" placeholder="Nhập email của bạn" required />
+      </div>
+
+      <div class="form-group">
+        <label for="message">Nội dung</label>
+        <textarea id="message" rows="5" placeholder="Viết tin nhắn tại đây..." required></textarea>
+      </div>
+
+      <button type="submit" class="btn-send">Gửi liên hệ</button>
+    </form>
+
+    <!-- Bản đồ -->
+    <div class="contact-map">
+      <iframe
+        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3919.480229377548!2d106.70042381533447!3d10.776889992322634!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31752f3a0a0f9d77%3A0xbcb8ff2f7cf3c6b!2zQ2jhu6MgVmnhu4duLCBI4buTbmcgU8ahbiwgSOG7kyBDaMOtIE1pbmggQ2l0eQ!5e0!3m2!1svi!2s!4v1684567890123!5m2!1svi!2s"
+        allowfullscreen=""
+        loading="lazy"
+        referrerpolicy="no-referrer-when-downgrade">
+      </iframe>
+    </div>
+  </div>
+</section>
+
+      </section>
+
+      <!-- View Chi tiết sản phẩm -->
+      <section id="view-product-details" class="spa-view">
+        <main class="main__products-details">
+          <div class="breadcrumb">
+            <a href="#" data-view="home">Trang chủ</a> <span class="breadcrumb-sep">&gt;</span> 
+            <a href="#" data-view="products">Sản phẩm</a> <span class="breadcrumb-sep">&gt;</span> 
+            <span id="breadcrumb-product-name"></span>
+          </div>
+          <section>
+            <div class="products__show"> 
+              <div class="products__show-left">
+                <div class="products__show-left-img">
+                  <img src="./assets/img/HEADPHONE/headphone_02.jpg" alt="Product image" id="product-detail-img">
+                </div>
+              </div>
+              <div class="products__show-right">
+                <h2 id="product-detail-name">Tai nghe không dây Logitech M221</h2>
+                <div class="products__show-right-rate">
+                  <span class="products__show-right-rate-stars">
+                    <i class="ri-star-fill"></i>
+                    <i class="ri-star-fill"></i>
+                    <i class="ri-star-fill"></i>
+                    <i class="ri-star-fill"></i>
+                    <i class="ri-star-half-line"></i>
+                  </span>
+                  <span>(100 đánh giá)</span>
+                  <span>Còn hàng</span>
+                </div>
+                <div class="products__show-right-price">
+                  <span class="products__show-right-price-current" id="product-detail-current-price">850.000đ</span>
+                  <span class="products__show-right-price-old" id="product-detail-old-price">1.200.000đ</span>
+                  <span class="products__show-right-price-sale" id="product-detail-sale">-30%</span> 
+                </div>
+                <div class="products__show-right-descript">
+                  <h3>Mô tả sản phẩm:</h3>
+                  <p id="product-detail-description">Tai nghe không dây Logitech M221 mang đến trải nghiệm âm thanh chất lượng cao với thiết kế tiện lợi và thoải mái. Với công nghệ kết nối không dây Bluetooth, bạn có thể dễ dàng kết nối tai nghe với các thiết bị di động như điện thoại, máy tính bảng và laptop. Tai nghe này cung cấp âm thanh rõ ràng, bass mạnh mẽ và khả năng chống ồn tốt, giúp bạn tận hưởng âm nhạc và cuộc gọi một cách tuyệt vời.</p>
+                  <h3>Tính năng nổi bật</h3>
+                  <ul id="product-detail-features">
+                    <li><i class="ri-check-line"></i>Kết nối không dây Bluetooth tiện lợi</li>
+                    <li><i class="ri-check-line"></i>Âm thanh chất lượng cao với bass mạnh mẽ</li>
+                    <li><i class="ri-check-line"></i>Thiết kế thoải mái và nhẹ nhàng</li>
+                    <li><i class="ri-check-line"></i>Khả năng chống ồn tốt</li>
+                    <li><i class="ri-check-line"></i>Thời lượng pin lâu dài, lên đến 20 giờ sử dụng liên tục</li>
+                  </ul>
+                </div>
+                <div class="products__show-right-buy">
+                  <div class="products__show-right-buy-indesc">
+                    <span>Số lượng: </span>
+                    <span class="products__show-right-buy-button">
+                      <span class="products__show-right-buy-in">-</span>
+                      <input class="products__show-right-buy-input" type="text" value="1" id="product-quantity"/>
+                      <span class="products__show-right-buy-de">+</span>
+                    </span>
+                  </div>
+                  <div class="products__show-right-buy-contain">
+                    <button class="products__show-right-buy-buy">
+                      Mua ngay
+                    </button>
+                    <button class="products__show-right-buy-cart" id="product-add-to-cart">
+                      <i class="ri-shopping-cart-2-line"></i>  Thêm vào giỏ
+                    </button>
+                  </div>
+                </div>         
+              </div>
+            </div>
+          </section>
+        </main>
+      </section>
+
+      
+    </div>
+
+ <!-- MODAL CONTAINER -->
+<div id="modal-container" class="modal-container">
+  <div class="modal-overlay" data-action="close-modal"></div>
+
+  <!-- LOGIN -->
+  <div id="login-modal" class="modal-content">
+    <button class="close-btn" data-action="close-modal">&times;</button>
+
+    <div class="modal-header">
+      <h2>Đăng nhập</h2>
+    </div>
+
+    <form id="login-form" class="auth-form">
+      <div class="form-group">
+        <label for="login-email">
+          <i class="ri-mail-line"></i>
+          Email
+        </label>
+        <input type="email" id="login-email" name="email" required placeholder="Nhập email của bạn" />
+      </div>
+
+      <div class="form-group">
+        <label for="login-password">
+          <i class="ri-lock-line"></i>
+          Mật khẩu
+        </label>
+        <input type="password" id="login-password" name="password" required placeholder="Nhập mật khẩu" />
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary btn-block">Đăng nhập</button>
+      </div>
+
+      <div class="form-footer">
+        <p>Chưa có tài khoản? <a href="#" data-action="switch-to-signup">Đăng ký ngay</a></p>
+        <p class="demo-info">
+          <strong>Tài khoản demo:</strong><br>
+          Email: user@xtray.com | Mật khẩu: user123
+        </p>
+      </div>
+    </form>
+  </div>
+
+    <!-- SIGN UP -->
+
+  <div id="signup-modal" class="modal-content">
+    <button class="close-btn" data-action="close-modal">&times;</button>
+
+    <div class="modal-header">
+      <h2>Đăng ký</h2>
+    </div>
+
+    <form id="signup-form" class="auth-form">
+      <div class="form-group">
+        <label for="signup-name">
+          <i class="ri-user-line"></i>
+          Họ và tên
+        </label>
+        <input type="text" id="signup-name" name="name" required placeholder="Nhập họ và tên của bạn" />
+      </div>
+
+      <div class="form-group">
+        <label for="signup-email">
+          <i class="ri-mail-line"></i>
+          Email
+        </label>
+        <input type="email" id="signup-email" name="email" required placeholder="Nhập email của bạn" />
+      </div>
+
+      <div class="form-group">
+        <label for="signup-password">
+          <i class="ri-lock-line"></i>
+          Mật khẩu
+        </label>
+        <input type="password" id="signup-password" name="password" required placeholder="Tạo mật khẩu" />
+      </div>
+
+      <div class="form-group">
+        <label for="signup-confirm">
+          <i class="ri-lock-password-line"></i>
+          Xác nhận mật khẩu
+        </label>
+        <input type="password" id="signup-confirm" name="confirm_password" required placeholder="Nhập lại mật khẩu" />
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary btn-block">Đăng ký</button>
+      </div>
+
+      <div class="form-footer">
+        <p>Đã có tài khoản? <a href="#" data-action="switch-to-login">Đăng nhập ngay</a></p>
+      </div>
+    </form>
+  </div>
+  <!-- PROFILE -->
+
+  <div id="profile-modal" class="modal-content">
+    <div class="modal-header">
+      <h2>Thông tin cá nhân</h2>
+    </div>
+
+    <form id="profile-form" class="auth-form">
+      <div class="form-group">
+        <label for="profile-name">
+          <i class="ri-user-line"></i>
+          Họ và tên
+        </label>
+        <input type="text" id="profile-name" name="name" required placeholder="Nhập tên của bạn" />
+      </div>
+
+      <div class="form-group">
+        <label for="profile-email">
+          <i class="ri-mail-line"></i>
+          Email (không thể thay đổi)
+        </label>
+        <input type="email" id="profile-email" name="email" readonly />
+      </div>
+
+      <div class="form-group">
+        <label for="profile-password">
+          <i class="ri-lock-line"></i>
+          Mật khẩu mới (tùy chọn)
+        </label>
+        <input type="password" id="profile-password" name="password" placeholder="Nhập mật khẩu mới nếu muốn đổi" />
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary btn-block">Lưu thay đổi</button>
+      </div>
+    </form>
+
+    <div class="form-footer">
+      <button class="btn btn-secondary" data-action="close-modal">Đóng</button>
+    </div>
+  </div>
+
+  <!-- CART -->
+<div id="cart-modal" class="modal-content">
+      <button class="close-btn" data-action="close-modal">&times;</button>
+        <h2>Giỏ hàng</h2>
+        <!-- Giỏ hàng -->
+<section id="cart-page" class="page-section active-page">
+  <div class="cart-container">
+    <div class="cart-items"></div>
+    <p class="cart-empty" style="display:none;">Giỏ hàng trống</p>
+    <a class="btn-nav" onclick="goToCheckout()">Tiếp tục thanh toán →</a>
+    <!-- Nút quay lại -->
+    <button id="back-to-shop">← Quay lại cửa hàng</button>
+  </div>
+</section>
+
+<!-- Thanh toán -->
+<section id="thanhtoan-page" class="page-section">
+  <div class="thanhtoan-container">
+    <h2 class="checkout-title">Thực Hiện Thanh Toán</h2>
+    <div class="checkout-wrapper">
+      <!-- Cột trái -->
+      <div class="checkout-left">
+        <class class="checkout-form">
+          <h3>Thông tin giao hàng</h3>
+          <div class="form-row"><input type="text" placeholder="Họ và tên" required></div>
+          <div class="form-row two-col">
+            <input type="email" placeholder="Email" required>
+            <input type="tel" placeholder="Số điện thoại" required>
+          </div>
+          <div class="form-row"><input type="text" placeholder="Địa chỉ" required></div>
+          <div class="form-row two-col">
+            <input type="text" placeholder="Phường/Xã" required>
+            <input type="text" placeholder="Quận/Huyện" required>
+          </div>
+          <div class="form-row"><input type="text" placeholder="Tỉnh/Thành phố" required></div>
+          <label class="save-info"><input type="checkbox"> Lưu Thông Tin Này</label>
+          <h3>Phương thức thanh toán</h3>
+          <label><input type="radio" name="pay" value="cod" checked> Thanh toán khi nhận hàng</label>
+          <label><input type="radio" name="pay" value="bank"> Thanh toán qua ngân hàng</label>
+          <div id="bank-info" style="display: none; margin-top: 15px;">
+            <h4>Thông tin chuyển khoản</h4>
+            <div class="form-row"><input type="text" placeholder="Tên ngân hàng"></div>
+            <div class="form-row"><input type="text" placeholder="Số tài khoản"></div>
+            <div class="form-row"><input type="text" placeholder="Tên chủ tài khoản"></div>
+          </div>
+          <a class="btn-nav" onclick="checkoutOrder()">Tiếp tục thanh toán →</a>
+          <button id="back-to-shop">← Quay lại giỏ hàng</button>
+        </form>
+      </div>
+      <!-- Cột phải -->
+      <div class="checkout-right">
+        <div class="order-summary">
+          <div class="cart-items-summary"></div>
+          <div class="price-detail">
+            <p>Tạm tính: <span class="subtotal">0 đ</span></p>
+            <p>Phí vận chuyển: <span class="shipping">0 đ</span></p>
+            <p class="total">Tổng cộng: <span class="total">0 đ</span></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- Đơn mua -->
+<section id="donmua-page" class="page-section">
+  <div class="success-container">
+    <div class="success-icon">✔</div>
+    <h2>Bạn đã thanh toán thành công!</h2>
+    <p>Cảm ơn bạn đã mua sắm tại <strong>Xtray</strong> 💙</p>
+    <div class="bill">
+      <h3>Hóa đơn thanh toán</h3>
+      <div class="bill-products"></div>
+      <p><strong>Tổng tiền:</strong> <span class="bill-total">0 đ</span></p>
+      <p><strong>Phương thức:</strong> <span class="bill-pay">COD</span></p>
+      <p><strong>Ngày đặt hàng:</strong> <span id="date"></span></p>
+      <p><strong>Địa chỉ giao hàng:</strong> <span class="bill-address"></span></p>
+    </div>
+    <div class="history">
+      <h3>Lịch sử mua hàng gần đây</h3>
+      <table>
+        <thead><tr><th>Sản phẩm</th><th>Giá</th><th>Trạng thái</th></tr></thead>
+        <tbody id="order-history">
+          <!-- <tr><td>iPhone 16 Pro</td><td>35.990.000 đ</td><td>Đã giao</td></tr>
+          <tr><td>Ốp lưng trong suốt</td><td>350.000 đ</td><td>Đang giao</td></tr> -->
+        </tbody>
+      </table>
+    </div>
+    <a class="btn-nav" onclick="showPage('cart-page')">← Quay lại giỏ hàng</a>
+  </div>
+</section>
+</div>
+
+<!-- END DIV MODAL -->
+</div>
+
+<!-- FOOTER -->
+
+<footer>
+      <div class="footer__top">
+        <div class="footer__top-slogan">
+          <i class="ri-truck-line"></i>
+          <div class="footer__top-slogan-text">
+            <span class="footer__top-slogan-text-01">Miễn phí vận chuyển</span>
+            <span class="footer__top-slogan-text-02"
+              >Cho đơn hàng trên 100.000đ</span
+            >
+          </div>
+        </div>
+        <div class="footer__top-slogan">
+          <i class="ri-shield-check-line"></i>
+          <div class="footer__top-slogan-text">
+            <span class="footer__top-slogan-text-01">Bảo hành 12 tháng</span>
+            <span class="footer__top-slogan-text-02">Cho tất cả sản phẩm</span>
+          </div>
+        </div>
+        <div class="footer__top-slogan">
+          <i class="ri-wallet-line"></i>
+          <div class="footer__top-slogan-text">
+            <span class="footer__top-slogan-text-01">Thanh toán đa dạng</span>
+            <span class="footer__top-slogan-text-02">COD, ATM, Visa...</span>
+          </div>
+        </div>
+        <div class="footer__top-slogan">
+          <i class="ri-customer-service-line"></i>
+          <div class="footer__top-slogan-text">
+            <span class="footer__top-slogan-text-01">Hỗ trợ 24/7</span>
+            <span class="footer__top-slogan-text-02">Cho tất cả sản phẩm</span>
+          </div>
+        </div>
+      </div>
+      <div class="footer__bottom">
+        <div class="footer__bottom-box01">
+          <h1>XTray</h1>
+          <p>
+            Xtray là địa chỉ uy tín hàng đầu chuyên cung cấp phụ kiện <br />
+            kiện tử chính hãng với chất lượng tốt nhất. Chúng tôi cam kết <br />
+            hàng đến trải nghiệm mua sắm tuyệt vời nhất cho khách hàng.
+          </p>
+
+          <h2>Kết nối với chúng tôi</h2>
+          <div class="footer__bottom-social">
+            <a href="https://facebook.com"><i class="ri-facebook-fill"></i></a>
+            <a href="https://github.com"><i class="ri-github-line"></i></a>
+            <a href="https://twitter.com"><i class="ri-twitter-x-line"></i></a>
+          </div>
+        </div>
+        <div class="footer__bottom-box02">
+          <a href="#" data-view="home">Trang chủ</a>
+          <a href="#" data-view="about">Giới thiệu</a>
+          <a href="#" data-view="products">Sản phẩm</a>
+          <div class="footer__bottom-box02-contact">
+            <a class="footer__bottom-box02-contact-a-special" href="#"
+              >Liên hệ</a
+            >
+            <div class="footer__bottom-box02-contact-item">
+              <i class="ri-phone-line"></i><span>1900 1234</span>
+            </div>
+            <div class="footer__bottom-box02-contact-item">
+              <i class="ri-mail-line"></i><span>xtray@gmail.com</span>
+            </div>
+            <div class="footer__bottom-box02-contact-item">
+              <i class="ri-map-pin-line"></i
+              ><span>123 Đường ABC, Quận XYZ, TP. HCM</span>
+            </div>
+          </div>
+        </div>
+      </div>
+</footer>
+    <!-- Popup xác nhận thêm giỏ hàng -->
+    <div id="cart-success" class="cart-success" aria-live="polite" role="status">
+      <i class="ri-check-line"></i>
+      <span>Đã thêm vào giỏ hàng!</span>
+    </div>
+  </body>
+
+  <script src="./mockData.js" type="module"></script>
+  <script src="./database.js" type="module"></script>
+  <script src="./user.js" type="module"></script>
+  <script src="./products.js" type="module"></script>
+
+  <!-- SCRIPT XU LY URL ADMIN VA USER -->
+  <script>
+    if(window.location.pathname.startsWith("/admin")){
+      window.location.href = "admin.html";
+    }
+  </script>
+</html>
