@@ -532,6 +532,7 @@ function checkoutOrder() {
 
   orders.push(order);
   localStorage.setItem("orders", JSON.stringify(orders));
+  alert("Đặt hàng thành công!");
 
   // ====== BƯỚC 3: HIỂN THỊ HÓA ĐƠN ======
   const billProducts = document.querySelector(".bill-products");
@@ -882,7 +883,7 @@ function checkPendingCartItem() {
 }
 
 // Hàm kiểm tra và xử lý "Mua ngay" sau khi đăng nhập
-function checkPendingBuyNow() {sơ
+function checkPendingBuyNow() {
   const pendingBuyNow = JSON.parse(localStorage.getItem("pendingBuyNow"));
 
   if (pendingBuyNow && pendingBuyNow.action === "buyNow") {
@@ -895,10 +896,17 @@ function checkPendingBuyNow() {sơ
     // Xóa pending buy now
     localStorage.removeItem("pendingBuyNow");
 
-    // Chỉ render và chuyển trang thanh toán
-    renderCart();
-    renderCheckout();
-    showPage("thanhtoan-page");
+    // Mở modal giỏ hàng và chuyển đến trang thanh toán
+    if (window.router && typeof window.router.openModal === "function") {
+      window.router.openModal("cart-modal");
+      renderCart();
+      renderCheckout();
+
+      // Chuyển đến trang thanh toán
+      setTimeout(() => {
+        showPage("thanhtoan-page");
+      }, 200);
+    }
   }
 }
 //Hàm
