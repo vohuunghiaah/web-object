@@ -554,7 +554,11 @@ function checkoutOrder() {
   billPay.innerText = payMethod.toUpperCase();
   // SỬA: Hiển thị ngày tháng đúng
   dateEl.innerText = new Date(order.date).toLocaleString('vi-VN'); 
-  billAddress.innerText = `${name}, ${address}, ${ward}, ${district}, ${city}, SĐT: ${phone}`;
+  billAddress.innerHTML = `
+    <p><strong>Người đặt:</strong> ${name}</p>
+    <p><strong>Địa chỉ:</strong> ${address}, ${ward}, ${district}, ${city}</p>
+    <p><strong>SĐT:</strong> ${phone}</p>
+  `;
 
   //  === Xóa giỏ hàng ===
   cart = [];
