@@ -681,13 +681,15 @@
       <button class="close-btn" data-action="close-modal">&times;</button>
         <h2>Giỏ hàng</h2>
         <!-- Giỏ hàng -->
-<section id="cart-page" class="page-section active-page">
+<section id="cart-page" class="page-section">
   <div class="cart-container">
     <div class="cart-items"></div>
     <p class="cart-empty" style="display:none;">Giỏ hàng trống</p>
-    <a class="btn-nav" onclick="goToCheckout()">Tiếp tục thanh toán →</a>
-    <!-- Nút quay lại -->
-    <button id="back-to-shop">← Quay lại cửa hàng</button>
+   <a class="btn-nav" onclick="goToCheckout()">Tiếp tục thanh toán →</a>
+      <div class="cart-navigation-links">
+        <a href="#" id="back-to-shop">← Quay lại cửa hàng</a>
+        <a href="#" id="view-order-history">Xem lịch sử mua hàng</a>
+      </div>
   </div>
 </section>
 
@@ -722,7 +724,7 @@
             <div class="form-row"><input type="text" placeholder="Tên chủ tài khoản"></div>
           </div>
           <a class="btn-nav" onclick="checkoutOrder()">Tiếp tục thanh toán →</a>
-          <button id="back-to-shop">← Quay lại giỏ hàng</button>
+          <a href="#" id="back-to-shop">← Quay lại giỏ hàng</a>
         </form>
       </div>
       <!-- Cột phải -->

@@ -1175,7 +1175,7 @@ header
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%) scale(0.95);
-  background: linear-gradient(135deg, #ffd700, #e53935);
+  background: linear-gradient(135deg, #a8dadc, #457b9d);
   border-radius: 2rem;
   padding: 3.5rem 3rem;
   box-shadow: 0 0 30px rgba(255, 215, 0, 0.3), 0 0 60px rgba(0, 128, 0, 0.3);
@@ -1184,7 +1184,7 @@ header
   visibility: hidden;
   min-width: 38rem;
   max-width: 90%;
-  border: 3px solid #ffe135;
+  border: 3px solid black;
   color: #333;
   transition: opacity 0.3s ease, transform 0.3s ease, box-shadow 0.4s ease;
 }
@@ -1279,7 +1279,9 @@ header
 
 /* 💫 NÚT CHÍNH */
 .btn-primary {
-  background: linear-gradient(135deg, #e53935, #2e7d32);
+  display: block;
+  margin: 0 auto;
+  background: linear-gradient(135deg, #a8dadc, #457b9d);
   color: white;
   border: none;
   padding: 1.1rem;
@@ -2718,22 +2720,36 @@ form input[type="checkbox"]:checked + label {
   background: #d9363e;
 }
 #back-to-shop {
-  display: block;
-  margin: 15px auto 0 auto;
-  padding: 10px 20px;
-  font-size: 16px;
+  font-size: 1.6rem;
+  color: #ffd700;
+  text-decoration: underline;
   cursor: pointer;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  transition: background 0.3s;
+  transition: color 0.3s;
 }
 
 #back-to-shop:hover {
-  background-color: #0056b3;
+  color: #fff;
+}
+.cart-navigation-links {
+  margin-top: 2rem; /* Khoảng cách với nút "Tiếp tục thanh toán" */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2.5rem; /* Khoảng cách giữa 2 link */
 }
 
+/* Link "Xem lịch sử mua hàng" mới thêm (thêm vào) */
+#view-order-history {
+  font-size: 1.6rem;
+  color: #ffd700;
+  text-decoration: underline;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+#view-order-history:hover {
+  color: #fff;
+}
 /* ================= THANH TOÁN ================= */
 .thanhtoan-container {
   max-width: 900px;
@@ -2830,7 +2846,6 @@ form input[type="checkbox"]:checked + label {
   background: #ffea00;
   transform: translateY(-2px);
 }
-
 /* Cột phải (order summary) */
 .cart-items-summary .product-item {
   display: flex;

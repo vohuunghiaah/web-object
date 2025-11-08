@@ -385,6 +385,24 @@ function renderCart() {
       }
     });
   }
+  // ✅ Gắn sự kiện cho nút XEM LỊCH SỬ MUA HÀNG
+  const historyBtn = document.getElementById("view-order-history");
+  if (historyBtn) {
+    safeReplaceHandler(historyBtn, "click", (e) => {
+        e.preventDefault(); // Ngăn link tự nhảy trang
+        
+        // Gọi hàm showPage (đã có sẵn trong file của bạn)
+        if (typeof showPage === "function") {
+            showPage("donmua-page");
+            renderOrderHistory(); // Tải lại lịch sử đơn hàng
+        }
+        
+        // Đóng modal giỏ hàng
+        if (window.router && typeof window.router.closeModal === "function") {
+            window.router.closeModal();
+        }
+    });
+  }
 }
 // ================= Render checkout =================
 function renderCheckout() {
@@ -670,7 +688,38 @@ function setupRegisterForm() {
     );
   });
 }
+// Đặt vào bên trong 'DOMContentLoaded' trong file user.js
 
+// TÙY CHỈNH LẠI THÔNG BÁO LỖI CHO FORM ĐĂNG NHẬP
+const loginEmailInput = document.getElementById("login-email");
+
+if (loginEmailInput) {
+    
+    // 1. Ghi đè thông báo khi trường bị "invalid" (không hợp lệ)
+    loginEmailInput.addEventListener("invalid", function(event) {
+        
+        if (loginEmailInput.validity.valueMissing) {
+            // Lỗi: Bị bỏ trống
+            loginEmailInput.setCustomValidity("Bạn ơi, email không được để trống!");
+        
+        } else if (loginEmailInput.validity.typeMismatch) {
+            // Lỗi: Sai định dạng (như trong hình của bạn)
+            loginEmailInput.setCustomValidity("Email phải có chữ '@' nhé. (ví dụ: user@xtray.com)");
+        
+        } else {
+            // Lỗi khác
+            loginEmailInput.setCustomValidity("Dữ liệu không hợp lệ.");
+        }
+    });
+
+    // 2. Xóa thông báo tùy chỉnh khi người dùng bắt đầu gõ
+    loginEmailInput.addEventListener("input", function(event) {
+        // Khi người dùng bắt đầu sửa lỗi, hãy xóa thông báo
+        loginEmailInput.setCustomValidity("");
+    });
+}
+
+// ... (phần code khác của bạn như setupLoginForm(), setupProfileForm()...)
 // Xử lý đăng nhập
 function setupLoginForm() {
   const form = document.getElementById("login-form");
@@ -683,6 +732,36 @@ function setupLoginForm() {
     const password = form.querySelector("#login-password").value.trim();
     const users = JSON.parse(localStorage.getItem("users")) || [];
 
+    // Đặt vào bên trong 'DOMContentLoaded' trong file user.js
+
+// TÙY CHỈNH LẠI THÔNG BÁO LỖI CHO FORM ĐĂNG NHẬP
+const loginEmailInput = document.getElementById("login-email");
+
+if (loginEmailInput) {
+    
+    // 1. Ghi đè thông báo khi trường bị "invalid" (không hợp lệ)
+    loginEmailInput.addEventListener("invalid", function(event) {
+        
+        if (loginEmailInput.validity.valueMissing) {
+            // Lỗi: Bị bỏ trống
+            loginEmailInput.setCustomValidity("Bạn ơi, email không được để trống!");
+        
+        } else if (loginEmailInput.validity.typeMismatch) {
+            // Lỗi: Sai định dạng (như trong hình của bạn)
+            loginEmailInput.setCustomValidity("Email phải có chữ '@' nhé. (ví dụ: user@xtray.com)");
+        
+        } else {
+            // Lỗi khác
+            loginEmailInput.setCustomValidity("Dữ liệu không hợp lệ.");
+        }
+    });
+
+    // 2. Xóa thông báo tùy chỉnh khi người dùng bắt đầu gõ
+    loginEmailInput.addEventListener("input", function(event) {
+        // Khi người dùng bắt đầu sửa lỗi, hãy xóa thông báo
+        loginEmailInput.setCustomValidity("");
+    });
+}
     // Hỗ trợ tài khoản demo
     if (email === "user@xtray.com" && password === "user123") {
       localStorage.setItem(
@@ -982,6 +1061,12 @@ document.addEventListener("DOMContentLoaded", () => {
     // Bỏ phần kiểm tra user đăng nhập 
     if (window.router && typeof window.router.openModal === "function") {
       window.router.openModal("cart-modal"); 
+
+      // ✨ THÊM DÒNG NÀY:
+      if (typeof showPage === "function") {
+        showPage("cart-page");
+      }
+
     } else {
       // fallback: show modal directly
       const modalContainer = document.getElementById("modal-container");
@@ -990,6 +1075,11 @@ document.addEventListener("DOMContentLoaded", () => {
         modalContainer.classList.add("active");
         cartModal.classList.add("active");
         document.body.style.overflow = "hidden";
+
+        // ✨ THÊM CẢ VÀO ĐÂY:
+        if (typeof showPage === "function") {
+          showPage("cart-page");
+        }
       }
     }
   });
