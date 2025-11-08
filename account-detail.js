@@ -21,6 +21,18 @@ function loadUserInfo() {
   if (signupLink) signupLink.style.display = 'none';
   if (logoutLink) logoutLink.style.display = 'inline-block';
   if (cartLink) cartLink.style.display = 'inline-block';
+}
+
+// Load thông tin user vào account detail page
+function loadAccountDetailInfo() {
+  const user = JSON.parse(localStorage.getItem("loggedInUser"));
+  if (!user) return;
+  
+  // Cập nhật avatar
+  const avatarImg = document.querySelector('.account-detail-top-avatar-img img');
+  if (avatarImg && user.avatar) {
+    avatarImg.src = user.avatar;
+  }
   
   // Cập nhật tên và mô tả
   const headerName = document.querySelector('.account-detail-top-info h1');
@@ -46,19 +58,6 @@ function loadUserInfo() {
   if (phoneInput) phoneInput.value = user.phone || '';
   if (addressInput) addressInput.value = user.address || '';
   if (bioTextarea) bioTextarea.value = user.bio || 'Chưa có thông tin giới thiệu';
-}
-
-// Setup logout functionality
-function setupLogout() {
-  const logoutLink = document.getElementById('logout-link');
-  if (logoutLink) {
-    logoutLink.addEventListener('click', (e) => {
-      e.preventDefault();
-      localStorage.removeItem('loggedInUser');
-      alert('Đã đăng xuất!');
-      window.location.href = 'index.html';
-    });
-  }
 }
 
 // Tab Navigation
@@ -129,7 +128,28 @@ class PersonalInfoManager {
     // Đọc và hiển thị ảnh
     const reader = new FileReader();
     reader.onload = (e) => {
-      this.avatarImg.src = e.target.result;
+      const avatarDataUrl = e.target.result;
+      
+      // Hiển thị ảnh ngay lập tức
+      if (this.avatarImg) {
+        this.avatarImg.src = avatarDataUrl;
+      }
+      
+      // Lưu vào localStorage
+      const user = JSON.parse(localStorage.getItem("loggedInUser"));
+      if (user) {
+        user.avatar = avatarDataUrl;
+        localStorage.setItem("loggedInUser", JSON.stringify(user));
+        
+        // Cập nhật trong database users
+        const users = JSON.parse(localStorage.getItem("users")) || [];
+        const userIndex = users.findIndex(u => u.email === user.email);
+        if (userIndex !== -1) {
+          users[userIndex].avatar = avatarDataUrl;
+          localStorage.setItem("users", JSON.stringify(users));
+        }
+      }
+      
       this.showNotification('✅ Avatar đã được cập nhật!', 'success');
     };
     reader.readAsDataURL(file);
@@ -277,28 +297,51 @@ class PersonalInfoManager {
 // Password Management
 class PasswordManager {
   constructor() {
-    this.toggleIcons = document.querySelectorAll('.toggle-password');
+    const accountDetailSection = document.getElementById('view-account-detail');
+    this.toggleIcons = accountDetailSection?.querySelectorAll('.toggle-password') || [];
     this.changePasswordBtn = document.getElementById('change-password-btn');
     this.currentPasswordInput = document.getElementById('current-password');
     this.newPasswordInput = document.getElementById('new-password');
     this.confirmPasswordInput = document.getElementById('confirm-password');
+    this.isProcessing = false; // Thêm flag để tránh xử lý nhiều lần
     
     this.init();
   }
   
   init() {
-    // Setup toggle password visibility
+    // Setup toggle password visibility - Xóa listener cũ trước
     this.toggleIcons.forEach(icon => {
-      icon.addEventListener('click', () => this.togglePasswordVisibility(icon));
+      // Clone để xóa tất cả listener cũ
+      const newIcon = icon.cloneNode(true);
+      icon.parentNode.replaceChild(newIcon, icon);
+      newIcon.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.togglePasswordVisibility(newIcon);
+      }, { once: false });
     });
     
+    // Cập nhật lại danh sách icons sau khi clone
+    const accountDetailSection = document.getElementById('view-account-detail');
+    this.toggleIcons = accountDetailSection?.querySelectorAll('.toggle-password') || [];
+    
     // Setup change password button
-    this.changePasswordBtn?.addEventListener('click', () => this.handleChangePassword());
+    if (this.changePasswordBtn) {
+      const newBtn = this.changePasswordBtn.cloneNode(true);
+      this.changePasswordBtn.parentNode.replaceChild(newBtn, this.changePasswordBtn);
+      this.changePasswordBtn = newBtn;
+      this.changePasswordBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        this.handleChangePassword();
+      });
+    }
     
     // Enter key to submit
     [this.currentPasswordInput, this.newPasswordInput, this.confirmPasswordInput].forEach(input => {
       input?.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') this.handleChangePassword();
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          this.handleChangePassword();
+        }
       });
     });
   }
@@ -321,35 +364,47 @@ class PasswordManager {
   }
   
   handleChangePassword() {
-    const user = JSON.parse(localStorage.getItem("loggedInUser"));
-    if (!user) return;
+    // Tránh xử lý nhiều lần cùng lúc
+    if (this.isProcessing) return;
+    this.isProcessing = true;
     
-    const currentPassword = this.currentPasswordInput.value.trim();
-    const newPassword = this.newPasswordInput.value.trim();
-    const confirmPassword = this.confirmPasswordInput.value.trim();
+    const user = JSON.parse(localStorage.getItem("loggedInUser"));
+    if (!user) {
+      this.isProcessing = false;
+      return;
+    }
+    
+    const currentPassword = this.currentPasswordInput?.value.trim() || '';
+    const newPassword = this.newPasswordInput?.value.trim() || '';
+    const confirmPassword = this.confirmPasswordInput?.value.trim() || '';
     
     // Validation
     if (!currentPassword || !newPassword || !confirmPassword) {
+      this.isProcessing = false;
       return this.showNotification('❌ Vui lòng điền đầy đủ thông tin!', 'error');
     }
     
     // Check current password
     if (user.password !== currentPassword) {
+      this.isProcessing = false;
       return this.showNotification('❌ Mật khẩu hiện tại không đúng!', 'error');
     }
     
     // Check new password length
     if (newPassword.length < 6) {
+      this.isProcessing = false;
       return this.showNotification('❌ Mật khẩu mới phải có ít nhất 6 ký tự!', 'error');
     }
     
     // Check password confirmation
     if (newPassword !== confirmPassword) {
+      this.isProcessing = false;
       return this.showNotification('❌ Mật khẩu xác nhận không khớp!', 'error');
     }
     
     // Check if new password is same as current
     if (currentPassword === newPassword) {
+      this.isProcessing = false;
       return this.showNotification('⚠️ Mật khẩu mới phải khác mật khẩu hiện tại!', 'error');
     }
     
@@ -368,9 +423,9 @@ class PasswordManager {
     }
     
     // Clear inputs
-    this.currentPasswordInput.value = '';
-    this.newPasswordInput.value = '';
-    this.confirmPasswordInput.value = '';
+    if (this.currentPasswordInput) this.currentPasswordInput.value = '';
+    if (this.newPasswordInput) this.newPasswordInput.value = '';
+    if (this.confirmPasswordInput) this.confirmPasswordInput.value = '';
     
     // Reset all password fields to hidden
     this.toggleIcons.forEach(icon => {
@@ -382,6 +437,9 @@ class PasswordManager {
         icon.classList.add('ri-eye-off-line');
       }
     });
+    
+    // Reset flag sau khi xử lý xong
+    this.isProcessing = false;
     
     this.showNotification('✅ Mật khẩu đã được cập nhật thành công!', 'success');
   }
@@ -436,24 +494,36 @@ class PasswordManager {
   }
 }
 
-// Initialize
-document.addEventListener('DOMContentLoaded', () => {
-  // Kiểm tra user trước
+// Initialize Account Detail when user is logged in
+function initAccountDetail() {
   const user = JSON.parse(localStorage.getItem("loggedInUser"));
   
   if (!user) {
-    // Chưa login -> chuyển về index
-    setTimeout(() => {
-      alert("Vui lòng đăng nhập để truy cập trang này!");
-      window.location.href = "index.html";
-    }, 100);
-    return; // Dừng khởi tạo
+    alert("Vui lòng đăng nhập để truy cập trang này!");
+    return false;
   }
   
   // Có user -> load thông tin và khởi tạo
-  loadUserInfo();
-  setupLogout();
+  loadUserInfo(); // Load header info
+  loadAccountDetailInfo(); // Load account detail page info + avatar
   initTabNavigation();
   new PersonalInfoManager();
   new PasswordManager();
+  return true;
+}
+
+// Initialize when DOM is loaded (for standalone page or first load)
+document.addEventListener('DOMContentLoaded', () => {
+  // Chỉ init nếu đang ở trang account-detail.html riêng biệt
+  if (window.location.pathname.includes('account-detail.html')) {
+    const user = JSON.parse(localStorage.getItem("loggedInUser"));
+    if (!user) {
+      setTimeout(() => {
+        alert("Vui lòng đăng nhập để truy cập trang này!");
+        window.location.href = "index.html";
+      }, 100);
+      return;
+    }
+    initAccountDetail();
+  }
 });

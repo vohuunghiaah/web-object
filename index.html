@@ -7,6 +7,7 @@
     <!-- Preload hero image để tránh flash -->
     <link rel="preload" href="./assets/img/hero-main.jpg" as="image" />
     <link rel="stylesheet" href="user.css" />
+    <link rel="stylesheet" href="account-detail.css">
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.css"
@@ -25,6 +26,7 @@
             id="search-input"
             class="search-bar__input"
             type="text"
+            name="search-products"
             placeholder="Nhập phụ kiện cần tìm..."
           />
           <button id="search-btn" class="search-bar__btn">
@@ -35,7 +37,7 @@
           <span id="user-info" style="display: none; color: white; font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;">👋 Xin chào, <strong id="username-display"></strong></span>
           <a href="#" data-action="open-modal" data-target="login-modal" id="login-link">👤 Đăng nhập</a>
           <a href="#" data-action="open-modal" data-target="signup-modal" id="signup-link">➕ Đăng ký</a>
-          <a href="account-detail.html" id="account-link" style="display: none;">👤 Tài khoản</a>
+          <a href="#" data-view="account-detail" id="account-link" style="display: none;">👤 Tài khoản</a>
           <a href="#" id="cart-link">🛒 Giỏ hàng</a>
           <a href="#" id="logout-link" >🚪 Đăng xuất</a>
         </nav>
@@ -467,7 +469,98 @@
 </section>
 
       </section>
-
+      <section id="view-account-detail" class="spa-view">
+        <main class="main-account-detail">
+       <div class="account-detail-top">
+           <div class="account-detail-top-avatar">
+              <div class="account-detail-top-avatar-img">
+                    <img src="./assets/img/avt-demo.jpg" alt="User Avatar" />
+              </div>
+           </div>
+           <div class="account-detail-top-info">
+               <h1>Nguyễn Văn A</h1>
+               <p>Đam mê công nghệ và phụ kiện điện tử cao cấp</p>
+           </div>
+       </div>
+       <div class="account-detail-bottom">
+           <div class="account-detail-bottom-nav">
+              <button class="nav-tab active" data-tab="info"><i class="ri-user-line"></i>Thông tin</button>
+              <button class="nav-tab" data-tab="security"><i class="ri-lock-line"></i>Bảo mật</button>
+              <button class="nav-tab" data-tab="order"><i class="ri-draggable"></i></i>Đơn hàng</button>
+           </div>
+           <div class="account-detail-bottom-info tab-content active" id="info-tab">
+               <div class="account-detail-bottom-info-title">
+                 <div class="account-detail-bottom-info-title1">
+                   <h2>Thông tin cá nhân</h2>
+                   <p>Quản lý thông tin tài khoản của bạn</p>
+                 </div>
+                 <button><i class="ri-pencil-line"></i>Chỉnh sửa</button>
+               </div>
+               <div class="account-detail-bottom-info-wrapper">
+                 <div class="account-detail-bottom-info-item">
+                     <span class="info-label">Họ và tên:</span>
+                     <input class="info-value" value="Nguyễn Văn A" disabled />
+                 </div>
+                 <div class="account-detail-bottom-info-item">
+                     <span class="info-label">Email:</span>
+                     <input class="info-value" value="nguyenvana@example.com" disabled/>
+                 </div>
+                 <div class="account-detail-bottom-info-item">
+                     <span class="info-label">Số điện thoại:</span>
+                     <input class="info-value" value="0912 345 678" disabled />
+                 </div>
+                 <div class="account-detail-bottom-info-item">
+                      <span class="info-label">Địa chỉ: </span>
+                      <input class="info-value" value="123 Đường ABC, Quận XYZ, TP. HCM" disabled>
+                 </div> 
+               </div>
+               <div class="account-detail-bottom-info-about">
+                   <span class="info-label">Giới thiệu: </span>
+                   <textarea class="info-value" disabled>Tôi là một người đam mê công nghệ và luôn tìm kiếm những sản phẩm tốt nhất.</textarea>
+               </div>
+           </div>
+           <div class="account-detail-bottom-security tab-content" id="security-tab" >
+              <div class="account-detail-bottom-security-container">
+                <div class="account-detail-bottom-security-title">
+                   <div class="account-detail-bottom-security-title01">
+                     <h2>Bảo mật</h2>
+                     <p>Quản lý mật khẩu và bảo vệ tài khoản của bạn</p>
+                   </div>
+                </div>
+                <div class="account-detail-bottom-security-wrapper">
+                     <div class="account-detail-bottom-security-item">
+                       <span class="security-label">Mật khẩu hiện tại:</span>
+                       <div class="password-input-wrapper">
+                         <input type="password" class="security-value" id="current-password" placeholder="Nhập mật khẩu hiện tại"/>
+                         <i class="ri-eye-off-line toggle-password" data-target="current-password"></i>
+                       </div>
+                   </div>
+                     <div class="account-detail-bottom-security-item">
+                       <span class="security-label">Mật khẩu mới:</span>
+                       <div class="password-input-wrapper">
+                         <input type="password" class="security-value" id="new-password" placeholder="Nhập mật khẩu mới (tối thiểu 6 ký tự)"/>
+                         <i class="ri-eye-off-line toggle-password" data-target="new-password"></i>
+                       </div>
+                   </div>
+                     <div class="account-detail-bottom-security-item">
+                       <span class="security-label">Xác nhận mật khẩu mới:</span>
+                       <div class="password-input-wrapper">
+                         <input type="password" class="security-value" id="confirm-password" placeholder="Nhập lại mật khẩu mới"/>
+                         <i class="ri-eye-off-line toggle-password" data-target="confirm-password"></i>
+                       </div>
+                   </div>
+                </div>
+                <button class="account-detail-bottom-security-button" id="change-password-btn">
+                  <i class="ri-lock-password-line"></i> Cập nhật mật khẩu
+                </button>
+              </div>
+           </div>
+           <div class="account-detail-bottom-order tab-content" id="order-tab">
+            
+           </div>
+        </div>
+        </main>
+      </section>
       <!-- View Chi tiết sản phẩm -->
       <section id="view-product-details" class="spa-view">
         <main class="main__products-details">
@@ -847,6 +940,7 @@
   <script src="./database.js" type="module"></script>
   <script src="./user.js" type="module"></script>
   <script src="./products.js" type="module"></script>
+  <script src="./account-detail.js"></script>
 
   <!-- SCRIPT XU LY URL ADMIN VA USER -->
   <script>

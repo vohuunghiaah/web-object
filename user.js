@@ -33,6 +33,15 @@ class SPARouter {
   }
 
   navigateToView(viewName) {
+    // Kiểm tra quyền truy cập cho account-detail
+    if (viewName === "account-detail") {
+      const user = JSON.parse(localStorage.getItem("loggedInUser"));
+      if (!user) {
+        alert("Vui lòng đăng nhập để truy cập trang này!");
+        return; // Dừng không chuyển view
+      }
+    }
+
     // Ẩn tất cả các view
     const allViews = document.querySelectorAll(".spa-view");
     allViews.forEach((view) => {
@@ -44,6 +53,11 @@ class SPARouter {
     if (targetView) {
       targetView.classList.add("active");
       this.currentView = viewName;
+
+      // Khởi tạo account-detail nếu cần
+      if (viewName === "account-detail" && typeof initAccountDetail === "function") {
+        initAccountDetail();
+      }
 
       // Cuộn lên đầu trang một lần duy nhất với requestAnimationFrame
       requestAnimationFrame(() => {
@@ -875,6 +889,11 @@ function setupLogout() {
     localStorage.removeItem("loggedInUser");
     alert("Đã đăng xuất!");
     updateUserUI();
+    
+    // Chuyển về trang home sau khi đăng xuất
+    if (window.router && typeof window.router.navigateToView === 'function') {
+      window.router.navigateToView('home');
+    }
   });
 }
 
