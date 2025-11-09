@@ -705,7 +705,15 @@
           <i class="ri-mail-line"></i>
           Email
         </label>
-        <input type="email" id="signup-email" name="email" required placeholder="Nhập email của bạn" />
+        <input 
+        type="email" 
+        id="signup-email" 
+        name="email" 
+        required 
+        placeholder="Nhập email của bạn"
+        pattern="[a-zA-Z0-9._%+-]+@(gmail\.com|yahoo\.com|outlook\.com)"
+        title="Chỉ chấp nhận email của gmail, yahoo hoặc outlook"
+  />
       </div>
 
       <div class="form-group">

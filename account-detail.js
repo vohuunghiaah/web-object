@@ -200,16 +200,30 @@ class PersonalInfoManager {
   
   enableEdit() {
     this.inputs.forEach(input => {
-      input.disabled = false;
-      Object.assign(input.style, { 
-        borderColor: '#FFD700', 
-        backgroundColor: 'rgba(24, 24, 27, 0.8)' 
-      });
+      // Kiểm tra xem input có phải là trường email không
+      const isEmailField = input.closest('.account-detail-bottom-info-item')?.querySelector('.info-label')?.textContent.includes('Email');
+      
+      // Nếu không phải email thì cho phép chỉnh sửa
+      if (!isEmailField) {
+        input.disabled = false;
+        Object.assign(input.style, { 
+          borderColor: '#FFD700', 
+          backgroundColor: 'rgba(24, 24, 27, 0.8)' 
+        });
+      } else {
+        // Giữ email ở trạng thái disabled
+        input.disabled = true;
+        Object.assign(input.style, { 
+          borderColor: '#3F3F46', 
+          backgroundColor: 'rgba(24, 24, 27, 0.3)',
+          cursor: 'not-allowed'
+        });
+      }
     });
     
     this.editBtn.innerHTML = '<i class="ri-save-line"></i>Lưu thay đổi';
     Object.assign(this.editBtn.style, { backgroundColor: '#FFD700', color: '#000' });
-    this.showNotification('ℹ️ Bạn có thể chỉnh sửa thông tin của mình', 'info');
+    this.showNotification('ℹ️ Bạn có thể chỉnh sửa thông tin của mình (Email không thể thay đổi)', 'info');
   }
   
   saveChanges() {

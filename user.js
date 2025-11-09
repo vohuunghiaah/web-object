@@ -680,7 +680,8 @@ function setupRegisterForm() {
     const email = form.querySelector("#signup-email").value.trim();
     const password = form.querySelector("#signup-password").value.trim();
     const confirm = form.querySelector("#signup-confirm").value.trim();
-
+    const pattern = /^[a-zA-Z0-9._%+-]+@(gmail\.com|yahoo\.com|outlook\.com)$/;
+    
     if (!name || !email || !password)
       return alert("Vui lòng nhập đầy đủ thông tin!");
     if (password !== confirm) return alert("Mật khẩu nhập lại không khớp!");
@@ -689,6 +690,10 @@ function setupRegisterForm() {
     if (users.some((u) => u.email === email))
       return alert("Email này đã được đăng ký!");
 
+    if(!pattern.test(email)) {
+      e.preventDefault(); // Ngăn form gửi
+      return alert("Email định dạng sai");
+    }
     const newUser = {
       id: Date.now(),
       name: name,
@@ -710,6 +715,7 @@ function setupRegisterForm() {
     );
   });
 }
+
 // Đặt vào bên trong 'DOMContentLoaded' trong file user.js
 
 // TÙY CHỈNH LẠI THÔNG BÁO LỖI CHO FORM ĐĂNG NHẬP
@@ -753,7 +759,6 @@ function setupLoginForm() {
     const email = form.querySelector("#login-email").value.trim();
     const password = form.querySelector("#login-password").value.trim();
     const users = JSON.parse(localStorage.getItem("users")) || [];
-
     // Đặt vào bên trong 'DOMContentLoaded' trong file user.js
 
 // TÙY CHỈNH LẠI THÔNG BÁO LỖI CHO FORM ĐĂNG NHẬP
