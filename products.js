@@ -1074,17 +1074,33 @@ function setupBuyNowButton(product) {
         quantity: quantity,
       };
 
-      console.log("Buy Now - Setting cart with:", newCartItem);
+      console.log("Buy Now - Adding to cart:", newCartItem);
 
-      // Set giỏ hàng với sản phẩm mới (thay thế giỏ hàng cũ)
+      // Lấy giỏ hàng hiện tại từ localStorage
+      let currentCart = JSON.parse(localStorage.getItem("cart")) || [];
+      
+      // Kiểm tra xem sản phẩm đã có trong giỏ hàng chưa
+      const existingItemIndex = currentCart.findIndex(item => item.name === newCartItem.name);
+      
+      if (existingItemIndex !== -1) {
+        // Nếu đã có, tăng số lượng
+        currentCart[existingItemIndex].quantity += newCartItem.quantity;
+        console.log("Product already in cart, increased quantity");
+      } else {
+        // Nếu chưa có, thêm mới vào giỏ hàng
+        currentCart.push(newCartItem);
+        console.log("New product added to cart");
+      }
+
+      // Cập nhật giỏ hàng
       if (typeof window.setCart === "function") {
-        window.setCart([newCartItem]);
-        console.log("Cart set via window.setCart");
+        window.setCart(currentCart);
+        console.log("Cart updated via window.setCart");
       } else {
         // Fallback: trực tiếp gán
-        window.cart = [newCartItem];
+        window.cart = currentCart;
         localStorage.setItem("cart", JSON.stringify(window.cart));
-        console.log("Cart set via fallback");
+        console.log("Cart updated via fallback");
       }
 
       console.log("Cart in localStorage:", localStorage.getItem("cart"));
