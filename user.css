@@ -2701,6 +2701,9 @@ form input[type="checkbox"]:checked + label {
   text-decoration: underline;
   cursor: pointer;
   transition: color 0.3s;
+  display: block;
+  text-align: center;
+  margin-top: 1.5rem;
 }
 
 #back-to-shop:hover {
