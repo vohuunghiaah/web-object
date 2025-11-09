@@ -628,3 +628,88 @@ document.addEventListener('DOMContentLoaded', () => {
     initAccountDetail();
   }
 });
+function loadOrderHistory() {
+  const orderListContainer = document.getElementById("account-order-list");
+  if (!orderListContainer) return;
+
+  const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser"));
+  const allOrders = JSON.parse(localStorage.getItem("orders")) || [];
+
+  if (!loggedInUser) {
+    orderListContainer.innerHTML = `<p class="order-empty-message">Vui lòng đăng nhập để xem lịch sử đơn hàng.</p>`;
+    return;
+  }
+
+  // Lọc các đơn hàng của người dùng hiện tại (dựa trên email)
+  const userOrders = allOrders.filter(order => 
+    order.userEmail === loggedInUser.email
+  );
+
+  if (userOrders.length === 0) {
+    orderListContainer.innerHTML = `<p class="order-empty-message">Bạn chưa có đơn hàng nào.</p>`;
+    return;
+  }
+
+  // Sắp xếp đơn hàng mới nhất lên đầu
+  userOrders.sort((a, b) => b.id - a.id); 
+
+  // Render các đơn hàng
+  orderListContainer.innerHTML = userOrders.map(order => {
+    // Tạo danh sách sản phẩm cho đơn hàng
+    const productsHTML = order.products.map(product => `
+      <div class="order-product-item">
+        <img src="${product.image}" alt="${product.name}">
+        <span>${product.name} (x${product.quantity})</span>
+      </div>
+    `).join("");
+
+    // Định dạng trạng thái (bạn có thể mở rộng)
+    let statusClass = "status-new";
+    if (order.status === "Đã hủy") statusClass = "status-cancelled";
+    if (order.status === "Hoàn thành") statusClass = "status-completed";
+
+    // === PHẦN MỚI: Lấy thông tin giao hàng ===
+    const shippingInfo = order.address || {}; // Đảm bảo an toàn nếu order.address không tồn tại
+    const fullName = shippingInfo.name || 'Không có tên';
+    const phone = shippingInfo.phone || 'Không có SĐT';
+    
+    // Ghép các thành phần địa chỉ lại, bỏ qua các phần bị trống
+    const fullAddress = [
+      shippingInfo.address,
+      shippingInfo.ward,
+      shippingInfo.district,
+      shippingInfo.city
+    ].filter(Boolean).join(', ') || 'Không có địa chỉ';
+    // ======================================
+
+    return `
+      <div class="order-card">
+        <div class="order-card-header">
+          <div><strong>Ngày đặt:</strong> ${new Date(order.date).toLocaleString('vi-VN')}</div>
+          <div><strong>Tổng tiền:</strong> <span class="order-total">${order.total.toLocaleString('vi-VN')} đ</span></div>
+          <div><strong>Trạng thái:</strong> <span class="order-status ${statusClass}">${order.status}</span></div>
+        </div>
+        <div class="order-card-body">
+          <p><strong>Các sản phẩm:</strong></p>
+          ${productsHTML}
+          
+          <div class="order-shipping-details">
+            <p><strong>Thông tin giao hàng:</strong></p>
+            <div class="shipping-info-item">
+              <i class="ri-user-line"></i>
+              <span><strong>Người nhận:</strong> ${fullName}</span>
+            </div>
+            <div class="shipping-info-item">
+              <i class="ri-phone-line"></i>
+              <span><strong>SĐT:</strong> ${phone}</span>
+            </div>
+            <div class="shipping-info-item">
+              <i class="ri-map-pin-line"></i>
+              <span><strong>Địa chỉ:</strong> ${fullAddress}</span>
+            </div>
+          </div>
+          </div>
+      </div>
+    `;
+  }).join("");
+}
