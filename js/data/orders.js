@@ -1,6 +1,6 @@
 
 
-// Lấy một ngày trong quá khứ để làm ví dụ
+
 const pastDate1 = new Date();
 pastDate1.setDate(pastDate1.getDate() - 5); // 5 ngày trước
 

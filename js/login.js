@@ -8,7 +8,7 @@ let adminList = getData("admin") || [];
 // Kiểm tra xem admin đã tồn tại trong mảng chưa
 const adminExists = adminList.some((user) => user.role === "admin");
 
-// Nếu admin CHƯA tồn tại
+
 if (!adminExists) {
   // Lưu lại vào localStorage
   setData("admin", initialAccount);
@@ -33,14 +33,14 @@ function handleLogin(event) {
 
   if (foundAdmin) {
     // Đăng nhập thành công
-    errorMessage.style.display = "none"; // Ẩn thông báo lỗi
+    errorMessage.style.display = "none";
 
     // Lưu 'currentAdmin'
     setData("currentAdmin", foundAdmin);
 
     //Kiểm tra vai trò VÀ chuyển hướng
     if (foundAdmin.role === "admin") {
-      window.location.href = "./index.html"; // Chuyển đến trang admin
+      window.location.href = "./index.html";
     }
   } else {
     // Đăng nhập thất bại

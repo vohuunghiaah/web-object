@@ -1,5 +1,4 @@
 
-// Lấy các hàm helper từ file product_list.js (vì chúng dùng chung)
 const getData = key => JSON.parse(localStorage.getItem(key));
 const setData = (key, val) => localStorage.setItem(key, JSON.stringify(val));
 const channel = new BroadcastChannel('data_update');
@@ -56,7 +55,6 @@ export const importHtml = `
 `;
 
 
-// Logic cho trang
 export function initImportPage() {
   // Lấy các DOM element
   const importListEl = document.getElementById('importList');
@@ -79,7 +77,6 @@ export function initImportPage() {
   let tempProducts = []; // Mảng chứa các SP trong phiếu đang tạo
   let editIndex = null;
 
-  // --- CÁC HÀM XỬ LÝ CHÍNH ---
 
   // 1. Render danh sách phiếu nhập
   function renderSlips(list) {
@@ -111,7 +108,6 @@ export function initImportPage() {
     });
   }
 
-  // 2. Render danh sách sản phẩm TẠM THỜI (trong popup)
   function renderTempProducts() {
     tempProductListEl.innerHTML = "";
     if (tempProducts.length === 0) {
@@ -128,7 +124,6 @@ export function initImportPage() {
     });
   }
 
-  // 3. Mở Form
   function openForm(isView = false) {
     // Nạp danh sách sản phẩm vào <select>
     productSelect.innerHTML = allProducts.map(p => 
@@ -141,7 +136,6 @@ export function initImportPage() {
     overlay.style.display = "flex";
   }
 
-  // 4. Đóng Form
   function closeForm() {
     overlay.style.display = "none";
     form.reset();
@@ -150,7 +144,6 @@ export function initImportPage() {
     renderTempProducts();
   }
 
-  // 5. Thêm sản phẩm vào phiếu tạm
   addToSlipBtn.onclick = () => {
     const productId = parseInt(document.getElementById('import-product-select').value);
     const product = allProducts.find(p => p.id === productId);
@@ -162,7 +155,6 @@ export function initImportPage() {
       return;
     }
 
-    // Thêm vào mảng tạm
     tempProducts.push({
       productId: product.id,
       name: product.name,
@@ -176,13 +168,11 @@ export function initImportPage() {
     document.getElementById('import-price').value = '';
   };
   
-  // 5.1 Xóa SP khỏi phiếu tạm
   window.removeTempProduct = (index) => {
     tempProducts.splice(index, 1);
     renderTempProducts();
   }
 
-  // 6. Sự kiện Submit Form (Lưu phiếu mới hoặc cập nhật phiếu)
   form.onsubmit = (e) => {
     e.preventDefault();
     if (tempProducts.length === 0) {
@@ -194,7 +184,7 @@ export function initImportPage() {
       id: editIndex !== null ? currentSlips[editIndex].id : Date.now(),
       date: new Date().toISOString(),
       status: "Đang xử lý",
-      products: tempProducts // Lưu mảng sản phẩm tạm
+      products: tempProducts 
     };
 
     if (editIndex !== null) {
@@ -209,8 +199,6 @@ export function initImportPage() {
     renderSlips(currentSlips);
     closeForm();
   };
-
-  // 7. Gán sự kiện cho các nút Sửa / Xóa / Hoàn thành
   
   // Sửa phiếu
   window.editSlip = (index) => {
@@ -266,15 +254,12 @@ export function initImportPage() {
       const productInStorage = currentProductStorage.find(p => p.id === slipProduct.productId);
       if (productInStorage) {
         
-        // 1. Cập nhật Giá Vốn MỚI NHẤT
+
         const newCostPrice = parseFloat(slipProduct.importPrice);
         productInStorage.costPrice = newCostPrice;
         
-        // 2. Cộng dồn số lượng
         productInStorage.quantity += slipProduct.quantity;
         
-        // 3. TỰ ĐỘNG TÍNH LẠI GIÁ BÁN
-        // Lấy % lợi nhuận đang có của sản phẩm (ví dụ: 0.2)
         const margin = productInStorage.profitMargin || 0; 
         // Tính giá bán mới
         productInStorage.price = newCostPrice * (1 + margin);

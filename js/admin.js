@@ -1,3 +1,4 @@
+import { inventoryHtml, initInventoryPage } from "./manager/inventory.js";
 import { productHtml } from "./manager/product.js";
 import { initProductPage } from "./manager/product_list.js";
 import { orders as initialOrders } from "./data/orders.js";
@@ -8,7 +9,7 @@ import { reportHtml, initReportPage } from "./manager/report.js";
 
 
 async function navigateSPA(pageId, isInitialLoad = false) {
-  window.navigateSPA = navigateSPA;
+
   const content = document.getElementById("content");
   const sidebar = document.getElementById("sidebar");
 
@@ -47,6 +48,7 @@ async function navigateSPA(pageId, isInitialLoad = false) {
     sidebar.classList.remove("hide");
   }
 }
+window.navigateSPA = navigateSPA;
 
 document.addEventListener("DOMContentLoaded", function () {
   const toggleBtn = document.getElementById("toggle-sidebar-btn");
@@ -60,6 +62,13 @@ document.addEventListener("DOMContentLoaded", function () {
     closeBtn.onclick = function () {
       wrapper.classList.add("sidebar-hidden");
     };
+  }
+  const inventoryPageDiv = document.getElementById("inventory");
+  if (inventoryPageDiv) {
+    inventoryPageDiv.innerHTML = inventoryHtml;
+    initInventoryPage();
+  } else {
+    console.error("Lỗi: Không thể khởi tạo <div id='inventory'>!");
   }
 
   const dashboardPageDiv = document.getElementById("dashboard");
@@ -541,16 +550,17 @@ function initOrdersPage() {
                   popup.classList.remove("active");
                   return;
               }
-              
+              const SOLD_STATUSES = ["Đang vận chuyển", "Giao hàng thành công"];
+              const oldIsSold = SOLD_STATUSES.includes(order.status);
+              const newIsSold = SOLD_STATUSES.includes(newStatus);
+
               order.status = newStatus;
               allProducts = getData("products") || [];
-
-              const oldIsSold = oldStatus === "Giao hàng thành công";
-              const newIsSold = newStatus === "Giao hàng thành công";
               let canProcess = true;
               let stockUpdates = [];
 
-              if (!oldIsSold && newIsSold) { // Trừ kho
+              if (!oldIsSold && newIsSold) {
+                //Chuyển từ "Chưa trừ" -> "Đã trừ"
                 order.products.forEach((p) => {
                   const productInStock = allProducts.find((item) => item.id == p.productId);
                   if (!productInStock) {
@@ -568,7 +578,8 @@ function initOrdersPage() {
                   setData("products", allProducts);
                   channel.postMessage({ type: "products_updated" });
                 }
-              } else if (oldIsSold && !newIsSold) { // Hoàn kho (nếu từ thành công -> hủy/khác)
+              } else if (oldIsSold && !newIsSold) {
+                //Chuyển từ "Đã trừ" -> "Chưa trừ"
                  order.products.forEach((p) => {
                   const productInStock = allProducts.find((item) => item.id == p.productId);
                   if (productInStock) productInStock.quantity += p.quantity;

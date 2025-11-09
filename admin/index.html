@@ -64,11 +64,13 @@
               </button>
             </li>
             <li>
-              <button
-                onclick="navigateSPA('products')"
-                id="menu-products"  
-              >
+              <button onclick="navigateSPA('products')" id="menu-products"  >
                 <i class="fas fa-box"></i> Products
+              </button>
+            </li>
+            <li>
+              <button onclick="navigateSPA('inventory')" id="menu-inventory">
+                <i class="fas fa-warehouse"></i> Inventory
               </button>
             </li>
             <li>
@@ -90,7 +92,7 @@
           </div>
 
           <div id="products" class="page" style="display: none"></div>
-          
+          <div id="inventory" class="page" style="display: none"></div>
           <div id="orders" class="page" style="display: none">
             <div class="linear_box">
               <div class="items_linear"> <button class="button_linear" data-mode="users">QL Người dùng</button>
