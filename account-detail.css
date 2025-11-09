@@ -488,3 +488,41 @@
   font-size: 1.4rem;
   color: #ddd;
 }
+/* === CSS CHO PHẦN THÔNG TIN GIAO HÀNG (THÊM MỚI) === */
+
+.order-shipping-details {
+  margin-top: 20px; /* Tạo khoảng cách với danh sách sản phẩm */
+  padding-top: 15px;
+  border-top: 1px solid #3f3f46; /* Đường kẻ phân cách (zinc-700) */
+}
+
+/* Tiêu đề "Thông tin giao hàng" */
+.order-shipping-details > p {
+  margin: 0 0 12px 0;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #f4f4f5; /* zinc-100 */
+}
+
+/* Mỗi dòng thông tin (icon, tên, sđt, địa chỉ) */
+.shipping-info-item {
+  display: flex;
+  align-items: center; /* Căn icon và chữ theo chiều dọc */
+  gap: 12px; /* Khoảng cách giữa icon và chữ */
+  color: #a1a1aa; /* zinc-400 */
+  font-size: 0.95rem;
+  margin-bottom: 8px; /* Khoảng cách giữa các dòng */
+}
+
+.shipping-info-item i {
+  font-size: 1.2rem;
+  color: #ffd700; /* Màu vàng (gold) */
+  width: 20px; /* Đảm bảo các icon thẳng hàng */
+  text-align: center;
+}
+
+.shipping-info-item strong {
+  color: #d4d4d8; /* zinc-300 */
+  font-weight: 500;
+  margin-right: 5px;
+}
