@@ -806,12 +806,12 @@
     <div class="checkout-wrapper">
       <!-- Cột trái -->
       <div class="checkout-left">
-        <form class="checkout-form">
+        <class class="checkout-form">
           <h3>Thông tin giao hàng</h3>
           <div class="form-row"><input type="text" placeholder="Họ và tên" required></div>
           <div class="form-row two-col">
             <input type="email" placeholder="Email" required>
-            <input type="tel" placeholder="Số điện thoại" required>
+            <input type="tel" placeholder="Số điện thoại" required pattern="[0-9]{10}">
           </div>
           <div class="form-row"><input type="text" placeholder="Địa chỉ" required></div>
           <div class="form-row two-col">
@@ -831,7 +831,7 @@
           </div>
           <a class="btn-nav" onclick="checkoutOrder()">Tiếp tục thanh toán →</a>
           <a href="#" id="back-to-shop">← Quay lại giỏ hàng</a>
-        </form>
+        </class>
       </div>
       <!-- Cột phải -->
       <div class="checkout-right">

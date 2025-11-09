@@ -1209,6 +1209,7 @@ document.addEventListener("DOMContentLoaded", () => {
   console.log("✅ App initialized (single DOMContentLoaded).");
 });
 
+
 window.addToCart = addToCart;
 window.showPage = showPage;
 window.goToCheckout = goToCheckout;
