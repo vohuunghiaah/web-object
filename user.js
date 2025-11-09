@@ -680,7 +680,7 @@ function setupRegisterForm() {
     const email = form.querySelector("#signup-email").value.trim();
     const password = form.querySelector("#signup-password").value.trim();
     const confirm = form.querySelector("#signup-confirm").value.trim();
-    const pattern = /^[a-zA-Z0-9._%+-]+@(gmail\.com|yahoo\.com|outlook\.com)$/;
+    const pattern = /^[a-zA-Z0-9]+@(gmail\.com|yahoo\.com|outlook\.com)$/;
     
     if (!name || !email || !password)
       return alert("Vui lòng nhập đầy đủ thông tin!");
@@ -747,7 +747,7 @@ if (loginEmailInput) {
     });
 }
 
-// ... (phần code khác của bạn như setupLoginForm(), setupProfileForm()...)
+// ... (phần code khác của bạn như setupLoginForm()...)
 // Xử lý đăng nhập
 function setupLoginForm() {
   const form = document.getElementById("login-form");
@@ -967,56 +967,6 @@ function closeAllModals() {
   document.body.style.overflow = "";
 }
 
-// ========================== PROFILE INFO ==========================
-function setupProfileForm() {
-  const form = document.getElementById("profile-form");
-  if (!form) return;
-
-  // Khi mở modal, tự động đổ dữ liệu người dùng
-  const observer = new MutationObserver(() => {
-    if (document.getElementById("profile-modal").classList.contains("active")) {
-      const user = JSON.parse(localStorage.getItem("loggedInUser"));
-      if (user) {
-        form.querySelector("#profile-name").value = user.name || "";
-        form.querySelector("#profile-email").value = user.email || "";
-        form.querySelector("#profile-password").value = "";
-      }
-    }
-  });
-  observer.observe(document.getElementById("profile-modal"), {
-    attributes: true,
-    attributeFilter: ["class"],
-  });
-
-  // Lưu thay đổi thông tin
-  form.addEventListener("submit", (e) => {
-    e.preventDefault();
-    let users = JSON.parse(localStorage.getItem("users")) || [];
-    let current = JSON.parse(localStorage.getItem("loggedInUser"));
-    if (!current) return alert("Vui lòng đăng nhập!");
-
-    const newName = form.querySelector("#profile-name").value.trim();
-    const newPass = form.querySelector("#profile-password").value.trim();
-
-    // Cập nhật trong danh sách user
-    const index = users.findIndex((u) => u.email === current.email);
-    if (index !== -1) {
-      users[index].name = newName;
-      if (newPass) users[index].password = newPass;
-      localStorage.setItem("users", JSON.stringify(users));
-    }
-
-    // Cập nhật user đang đăng nhập
-    current.name = newName;
-    localStorage.setItem("loggedInUser", JSON.stringify(current));
-
-    alert("Đã lưu thay đổi!");
-    form.querySelector("#profile-password").value = "";
-    updateUserUI();
-    closeAllModals();
-  });
-}
-
 // ========================== END LOGIN & REGISTER ==========================
 
 // ===== Kiểm tra và thêm sản phẩm đang chờ vào giỏ hàng sau khi đăng nhập=====
@@ -1114,11 +1064,10 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // 3) Khởi tạo auth (login/register/profile/logout)
+  // 3) Khởi tạo auth (login/register/logout)
   setupAuthFormToggle();
   setupRegisterForm();
   setupLoginForm();
-  setupProfileForm();
   setupLogout();
 
   // 4) Cập nhật UI người dùng (dựa trên trạng thái loggedInUser)
@@ -1161,23 +1110,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 }
-    // Gắn click vào userInfo để mở profile modal (an toàn)
-    if (userInfo) {
-      safeReplaceHandler(userInfo, "click", (e) => {
-        e.preventDefault();
-        if (window.router && typeof window.router.openModal === "function") {
-          window.router.openModal("profile-modal");
-        } else {
-          const modalContainer = document.getElementById("modal-container");
-          const profileModal = document.getElementById("profile-modal");
-          if (modalContainer && profileModal) {
-            modalContainer.classList.add("active");
-            profileModal.classList.add("active");
-            document.body.style.overflow = "hidden";
-          }
-        }
-      });
-    }
     if (typeof updateUserUI === "function") {
       updateUserUI();
     }

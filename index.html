@@ -691,7 +691,7 @@
       <h2>Đăng ký</h2>
     </div>
 
-    <form id="signup-form" class="auth-form">
+    <form id="signup-form" class="auth-form" novalidate>
       <div class="form-group">
         <label for="signup-name">
           <i class="ri-user-line"></i>
@@ -711,7 +711,7 @@
         name="email" 
         required 
         placeholder="Nhập email của bạn"
-        pattern="[a-zA-Z0-9._%+-]+@(gmail\.com|yahoo\.com|outlook\.com)"
+        pattern="^[a-zA-Z0-9]+@(gmail\.com|yahoo\.com|outlook\.com)$"
         title="Chỉ chấp nhận email của gmail, yahoo hoặc outlook"
   />
       </div>
@@ -740,47 +740,6 @@
         <p>Đã có tài khoản? <a href="#" data-action="switch-to-login">Đăng nhập ngay</a></p>
       </div>
     </form>
-  </div>
-  <!-- PROFILE -->
-
-  <div id="profile-modal" class="modal-content">
-    <div class="modal-header">
-      <h2>Thông tin cá nhân</h2>
-    </div>
-
-    <form id="profile-form" class="auth-form">
-      <div class="form-group">
-        <label for="profile-name">
-          <i class="ri-user-line"></i>
-          Họ và tên
-        </label>
-        <input type="text" id="profile-name" name="name" required placeholder="Nhập tên của bạn" />
-      </div>
-
-      <div class="form-group">
-        <label for="profile-email">
-          <i class="ri-mail-line"></i>
-          Email (không thể thay đổi)
-        </label>
-        <input type="email" id="profile-email" name="email" readonly />
-      </div>
-
-      <div class="form-group">
-        <label for="profile-password">
-          <i class="ri-lock-line"></i>
-          Mật khẩu mới (tùy chọn)
-        </label>
-        <input type="password" id="profile-password" name="password" placeholder="Nhập mật khẩu mới nếu muốn đổi" />
-      </div>
-
-      <div class="form-actions">
-        <button type="submit" class="btn btn-primary btn-block">Lưu thay đổi</button>
-      </div>
-    </form>
-
-    <div class="form-footer">
-      <button class="btn btn-secondary" data-action="close-modal">Đóng</button>
-    </div>
   </div>
 
   <!-- CART -->
