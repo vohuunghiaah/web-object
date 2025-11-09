@@ -56,7 +56,7 @@ class SPARouter {
 
       // Khởi tạo account-detail nếu cần
       if (viewName === "account-detail" && typeof initAccountDetail === "function") {
-        initAccountDetail();
+        window.initAccountDetail();
       }
 
       // Cuộn lên đầu trang một lần duy nhất với requestAnimationFrame
@@ -556,7 +556,7 @@ function checkoutOrder() {
     date: new Date().toISOString(),     // SỬA ĐỊNH DẠNG NGÀY
     products: productsForOrder,         // SỬA LOGIC (dùng mảng có ID)
     total,
-    user: name,                         // THÊM TÊN USER
+    userEmail: user.email,                         // THÊM TÊN USER
     status: "Mới đặt",                  // THÊM TRẠNG THÁI
     payMethod,
     address: { name, email, phone, address, ward, district, city },

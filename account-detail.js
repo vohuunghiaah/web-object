@@ -60,10 +60,14 @@ function loadAccountDetailInfo() {
   if (bioTextarea) bioTextarea.value = user.bio || 'Chưa có thông tin giới thiệu';
 }
 
-// Tab Navigation
+// Tab Navigation (Phiên bản cập nhật)
 function initTabNavigation() {
   document.querySelectorAll('.nav-tab').forEach(tab => {
-    tab.addEventListener('click', function() {
+    // Clone node để tránh gán listener nhiều lần nếu initAccountDetail được gọi lại
+    const newTab = tab.cloneNode(true);
+    tab.parentNode.replaceChild(newTab, tab);
+
+    newTab.addEventListener('click', function() {
       const targetTab = this.dataset.tab;
       
       // Remove active từ tất cả tabs và contents
@@ -72,11 +76,17 @@ function initTabNavigation() {
       // Add active cho tab được chọn
       this.classList.add('active');
       document.getElementById(targetTab + '-tab')?.classList.add('active');
+
+      // === THÊM MỚI: Tải lịch sử đơn hàng khi click tab ===
+      if (targetTab === 'order') {
+        loadOrderHistory();
+      }
+      // ===================================================
     });
   });
 }
 
-// Personal Info Management
+// Personal Info Management (Giữ nguyên từ file của bạn)
 class PersonalInfoManager {
   constructor() {
     this.editBtn = document.querySelector('.account-detail-bottom-info .account-detail-bottom-info-title button');
@@ -97,27 +107,28 @@ class PersonalInfoManager {
   setupAvatarChange() {
     if (!this.avatarContainer) return;
     
-    // Tạo overlay và input file
-    const overlay = document.createElement('div');
-    overlay.className = 'avatar-overlay';
-    overlay.innerHTML = '<i class="ri-camera-line"></i><span>Đổi ảnh</span>';
-    
-    const fileInput = document.createElement('input');
-    Object.assign(fileInput, { type: 'file', accept: 'image/*', id: 'avatar-input' });
-    fileInput.style.display = 'none';
-    
-    this.avatarContainer.append(overlay, fileInput);
-    
-    // Xử lý click và change
-    this.avatarContainer.addEventListener('click', () => fileInput.click());
-    fileInput.addEventListener('change', (e) => this.handleAvatarChange(e));
+    // Tạo overlay và input file (Nếu chưa có)
+    if (!this.avatarContainer.querySelector('.avatar-overlay')) {
+      const overlay = document.createElement('div');
+      overlay.className = 'avatar-overlay';
+      overlay.innerHTML = '<i class="ri-camera-line"></i><span>Đổi ảnh</span>';
+      
+      const fileInput = document.createElement('input');
+      Object.assign(fileInput, { type: 'file', accept: 'image/*', id: 'avatar-input' });
+      fileInput.style.display = 'none';
+      
+      this.avatarContainer.append(overlay, fileInput);
+
+      // Xử lý click và change
+      this.avatarContainer.addEventListener('click', () => fileInput.click());
+      fileInput.addEventListener('change', (e) => this.handleAvatarChange(e));
+    }
   }
   
   handleAvatarChange(event) {
     const file = event.target.files[0];
     if (!file) return;
     
-    // Validate file
     if (!file.type.startsWith('image/')) {
       return this.showNotification('❌ Vui lòng chọn file ảnh!', 'error');
     }
@@ -125,23 +136,18 @@ class PersonalInfoManager {
       return this.showNotification('❌ Kích thước ảnh không được vượt quá 5MB!', 'error');
     }
     
-    // Đọc và hiển thị ảnh
     const reader = new FileReader();
     reader.onload = (e) => {
       const avatarDataUrl = e.target.result;
-      
-      // Hiển thị ảnh ngay lập tức
       if (this.avatarImg) {
         this.avatarImg.src = avatarDataUrl;
       }
       
-      // Lưu vào localStorage
       const user = JSON.parse(localStorage.getItem("loggedInUser"));
       if (user) {
         user.avatar = avatarDataUrl;
         localStorage.setItem("loggedInUser", JSON.stringify(user));
         
-        // Cập nhật trong database users
         const users = JSON.parse(localStorage.getItem("users")) || [];
         const userIndex = users.findIndex(u => u.email === user.email);
         if (userIndex !== -1) {
@@ -149,7 +155,6 @@ class PersonalInfoManager {
           localStorage.setItem("users", JSON.stringify(users));
         }
       }
-      
       this.showNotification('✅ Avatar đã được cập nhật!', 'success');
     };
     reader.readAsDataURL(file);
@@ -161,7 +166,6 @@ class PersonalInfoManager {
   }
   
   enableEdit() {
-    // Enable inputs
     this.inputs.forEach(input => {
       input.disabled = false;
       Object.assign(input.style, { 
@@ -170,19 +174,15 @@ class PersonalInfoManager {
       });
     });
     
-    // Update button
     this.editBtn.innerHTML = '<i class="ri-save-line"></i>Lưu thay đổi';
     Object.assign(this.editBtn.style, { backgroundColor: '#FFD700', color: '#000' });
-    
     this.showNotification('ℹ️ Bạn có thể chỉnh sửa thông tin của mình', 'info');
   }
   
   saveChanges() {
-    // Lấy user từ localStorage
     const user = JSON.parse(localStorage.getItem("loggedInUser"));
     if (!user) return;
     
-    // Lấy các giá trị từ input
     const nameInput = Array.from(this.inputs).find(input => 
       input.closest('.account-detail-bottom-info-item')?.querySelector('.info-label')?.textContent.includes('Họ và tên')
     );
@@ -197,10 +197,8 @@ class PersonalInfoManager {
     );
     const bioTextarea = document.querySelector('.account-detail-bottom-info-about .info-value');
     
-    // Lưu email cũ để tìm user trong database
     const oldEmail = user.email;
     
-    // Cập nhật thông tin user
     if (nameInput?.value.trim()) {
       user.name = nameInput.value.trim();
       if (this.headerName) this.headerName.textContent = user.name;
@@ -212,10 +210,8 @@ class PersonalInfoManager {
     if (addressInput?.value.trim()) user.address = addressInput.value.trim();
     if (bioTextarea?.value.trim()) user.bio = bioTextarea.value.trim();
     
-    // Lưu lại vào localStorage
     localStorage.setItem("loggedInUser", JSON.stringify(user));
     
-    // Cập nhật trong database users (dùng oldEmail để tìm)
     const users = JSON.parse(localStorage.getItem("users")) || [];
     const userIndex = users.findIndex(u => u.email === oldEmail);
     if (userIndex !== -1) {
@@ -223,10 +219,8 @@ class PersonalInfoManager {
       localStorage.setItem("users", JSON.stringify(users));
     }
     
-    // Cập nhật hiển thị ở header ngay lập tức
     loadUserInfo();
     
-    // Disable inputs
     this.inputs.forEach(input => {
       input.disabled = true;
       Object.assign(input.style, { 
@@ -235,11 +229,8 @@ class PersonalInfoManager {
       });
     });
     
-    // Reset button
     this.editBtn.innerHTML = '<i class="ri-pencil-line"></i>Chỉnh sửa';
     Object.assign(this.editBtn.style, { backgroundColor: 'transparent', color: '#FFD700' });
-    
-    // Hiển thị thông báo thành công với icon đẹp
     this.showNotification('✅ Thông tin của bạn đã được cập nhật thành công!', 'success');
   }
   
@@ -282,7 +273,6 @@ class PersonalInfoManager {
     
     document.body.appendChild(notification);
     
-    // Animation
     setTimeout(() => {
       notification.style.transform = 'translateX(0)';
     }, 100);
@@ -294,7 +284,7 @@ class PersonalInfoManager {
   }
 }
 
-// Password Management
+// Password Management (Giữ nguyên từ file của bạn)
 class PasswordManager {
   constructor() {
     const accountDetailSection = document.getElementById('view-account-detail');
@@ -303,15 +293,13 @@ class PasswordManager {
     this.currentPasswordInput = document.getElementById('current-password');
     this.newPasswordInput = document.getElementById('new-password');
     this.confirmPasswordInput = document.getElementById('confirm-password');
-    this.isProcessing = false; // Thêm flag để tránh xử lý nhiều lần
+    this.isProcessing = false;
     
     this.init();
   }
   
   init() {
-    // Setup toggle password visibility - Xóa listener cũ trước
     this.toggleIcons.forEach(icon => {
-      // Clone để xóa tất cả listener cũ
       const newIcon = icon.cloneNode(true);
       icon.parentNode.replaceChild(newIcon, icon);
       newIcon.addEventListener('click', (e) => {
@@ -320,11 +308,9 @@ class PasswordManager {
       }, { once: false });
     });
     
-    // Cập nhật lại danh sách icons sau khi clone
     const accountDetailSection = document.getElementById('view-account-detail');
     this.toggleIcons = accountDetailSection?.querySelectorAll('.toggle-password') || [];
     
-    // Setup change password button
     if (this.changePasswordBtn) {
       const newBtn = this.changePasswordBtn.cloneNode(true);
       this.changePasswordBtn.parentNode.replaceChild(newBtn, this.changePasswordBtn);
@@ -335,7 +321,6 @@ class PasswordManager {
       });
     }
     
-    // Enter key to submit
     [this.currentPasswordInput, this.newPasswordInput, this.confirmPasswordInput].forEach(input => {
       input?.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
@@ -349,7 +334,6 @@ class PasswordManager {
   togglePasswordVisibility(icon) {
     const targetId = icon.dataset.target;
     const input = document.getElementById(targetId);
-    
     if (!input) return;
     
     if (input.type === 'password') {
@@ -364,7 +348,6 @@ class PasswordManager {
   }
   
   handleChangePassword() {
-    // Tránh xử lý nhiều lần cùng lúc
     if (this.isProcessing) return;
     this.isProcessing = true;
     
@@ -378,43 +361,34 @@ class PasswordManager {
     const newPassword = this.newPasswordInput?.value.trim() || '';
     const confirmPassword = this.confirmPasswordInput?.value.trim() || '';
     
-    // Validation
     if (!currentPassword || !newPassword || !confirmPassword) {
       this.isProcessing = false;
       return this.showNotification('❌ Vui lòng điền đầy đủ thông tin!', 'error');
     }
     
-    // Check current password
     if (user.password !== currentPassword) {
       this.isProcessing = false;
       return this.showNotification('❌ Mật khẩu hiện tại không đúng!', 'error');
     }
     
-    // Check new password length
     if (newPassword.length < 6) {
       this.isProcessing = false;
       return this.showNotification('❌ Mật khẩu mới phải có ít nhất 6 ký tự!', 'error');
     }
     
-    // Check password confirmation
     if (newPassword !== confirmPassword) {
       this.isProcessing = false;
       return this.showNotification('❌ Mật khẩu xác nhận không khớp!', 'error');
     }
     
-    // Check if new password is same as current
     if (currentPassword === newPassword) {
       this.isProcessing = false;
       return this.showNotification('⚠️ Mật khẩu mới phải khác mật khẩu hiện tại!', 'error');
     }
     
-    // Update password
     user.password = newPassword;
-    
-    // Save to localStorage
     localStorage.setItem("loggedInUser", JSON.stringify(user));
     
-    // Update in users database
     const users = JSON.parse(localStorage.getItem("users")) || [];
     const userIndex = users.findIndex(u => u.email === user.email);
     if (userIndex !== -1) {
@@ -422,12 +396,10 @@ class PasswordManager {
       localStorage.setItem("users", JSON.stringify(users));
     }
     
-    // Clear inputs
     if (this.currentPasswordInput) this.currentPasswordInput.value = '';
     if (this.newPasswordInput) this.newPasswordInput.value = '';
     if (this.confirmPasswordInput) this.confirmPasswordInput.value = '';
     
-    // Reset all password fields to hidden
     this.toggleIcons.forEach(icon => {
       const targetId = icon.dataset.target;
       const input = document.getElementById(targetId);
@@ -438,13 +410,12 @@ class PasswordManager {
       }
     });
     
-    // Reset flag sau khi xử lý xong
     this.isProcessing = false;
-    
     this.showNotification('✅ Mật khẩu đã được cập nhật thành công!', 'success');
   }
   
   showNotification(message, type = 'success') {
+    // (Giữ nguyên hàm showNotification của bạn)
     const icons = { 
       success: 'checkbox-circle-line', 
       error: 'error-warning-line', 
@@ -482,7 +453,6 @@ class PasswordManager {
     
     document.body.appendChild(notification);
     
-    // Animation
     setTimeout(() => {
       notification.style.transform = 'translateX(0)';
     }, 100);
@@ -493,6 +463,70 @@ class PasswordManager {
     }, 3000);
   }
 }
+
+
+// === HÀM MỚI: TẢI LỊCH SỬ ĐƠN HÀNG ===
+/**
+ * Tải và hiển thị lịch sử đơn hàng từ localStorage
+ */
+function loadOrderHistory() {
+  const orderListContainer = document.getElementById("account-order-list");
+  if (!orderListContainer) return;
+
+  const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser"));
+  const allOrders = JSON.parse(localStorage.getItem("orders")) || [];
+
+  if (!loggedInUser) {
+    orderListContainer.innerHTML = `<p class="order-empty-message">Vui lòng đăng nhập để xem lịch sử đơn hàng.</p>`;
+    return;
+  }
+
+  // Lọc các đơn hàng của người dùng hiện tại (dựa trên email)
+  const userOrders = allOrders.filter(order => 
+    order.userEmail === loggedInUser.email
+  );
+
+  if (userOrders.length === 0) {
+    orderListContainer.innerHTML = `<p class="order-empty-message">Bạn chưa có đơn hàng nào.</p>`;
+    return;
+  }
+
+  // Sắp xếp đơn hàng mới nhất lên đầu
+  userOrders.sort((a, b) => b.id - a.id); 
+
+  // Render các đơn hàng
+  orderListContainer.innerHTML = userOrders.map(order => {
+    // Tạo danh sách sản phẩm cho đơn hàng
+    const productsHTML = order.products.map(product => `
+      <div class="order-product-item">
+        <img src="${product.image}" alt="${product.name}">
+        <span>${product.name} (x${product.quantity})</span>
+      </div>
+    `).join("");
+
+    // Định dạng trạng thái (bạn có thể mở rộng)
+    let statusClass = "status-new";
+    if (order.status === "Đã hủy") statusClass = "status-cancelled";
+    if (order.status === "Hoàn thành") statusClass = "status-completed";
+
+    return `
+      <div class="order-card">
+        <div class="order-card-header">
+          <div><strong>Mã đơn:</strong> #${order.id}</div>
+          <div><strong>Ngày đặt:</strong> ${new Date(order.date).toLocaleString('vi-VN')}</div>
+          <div><strong>Tổng tiền:</strong> <span class="order-total">${order.total.toLocaleString('vi-VN')} đ</span></div>
+          <div><strong>Trạng thái:</strong> <span class="order-status ${statusClass}">${order.status}</span></div>
+        </div>
+        <div class="order-card-body">
+          <p><strong>Các sản phẩm:</strong></p>
+          ${productsHTML}
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+// ======================================
+
 
 // Initialize Account Detail when user is logged in
 function initAccountDetail() {
@@ -506,9 +540,15 @@ function initAccountDetail() {
   // Có user -> load thông tin và khởi tạo
   loadUserInfo(); // Load header info
   loadAccountDetailInfo(); // Load account detail page info + avatar
-  initTabNavigation();
+  initTabNavigation(); // Cài đặt chuyển tab
   new PersonalInfoManager();
   new PasswordManager();
+
+  // Tải lịch sử đơn hàng cho tab 'order' (ngay cả khi nó đang ẩn)
+  // để khi người dùng click, nó đã sẵn sàng.
+  // Hoặc, bạn có thể chờ click trong initTabNavigation()
+  // loadOrderHistory(); // <-- Đã chuyển vào initTabNavigation()
+  
   return true;
 }
 
@@ -527,3 +567,18 @@ document.addEventListener('DOMContentLoaded', () => {
     initAccountDetail();
   }
 });
+
+// GHI CHÚ:
+// File user.js của bạn có một hàm tên là initAccountDetail()
+// Hãy đảm bảo rằng hàm đó trong user.js gọi hàm initAccountDetail()
+// trong file NÀY khi chuyển view SPA.
+// Ví dụ, trong user.js:
+/*
+  navigateToView(viewName) {
+    // ... (code khác) ...
+    if (viewName === "account-detail" && typeof initAccountDetail === "function") {
+      initAccountDetail(); // Phải gọi hàm trong file account-detail.js này
+    }
+    // ... (code khác) ...
+  }
+*/

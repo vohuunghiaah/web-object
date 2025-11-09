@@ -2738,18 +2738,6 @@ form input[type="checkbox"]:checked + label {
   gap: 2.5rem; /* Khoảng cách giữa 2 link */
 }
 
-/* Link "Xem lịch sử mua hàng" mới thêm (thêm vào) */
-#view-order-history {
-  font-size: 1.6rem;
-  color: #ffd700;
-  text-decoration: underline;
-  cursor: pointer;
-  transition: color 0.3s;
-}
-
-#view-order-history:hover {
-  color: #fff;
-}
 /* ================= THANH TOÁN ================= */
 .thanhtoan-container {
   max-width: 900px;

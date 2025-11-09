@@ -382,3 +382,109 @@
 .account-detail-bottom-security .account-detail-bottom-security-container .account-detail-bottom-security-button:active {
   transform: translateY(0);
 }
+
+.account-order-list-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.order-empty-message {
+  font-size: 1.6rem;
+  color: #999;
+  text-align: center;
+  padding: 4rem 0;
+}
+
+.order-card {
+  background-color: #1a1a1a;
+  border: 1px solid #3a3a3a;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+}
+
+.order-card:hover {
+  border-color: #ffd700;
+  box-shadow: 0 6px 15px rgba(255, 215, 0, 0.1);
+}
+
+.order-card-header {
+  display: flex;
+  flex-wrap: wrap; /* Cho phép xuống dòng trên di động */
+  justify-content: space-between;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1.5rem 2rem;
+  background-color: #2a2a2a;
+  border-bottom: 1px solid #3a3a3a;
+  font-size: 1.4rem;
+  color: #ccc;
+}
+
+.order-card-header strong {
+  color: #fff;
+}
+
+.order-total {
+  font-size: 1.6rem;
+  font-weight: bold;
+  color: #ffd700;
+}
+
+.order-status {
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-weight: bold;
+  font-size: 1.3rem;
+  color: #000;
+}
+
+.order-status.status-new {
+  background-color: #4dabf7; /* Màu xanh dương */
+}
+.order-status.status-completed {
+  background-color: #51cf66; /* Màu xanh lá */
+}
+.order-status.status-cancelled {
+  background-color: #fa5252; /* Màu đỏ */
+  color: #fff;
+}
+
+.order-card-body {
+  padding: 2rem;
+}
+
+.order-card-body > p {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #fff;
+  margin-bottom: 1.5rem;
+}
+
+.order-product-item {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid #2a2a2a;
+}
+
+.order-product-item:last-child {
+  border-bottom: none;
+}
+
+.order-product-item img {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #3a3a3a;
+}
+
+.order-product-item span {
+  font-size: 1.4rem;
+  color: #ddd;
+}
