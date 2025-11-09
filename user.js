@@ -314,6 +314,9 @@ function safeReplaceHandler(el, event, handler) {
 
 // ================= Render giỏ hàng =================
 function renderCart() {
+  // Reload cart từ localStorage để đảm bảo dữ liệu mới nhất
+  cart = JSON.parse(localStorage.getItem("cart")) || [];
+  
   const container = document.querySelector(".cart-items");
   const emptyMsg = document.querySelector(".cart-empty");
 
@@ -565,6 +568,11 @@ function checkoutOrder() {
   orders.push(order);
   localStorage.setItem("orders", JSON.stringify(orders));
   alert("Đặt hàng thành công!");
+
+  // Cập nhật lịch sử đơn hàng realtime (nếu đang ở tab đơn hàng)
+  if (typeof loadOrderHistory === 'function') {
+    loadOrderHistory();
+  }
 
   // ====== BƯỚC 3: HIỂN THỊ HÓA ĐƠN ======
   const billProducts = document.querySelector(".bill-products");
@@ -856,6 +864,17 @@ function updateUserUI() {
     logoutLink.style.display = "inline-block";
     cartLink.style.display = "inline-block";
     if (accountLink) accountLink.style.display = "inline-block";
+    
+    // Cập nhật avatar nếu có
+    const userAvatar = document.getElementById('user-avatar');
+    if (userAvatar) {
+      if (user.avatar) {
+        userAvatar.src = user.avatar;
+        userAvatar.style.display = 'inline-block';
+      } else {
+        userAvatar.style.display = 'none';
+      }
+    }
   } else {
     // Chưa đăng nhập
     userInfo.style.display = "none";
@@ -865,6 +884,42 @@ function updateUserUI() {
     if (accountLink) accountLink.style.display = "none";
   }
 }
+
+// Hàm global để refresh toàn bộ dữ liệu user ở mọi nơi
+window.refreshUserData = function() {
+  const user = JSON.parse(localStorage.getItem("loggedInUser"));
+  if (!user) return;
+  
+  // 1. Cập nhật header navigation
+  updateUserUI();
+  
+  // 2. Cập nhật account detail page (nếu đang mở)
+  const accountDetailView = document.getElementById('view-account-detail');
+  if (accountDetailView && accountDetailView.classList.contains('active')) {
+    // Cập nhật avatar trong account detail
+    const avatarImg = document.querySelector('.account-detail-top-avatar-img img');
+    if (avatarImg && user.avatar) {
+      avatarImg.src = user.avatar;
+    }
+    
+    // Cập nhật tên trong header
+    const headerName = document.querySelector('.account-detail-top-info h1');
+    if (headerName) {
+      headerName.textContent = user.name || user.email.split('@')[0];
+    }
+    
+    // Cập nhật mô tả
+    const headerDesc = document.querySelector('.account-detail-top-info p');
+    if (headerDesc && user.bio) {
+      headerDesc.textContent = user.bio;
+    }
+    
+    // Cập nhật các input fields (không cần vì đã được xử lý trong saveChanges)
+  }
+  
+  console.log("✅ User data refreshed globally");
+};
+
 
 // Cho phép mở giỏ hàng nếu đã login
 function allowCartAccess(e) {

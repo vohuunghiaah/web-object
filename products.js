@@ -1066,36 +1066,43 @@ function setupBuyNowButton(product) {
       // ĐÃ ĐĂNG NHẬP
       const price = parseInt(product.currentPrice.replace(/[^\d]/g, ""));
 
+      // Tạo sản phẩm mới cho giỏ hàng
+      const newCartItem = {
+        name: product.name,
+        price: price,
+        image: product.imgSrc,
+        quantity: quantity,
+      };
+
+      console.log("Buy Now - Setting cart with:", newCartItem);
+
+      // Set giỏ hàng với sản phẩm mới (thay thế giỏ hàng cũ)
       if (typeof window.setCart === "function") {
-        window.setCart([
-          {
-            name: product.name,
-            price: price,
-            image: product.imgSrc,
-            quantity: quantity,
-          },
-        ]);
+        window.setCart([newCartItem]);
+        console.log("Cart set via window.setCart");
       } else {
         // Fallback: trực tiếp gán
-        window.cart = [
-          {
-            name: product.name,
-            price: price,
-            image: product.imgSrc,
-            quantity: quantity,
-          },
-        ];
+        window.cart = [newCartItem];
         localStorage.setItem("cart", JSON.stringify(window.cart));
+        console.log("Cart set via fallback");
       }
+
+      console.log("Cart in localStorage:", localStorage.getItem("cart"));
 
       // Mở modal giỏ hàng và hiển thị trang thanh toán
       if (window.router && typeof window.router.openModal === "function") {
         window.router.openModal("cart-modal");
         // Chuyển đến trang thanh toán
         setTimeout(() => {
-          renderCart();
-          renderCheckout();
-          showPage("thanhtoan-page");
+          if (typeof renderCart === "function") {
+            renderCart();
+          }
+          if (typeof renderCheckout === "function") {
+            renderCheckout();
+          }
+          if (typeof showPage === "function") {
+            showPage("thanhtoan-page");
+          }
         }, 100);
       }
     }

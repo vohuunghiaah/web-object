@@ -26,12 +26,22 @@ function loadUserInfo() {
 // Load thông tin user vào account detail page
 function loadAccountDetailInfo() {
   const user = JSON.parse(localStorage.getItem("loggedInUser"));
-  if (!user) return;
+  if (!user) {
+    console.warn("⚠️ No user logged in");
+    return;
+  }
+  
+  console.log("📝 Loading account detail for:", user.email, user);
   
   // Cập nhật avatar
   const avatarImg = document.querySelector('.account-detail-top-avatar-img img');
-  if (avatarImg && user.avatar) {
-    avatarImg.src = user.avatar;
+  if (avatarImg) {
+    if (user.avatar) {
+      avatarImg.src = user.avatar;
+    } else {
+      // Nếu không có avatar, dùng placeholder
+      avatarImg.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100"%3E%3Crect fill="%23ddd" width="100" height="100"/%3E%3Ctext fill="%23999" x="50%25" y="50%25" text-anchor="middle" dy=".3em" font-size="40"%3E?%3C/text%3E%3C/svg%3E';
+    }
   }
   
   // Cập nhật tên và mô tả
@@ -42,22 +52,39 @@ function loadAccountDetailInfo() {
     headerName.textContent = user.name || user.email.split('@')[0];
   }
   
-  if (headerDesc && user.bio) {
-    headerDesc.textContent = user.bio;
+  if (headerDesc) {
+    headerDesc.textContent = user.bio || 'Chưa có thông tin giới thiệu';
   }
   
-  // Cập nhật các input fields
+  // Cập nhật các input fields - QUAN TRỌNG: Force update value
   const nameInput = document.querySelector('.account-detail-bottom-info-item:nth-child(1) .info-value');
   const emailInput = document.querySelector('.account-detail-bottom-info-item:nth-child(2) .info-value');
   const phoneInput = document.querySelector('.account-detail-bottom-info-item:nth-child(3) .info-value');
   const addressInput = document.querySelector('.account-detail-bottom-info-item:nth-child(4) .info-value');
   const bioTextarea = document.querySelector('.account-detail-bottom-info-about .info-value');
   
-  if (nameInput) nameInput.value = user.name || '';
-  if (emailInput) emailInput.value = user.email || '';
-  if (phoneInput) phoneInput.value = user.phone || '';
-  if (addressInput) addressInput.value = user.address || '';
-  if (bioTextarea) bioTextarea.value = user.bio || 'Chưa có thông tin giới thiệu';
+  if (nameInput) {
+    nameInput.value = user.name || '';
+    nameInput.defaultValue = user.name || '';
+  }
+  if (emailInput) {
+    emailInput.value = user.email || '';
+    emailInput.defaultValue = user.email || '';
+  }
+  if (phoneInput) {
+    phoneInput.value = user.phone || '';
+    phoneInput.defaultValue = user.phone || '';
+  }
+  if (addressInput) {
+    addressInput.value = user.address || '';
+    addressInput.defaultValue = user.address || '';
+  }
+  if (bioTextarea) {
+    bioTextarea.value = user.bio || 'Chưa có thông tin giới thiệu';
+    bioTextarea.defaultValue = user.bio || 'Chưa có thông tin giới thiệu';
+  }
+  
+  console.log("✅ Account detail info loaded successfully");
 }
 
 // Tab Navigation (Phiên bản cập nhật)
@@ -155,6 +182,12 @@ class PersonalInfoManager {
           localStorage.setItem("users", JSON.stringify(users));
         }
       }
+      
+      // Cập nhật UI ngay lập tức ở mọi nơi
+      if (typeof window.refreshUserData === 'function') {
+        window.refreshUserData();
+      }
+      
       this.showNotification('✅ Avatar đã được cập nhật!', 'success');
     };
     reader.readAsDataURL(file);
@@ -219,7 +252,10 @@ class PersonalInfoManager {
       localStorage.setItem("users", JSON.stringify(users));
     }
     
-    loadUserInfo();
+    // Gọi hàm refresh UI global để cập nhật mọi nơi
+    if (typeof window.refreshUserData === 'function') {
+      window.refreshUserData();
+    }
     
     this.inputs.forEach(input => {
       input.disabled = true;
@@ -536,9 +572,19 @@ function initAccountDetail() {
     return false;
   }
   
+  // Clear các instance cũ để tránh duplicate
+  // Reset tab về Info tab
+  document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+  
+  const infoTab = document.querySelector('.nav-tab[data-tab="info"]');
+  const infoContent = document.getElementById('info-tab');
+  if (infoTab) infoTab.classList.add('active');
+  if (infoContent) infoContent.classList.add('active');
+  
   // Có user -> load thông tin và khởi tạo
   loadUserInfo(); // Load header info
-  loadAccountDetailInfo(); // Load account detail page info + avatar
+  loadAccountDetailInfo(); // Load account detail page info + avatar (QUAN TRỌNG: load lại data mới)
   initTabNavigation(); // Cài đặt chuyển tab
   new PersonalInfoManager();
   new PasswordManager();
@@ -547,6 +593,8 @@ function initAccountDetail() {
   // để khi người dùng click, nó đã sẵn sàng.
   // Hoặc, bạn có thể chờ click trong initTabNavigation()
   // loadOrderHistory(); // <-- Đã chuyển vào initTabNavigation()
+  
+  console.log("✅ Account detail initialized for:", user.name || user.email);
   
   return true;
 }
