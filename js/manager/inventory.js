@@ -140,7 +140,6 @@ export function initInventoryPage() {
                 if (orderDate >= start && orderDate <= end) {
                     if (order.products) {
                         order.products.forEach(p => {
-                             // Order lưu productId có thể là string hoặc number, cần ép kiểu để so sánh an toàn
                             if (parseInt(p.productId) === productId) {
                                 ledger.push({
                                     date: orderDate,
