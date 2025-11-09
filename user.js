@@ -1081,7 +1081,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (window.router && typeof window.router.openModal === "function") {
       window.router.openModal("cart-modal"); 
 
-      // ✨ THÊM DÒNG NÀY:
       if (typeof showPage === "function") {
         showPage("cart-page");
       }
@@ -1095,7 +1094,6 @@ document.addEventListener("DOMContentLoaded", () => {
         cartModal.classList.add("active");
         document.body.style.overflow = "hidden";
 
-        // ✨ THÊM CẢ VÀO ĐÂY:
         if (typeof showPage === "function") {
           showPage("cart-page");
         }

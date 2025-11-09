@@ -1148,7 +1148,7 @@ header
   font-size: 2.4rem;
 }
 /* 🎄 CONTAINER MODAL */
-/* 🎄 CONTAINER MODAL */
+/* 🖤 CONTAINER MODAL - Gold & Black Theme */
 .modal-container {
   position: fixed;
   inset: 0;
@@ -1159,66 +1159,38 @@ header
   font-family: "Poppins", "Segoe UI", sans-serif;
 }
 
-/* ✨ LỚP PHỦ */
+/* 🪶 LỚP PHỦ */
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(10, 65, 10, 0.55);
-  backdrop-filter: blur(6px);
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
   cursor: pointer;
   z-index: 2000;
 }
 
-/* 🎁 NỘI DUNG MODAL - Christmas Theme */
+/* 💛 NỘI DUNG MODAL - Gold & Black Style */
 .modal-content {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%) scale(0.95);
-  background: linear-gradient(135deg, #a8dadc, #457b9d);
-  border-radius: 2rem;
-  padding: 3.5rem 3rem;
-  box-shadow: 0 0 30px rgba(255, 215, 0, 0.3), 0 0 60px rgba(0, 128, 0, 0.3);
+  background: #000;
+  border-radius: 1.8rem;
+  padding: 3rem 2.8rem;
+  border: 2px solid #ffd700;
+  color: #ffd700;
   z-index: 2001;
   opacity: 0;
   visibility: hidden;
   min-width: 38rem;
   max-width: 90%;
-  border: 3px solid black;
-  color: #333;
-  transition: opacity 0.3s ease, transform 0.3s ease, box-shadow 0.4s ease;
+  transition: opacity 0.3s ease, transform 0.3s ease, border-color 0.3s ease;
 }
 
-/* Hoa tuyết bay xung quanh modal */
-.modal-content::before,
-.modal-content::after {
-  content: "❆";
-  position: absolute;
-  font-size: 2.8rem;
-  color: #fff;
-  opacity: 0.6;
-  animation: snow-spin 12s linear infinite;
-}
+/* ❄️ Bỏ hiệu ứng hoa tuyết và đổ bóng */
 
-.modal-content::before {
-  top: -1.5rem;
-  left: 2.2rem;
-}
-
-.modal-content::after {
-  bottom: -1.8rem;
-  right: 2.7rem;
-}
-
-@keyframes snow-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
+/* Hiển thị khi kích hoạt */
 .modal-container.active {
   display: flex;
 }
@@ -1227,15 +1199,15 @@ header
   opacity: 1;
   visibility: visible;
   transform: translate(-50%, -50%) scale(1);
-  box-shadow: 0 0 40px rgba(255, 215, 0, 0.5), 0 0 80px rgba(0, 128, 0, 0.5);
+  border-color: #ffcc33;
 }
 
-/* 🎀 NÚT ĐÓNG kiểu Christmas */
+/* ✖️ NÚT ĐÓNG - Vàng tinh tế */
 .close-btn {
   position: absolute;
   top: 1rem;
   right: 1.5rem;
-  font-size: 3rem;
+  font-size: 2.8rem;
   color: #ffd700;
   background: none;
   border: none;
@@ -1244,11 +1216,12 @@ header
 }
 
 .close-btn:hover {
-  color: #e53935;
+  color: #ff3333;
   transform: rotate(90deg) scale(1.2);
 }
 
-/* 🧸 FORM NỘI DUNG */
+
+/* 🖤 FORM NỘI DUNG - Gold & Black Style */
 .auth-form {
   display: flex;
   flex-direction: column;
@@ -1257,63 +1230,66 @@ header
 
 .auth-form label {
   font-weight: 600;
-  color: #444;
+  color: #ffd700; /* vàng nổi bật */
   margin-bottom: 0.3rem;
 }
 
+/* Ô nhập dữ liệu - nền tối, viền vàng nhẹ */
 .auth-form input {
   width: 100%;
   padding: 1rem 1.2rem;
-  border: 2px solid rgba(0, 128, 0, 0.25);
+  border: 2px solid #555;
   border-radius: 0.6rem;
   font-size: 1.5rem;
   outline: none;
-  background-color: #fffdf9;
-  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+  background-color: #111;
+  color: #f1f1f1;
+  transition: border-color 0.25s ease, background-color 0.25s ease;
 }
 
+/* Khi focus - đổi viền vàng rực */
 .auth-form input:focus {
-  border-color: #e53935;
-  box-shadow: 0 0 10px rgba(255, 0, 0, 0.3);
+  border-color: #ffd700;
+  background-color: #1a1a1a;
 }
 
-/* 💫 NÚT CHÍNH */
+/* 💛 NÚT CHÍNH */
 .btn-primary {
   display: block;
   margin: 0 auto;
-  background: linear-gradient(135deg, #a8dadc, #457b9d);
-  color: white;
+  background-color: #ffd700;
+  color: #000;
   border: none;
   padding: 1.1rem;
   border-radius: 0.8rem;
   cursor: pointer;
   font-weight: 600;
   font-size: 1.6rem;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.2s ease, background-color 0.2s ease;
 }
 
 .btn-primary:hover {
   transform: translateY(-3px);
-  box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
+  background-color: #ffcc33;
 }
 
-/* 🎁 FOOTER kiểu Christmas */
+/* ⚜️ FOOTER - Tông vàng dịu, không còn Christmas */
 .form-footer {
   text-align: center;
   font-size: 1.4rem;
   margin-top: 1.2rem;
-  color: #2e7d32;
-  text-shadow: 0 1px 6px #ffe4e1, 0 0 4px #d32f2f;
+  color: #aaa;
 }
 
 .form-footer a {
-  color: #b30000;
+  color: #ffd700;
   font-weight: 600;
+  transition: color 0.2s ease;
 }
 
 .form-footer a:hover {
   text-decoration: underline;
-  color: #2e7d32;
+  color: #ffcc33;
 }
 
 /* 🚫 KHÓA CUỘN KHI MỞ MODAL */

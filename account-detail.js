@@ -512,7 +512,6 @@ function loadOrderHistory() {
     return `
       <div class="order-card">
         <div class="order-card-header">
-          <div><strong>Mã đơn:</strong> #${order.id}</div>
           <div><strong>Ngày đặt:</strong> ${new Date(order.date).toLocaleString('vi-VN')}</div>
           <div><strong>Tổng tiền:</strong> <span class="order-total">${order.total.toLocaleString('vi-VN')} đ</span></div>
           <div><strong>Trạng thái:</strong> <span class="order-status ${statusClass}">${order.status}</span></div>
@@ -567,18 +566,3 @@ document.addEventListener('DOMContentLoaded', () => {
     initAccountDetail();
   }
 });
-
-// GHI CHÚ:
-// File user.js của bạn có một hàm tên là initAccountDetail()
-// Hãy đảm bảo rằng hàm đó trong user.js gọi hàm initAccountDetail()
-// trong file NÀY khi chuyển view SPA.
-// Ví dụ, trong user.js:
-/*
-  navigateToView(viewName) {
-    // ... (code khác) ...
-    if (viewName === "account-detail" && typeof initAccountDetail === "function") {
-      initAccountDetail(); // Phải gọi hàm trong file account-detail.js này
-    }
-    // ... (code khác) ...
-  }
-*/
