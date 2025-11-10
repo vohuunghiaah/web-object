@@ -767,10 +767,18 @@
       <div class="checkout-left">
         <class class="checkout-form">
           <h3>Thông tin giao hàng</h3>
-          <div class="form-row"><input type="text" placeholder="Họ và tên" required></div>
+          <div class="form-row"><input type="text" placeholder="Họ và tên" required 
+                    pattern="[a-zA-ZÀ-ỹ\s]{2,50}" 
+                    title="Nhập 2-50 ký tự, không chứa số">
+            </div>
           <div class="form-row two-col">
-            <input type="email" placeholder="Email" required>
-            <input type="tel" placeholder="Số điện thoại" required pattern="[0-9]{10}">
+                  <input type="email" placeholder="Email" required 
+                   pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$" 
+                   title="Nhập địa chỉ email hợp lệ">
+                  <input type="tel" placeholder="Số điện thoại" required 
+                  pattern="0[0-9]{9}" 
+                  title="Nhập đúng 10 số, bắt đầu bằng 0"
+                  maxlength="10">
           </div>
           <div class="form-row"><input type="text" placeholder="Địa chỉ" required></div>
           <div class="form-row two-col">

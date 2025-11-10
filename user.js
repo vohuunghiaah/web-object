@@ -55,7 +55,10 @@ class SPARouter {
       this.currentView = viewName;
 
       // Khởi tạo account-detail nếu cần
-      if (viewName === "account-detail" && typeof initAccountDetail === "function") {
+      if (
+        viewName === "account-detail" &&
+        typeof initAccountDetail === "function"
+      ) {
         window.initAccountDetail();
       }
 
@@ -316,7 +319,7 @@ function safeReplaceHandler(el, event, handler) {
 function renderCart() {
   // Reload cart từ localStorage để đảm bảo dữ liệu mới nhất
   cart = JSON.parse(localStorage.getItem("cart")) || [];
-  
+
   const container = document.querySelector(".cart-items");
   const emptyMsg = document.querySelector(".cart-empty");
 
@@ -406,18 +409,18 @@ function renderCart() {
   const historyBtn = document.getElementById("view-order-history");
   if (historyBtn) {
     safeReplaceHandler(historyBtn, "click", (e) => {
-        e.preventDefault(); // Ngăn link tự nhảy trang
-        
-        // Gọi hàm showPage (đã có sẵn trong file của bạn)
-        if (typeof showPage === "function") {
-            showPage("donmua-page");
-            renderOrderHistory(); // Tải lại lịch sử đơn hàng
-        }
-        
-        // Đóng modal giỏ hàng
-        if (window.router && typeof window.router.closeModal === "function") {
-            window.router.closeModal();
-        }
+      e.preventDefault(); // Ngăn link tự nhảy trang
+
+      // Gọi hàm showPage (đã có sẵn trong file của bạn)
+      if (typeof showPage === "function") {
+        showPage("donmua-page");
+        renderOrderHistory(); // Tải lại lịch sử đơn hàng
+      }
+
+      // Đóng modal giỏ hàng
+      if (window.router && typeof window.router.closeModal === "function") {
+        window.router.closeModal();
+      }
     });
   }
 }
@@ -472,15 +475,16 @@ function renderCheckout() {
   }
 }
 // ================= Hiển thị form chuyển khoản =================
-document.querySelectorAll('input[name="pay"]').forEach(radio => {
-    radio.addEventListener('change', () => {
-        document.getElementById('bank-info').style.display = (radio.value === 'bank') ? 'block' : 'none';
-    });
+document.querySelectorAll('input[name="pay"]').forEach((radio) => {
+  radio.addEventListener("change", () => {
+    document.getElementById("bank-info").style.display =
+      radio.value === "bank" ? "block" : "none";
+  });
 });
 // ================= Thanh toán =================
 // === SỬA LỖI 2: THAY THẾ TOÀN BỘ HÀM NÀY ===
 function checkoutOrder() {
-  // Kiểm tra đăng nhập trước khi lấy thông tin giao hàng
+  // Kiểm tra đăng nhập
   const user = JSON.parse(localStorage.getItem("loggedInUser"));
   if (!user) {
     alert("Vui lòng đăng nhập để tiếp tục thanh toán!");
@@ -497,26 +501,89 @@ function checkoutOrder() {
 
   // Lấy thông tin giao hàng
   const form = document.querySelector(".checkout-form");
-  const name = form.querySelector('input[placeholder="Họ và tên"]').value;
-  const email = form.querySelector('input[type="email"]').value;
-  const phone = form.querySelector('input[type="tel"]').value;
-  const address = form.querySelector('input[placeholder="Địa chỉ"]').value;
-  const ward = form.querySelector('input[placeholder="Phường/Xã"]').value;
-  const district = form.querySelector('input[placeholder="Quận/Huyện"]').value;
-  const city = form.querySelector('input[placeholder="Tỉnh/Thành phố"]').value;
-  const payMethod = form.querySelector('input[name="pay"]:checked').value;
+  const name = form
+    .querySelector('input[placeholder="Họ và tên"]')
+    .value.trim();
+  const email = form.querySelector('input[type="email"]').value.trim();
+  const phone = form.querySelector('input[type="tel"]').value.trim();
+  const address = form
+    .querySelector('input[placeholder="Địa chỉ"]')
+    .value.trim();
+  const ward = form
+    .querySelector('input[placeholder="Phường/Xã"]')
+    .value.trim();
+  const district = form
+    .querySelector('input[placeholder="Quận/Huyện"]')
+    .value.trim();
+  const city = form
+    .querySelector('input[placeholder="Tỉnh/Thành phố"]')
+    .value.trim();
+  const payMethod = form.querySelector('input[name="pay"]:checked')?.value;
 
-  if (!name || !email || !phone || !address || !ward || !district || !city) {
-    alert("Vui lòng điền đầy đủ thông tin giao hàng trước khi thanh toán!");
+  // ===== THÊM VALIDATION CHI TIẾT =====
+
+  // 1. Kiểm tra rỗng
+  if (
+    !name ||
+    !email ||
+    !phone ||
+    !address ||
+    !ward ||
+    !district ||
+    !city ||
+    !payMethod
+  ) {
+    alert("Vui lòng điền đầy đủ thông tin giao hàng!");
     return;
   }
+
+  // 2. Validate tên (ít nhất 2 ký tự, không chứa số hoặc ký tự đặc biệt)
+  const nameRegex = /^[a-zA-ZÀ-ỹ\s]{2,50}$/;
+  if (!nameRegex.test(name)) {
+    alert("Tên không hợp lệ! Vui lòng nhập từ 2-50 ký tự, không chứa số.");
+    return;
+  }
+
+  // 3. Validate email
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    alert(
+      "Email không hợp lệ! Vui lòng nhập đúng định dạng (vd: example@gmail.com)"
+    );
+    return;
+  }
+
+  // 4. Validate số điện thoại Việt Nam (10 số, bắt đầu bằng 0)
+  const phoneRegex = /^0[0-9]{9}$/;
+  if (!phoneRegex.test(phone)) {
+    alert(
+      "Số điện thoại không hợp lệ! Vui lòng nhập đúng 10 số (vd: 0912345678)"
+    );
+    return;
+  }
+
+  // 5. Validate độ dài địa chỉ (tối thiểu 10 ký tự)
+  if (address.length < 10) {
+    alert(
+      "Địa chỉ quá ngắn! Vui lòng nhập địa chỉ chi tiết (tối thiểu 10 ký tự)"
+    );
+    return;
+  }
+
+  // 6. Validate phường/xã, quận/huyện, tỉnh/thành (tối thiểu 2 ký tự)
+  if (ward.length < 2 || district.length < 2 || city.length < 2) {
+    alert("Thông tin Phường/Xã, Quận/Huyện, Tỉnh/Thành không hợp lệ!");
+    return;
+  }
+
+  // ===== TIẾP TỤC LOGIC CŨ =====
 
   let total =
     cart.reduce((sum, p) => sum + p.price * p.quantity, 0) + shippingFee;
 
-  // ====== BƯỚC 1: KIỂM TRA TỒN KHO (KHÔNG TRỪ) ======
+  // Kiểm tra tồn kho
   let products = JSON.parse(localStorage.getItem("products")) || [];
-  let stockWarnings = []; 
+  let stockWarnings = [];
 
   cart.forEach((cartItem) => {
     const productIndex = products.findIndex((p) => p.name === cartItem.name);
@@ -528,12 +595,10 @@ function checkoutOrder() {
           `${product.name} chỉ còn ${product.quantity} sản phẩm!`
         );
       }
-      // ĐÃ XÓA LOGIC TRỪ KHO (theo yêu cầu)
     } else {
-        // SỬA LỖI: Phải chặn nếu không tìm thấy
-        stockWarnings.push(
-          `Không tìm thấy sản phẩm "${cartItem.name}" trong kho!`
-        );
+      stockWarnings.push(
+        `Không tìm thấy sản phẩm "${cartItem.name}" trong kho!`
+      );
     }
   });
 
@@ -542,25 +607,22 @@ function checkoutOrder() {
     return;
   }
 
-  // ====== BƯỚC 2: TẠO DỮ LIỆU ĐƠN HÀNG ======
-
-  // Tạo mảng sản phẩm mới cho đơn hàng, có chứa ID
-  const productsForOrder = cart.map(cartItem => {
-    const productInStock = products.find(p => p.name === cartItem.name);
+  // Tạo đơn hàng
+  const productsForOrder = cart.map((cartItem) => {
+    const productInStock = products.find((p) => p.name === cartItem.name);
     return {
-        ...cartItem, // name, price, image, quantity
-        productId: productInStock ? productInStock.id : null // Thêm ID
+      ...cartItem,
+      productId: productInStock ? productInStock.id : null,
     };
   });
 
-  // Lưu đơn hàng (ĐÃ SỬA HOÀN CHỈNH)
   const order = {
-    id: Date.now(),                     // THÊM ID ĐƠN HÀNG
-    date: new Date().toISOString(),     // SỬA ĐỊNH DẠNG NGÀY
-    products: productsForOrder,         // SỬA LOGIC (dùng mảng có ID)
+    id: Date.now(),
+    date: new Date().toISOString(),
+    products: productsForOrder,
     total,
-    userEmail: user.email,                         // THÊM TÊN USER
-    status: "Mới đặt",                  // THÊM TRẠNG THÁI
+    userEmail: user.email,
+    status: "Mới đặt",
     payMethod,
     address: { name, email, phone, address, ward, district, city },
   };
@@ -569,20 +631,19 @@ function checkoutOrder() {
   localStorage.setItem("orders", JSON.stringify(orders));
   alert("Đặt hàng thành công!");
 
-  // Cập nhật lịch sử đơn hàng realtime (nếu đang ở tab đơn hàng)
-  if (typeof loadOrderHistory === 'function') {
+  if (typeof loadOrderHistory === "function") {
     loadOrderHistory();
   }
 
-  // ====== BƯỚC 3: HIỂN THỊ HÓA ĐƠN ======
+  // Hiển thị hóa đơn
   const billProducts = document.querySelector(".bill-products");
   const billTotal = document.querySelector(".bill-total");
   const billPay = document.querySelector(".bill-pay");
   const dateEl = document.getElementById("date");
   const billAddress = document.querySelector(".bill-address");
-  
+
   billProducts.innerHTML = "";
-  order.products.forEach((item) => { 
+  order.products.forEach((item) => {
     const p = document.createElement("p");
     p.innerHTML = `<strong>${item.name}</strong> x ${item.quantity} - ${
       item.price * item.quantity
@@ -592,23 +653,22 @@ function checkoutOrder() {
 
   billTotal.innerText = total + " đ";
   billPay.innerText = payMethod.toUpperCase();
-  // SỬA: Hiển thị ngày tháng đúng
-  dateEl.innerText = new Date(order.date).toLocaleString('vi-VN'); 
+  dateEl.innerText = new Date(order.date).toLocaleString("vi-VN");
   billAddress.innerHTML = `
     <p><strong>Người đặt:</strong> ${name}</p>
     <p><strong>Địa chỉ:</strong> ${address}, ${ward}, ${district}, ${city}</p>
     <p><strong>SĐT:</strong> ${phone}</p>
   `;
 
-  //  === Xóa giỏ hàng ===
+  // Xóa giỏ hàng
   cart = [];
   localStorage.removeItem("cart");
   renderCart();
   renderCheckout();
   showPage("donmua-page");
 }
-// === KẾT THÚC SỬA LỖI 2 ===
 
+// === KẾT THÚC SỬA LỖI 2 ===
 
 // ================= Hiển thị lịch sử đơn hàng =================
 function renderOrderHistory() {
@@ -624,7 +684,6 @@ function renderOrderHistory() {
     });
   });
 }
-
 
 // Chuyển tới trang thanh toán
 // === SỬA LỖI 3: NÚT THANH TOÁN ===
@@ -681,7 +740,7 @@ function setupRegisterForm() {
     const password = form.querySelector("#signup-password").value.trim();
     const confirm = form.querySelector("#signup-confirm").value.trim();
     const pattern = /^[a-zA-Z0-9]+@(gmail\.com|yahoo\.com|outlook\.com)$/;
-    
+
     if (!name || !email || !password)
       return alert("Vui lòng nhập đầy đủ thông tin!");
     if (password !== confirm) return alert("Mật khẩu nhập lại không khớp!");
@@ -690,7 +749,7 @@ function setupRegisterForm() {
     if (users.some((u) => u.email === email))
       return alert("Email này đã được đăng ký!");
 
-    if(!pattern.test(email)) {
+    if (!pattern.test(email)) {
       e.preventDefault(); // Ngăn form gửi
       return alert("Email định dạng sai");
     }
@@ -700,7 +759,7 @@ function setupRegisterForm() {
       email: email,
       password: password,
       role: "Khách hàng",
-      state: "On"
+      state: "On",
     };
     users.push(newUser);
     localStorage.setItem("users", JSON.stringify(users));
@@ -722,29 +781,27 @@ function setupRegisterForm() {
 const loginEmailInput = document.getElementById("login-email");
 
 if (loginEmailInput) {
-    
-    // 1. Ghi đè thông báo khi trường bị "invalid" (không hợp lệ)
-    loginEmailInput.addEventListener("invalid", function(event) {
-        
-        if (loginEmailInput.validity.valueMissing) {
-            // Lỗi: Bị bỏ trống
-            loginEmailInput.setCustomValidity("Bạn ơi, email không được để trống!");
-        
-        } else if (loginEmailInput.validity.typeMismatch) {
-            // Lỗi: Sai định dạng (như trong hình của bạn)
-            loginEmailInput.setCustomValidity("Email phải có chữ '@' nhé. (ví dụ: user@xtray.com)");
-        
-        } else {
-            // Lỗi khác
-            loginEmailInput.setCustomValidity("Dữ liệu không hợp lệ.");
-        }
-    });
+  // 1. Ghi đè thông báo khi trường bị "invalid" (không hợp lệ)
+  loginEmailInput.addEventListener("invalid", function (event) {
+    if (loginEmailInput.validity.valueMissing) {
+      // Lỗi: Bị bỏ trống
+      loginEmailInput.setCustomValidity("Bạn ơi, email không được để trống!");
+    } else if (loginEmailInput.validity.typeMismatch) {
+      // Lỗi: Sai định dạng (như trong hình của bạn)
+      loginEmailInput.setCustomValidity(
+        "Email phải có chữ '@' nhé. (ví dụ: user@xtray.com)"
+      );
+    } else {
+      // Lỗi khác
+      loginEmailInput.setCustomValidity("Dữ liệu không hợp lệ.");
+    }
+  });
 
-    // 2. Xóa thông báo tùy chỉnh khi người dùng bắt đầu gõ
-    loginEmailInput.addEventListener("input", function(event) {
-        // Khi người dùng bắt đầu sửa lỗi, hãy xóa thông báo
-        loginEmailInput.setCustomValidity("");
-    });
+  // 2. Xóa thông báo tùy chỉnh khi người dùng bắt đầu gõ
+  loginEmailInput.addEventListener("input", function (event) {
+    // Khi người dùng bắt đầu sửa lỗi, hãy xóa thông báo
+    loginEmailInput.setCustomValidity("");
+  });
 }
 
 // ... (phần code khác của bạn như setupLoginForm()...)
@@ -761,34 +818,34 @@ function setupLoginForm() {
     const users = JSON.parse(localStorage.getItem("users")) || [];
     // Đặt vào bên trong 'DOMContentLoaded' trong file user.js
 
-// TÙY CHỈNH LẠI THÔNG BÁO LỖI CHO FORM ĐĂNG NHẬP
-const loginEmailInput = document.getElementById("login-email");
+    // TÙY CHỈNH LẠI THÔNG BÁO LỖI CHO FORM ĐĂNG NHẬP
+    const loginEmailInput = document.getElementById("login-email");
 
-if (loginEmailInput) {
-    
-    // 1. Ghi đè thông báo khi trường bị "invalid" (không hợp lệ)
-    loginEmailInput.addEventListener("invalid", function(event) {
-        
+    if (loginEmailInput) {
+      // 1. Ghi đè thông báo khi trường bị "invalid" (không hợp lệ)
+      loginEmailInput.addEventListener("invalid", function (event) {
         if (loginEmailInput.validity.valueMissing) {
-            // Lỗi: Bị bỏ trống
-            loginEmailInput.setCustomValidity("Bạn ơi, email không được để trống!");
-        
+          // Lỗi: Bị bỏ trống
+          loginEmailInput.setCustomValidity(
+            "Bạn ơi, email không được để trống!"
+          );
         } else if (loginEmailInput.validity.typeMismatch) {
-            // Lỗi: Sai định dạng (như trong hình của bạn)
-            loginEmailInput.setCustomValidity("Email phải có chữ '@' nhé. (ví dụ: user@xtray.com)");
-        
+          // Lỗi: Sai định dạng (như trong hình của bạn)
+          loginEmailInput.setCustomValidity(
+            "Email phải có chữ '@' nhé. (ví dụ: user@xtray.com)"
+          );
         } else {
-            // Lỗi khác
-            loginEmailInput.setCustomValidity("Dữ liệu không hợp lệ.");
+          // Lỗi khác
+          loginEmailInput.setCustomValidity("Dữ liệu không hợp lệ.");
         }
-    });
+      });
 
-    // 2. Xóa thông báo tùy chỉnh khi người dùng bắt đầu gõ
-    loginEmailInput.addEventListener("input", function(event) {
+      // 2. Xóa thông báo tùy chỉnh khi người dùng bắt đầu gõ
+      loginEmailInput.addEventListener("input", function (event) {
         // Khi người dùng bắt đầu sửa lỗi, hãy xóa thông báo
         loginEmailInput.setCustomValidity("");
-    });
-}
+      });
+    }
     // Hỗ trợ tài khoản demo
     if (email === "user@xtray.com" && password === "user123") {
       localStorage.setItem(
@@ -809,7 +866,9 @@ if (loginEmailInput) {
     );
     if (!user) return alert("Sai email hoặc mật khẩu!");
     if (user.state === "Off") {
-      return alert("Tài khoản của bạn đã bị khóa! Vui lòng liên hệ quản trị viên.");
+      return alert(
+        "Tài khoản của bạn đã bị khóa! Vui lòng liên hệ quản trị viên."
+      );
     }
     localStorage.setItem("loggedInUser", JSON.stringify(user));
     alert("Đăng nhập thành công!");
@@ -869,15 +928,15 @@ function updateUserUI() {
     logoutLink.style.display = "inline-block";
     cartLink.style.display = "inline-block";
     if (accountLink) accountLink.style.display = "inline-block";
-    
+
     // Cập nhật avatar nếu có
-    const userAvatar = document.getElementById('user-avatar');
+    const userAvatar = document.getElementById("user-avatar");
     if (userAvatar) {
       if (user.avatar) {
         userAvatar.src = user.avatar;
-        userAvatar.style.display = 'inline-block';
+        userAvatar.style.display = "inline-block";
       } else {
-        userAvatar.style.display = 'none';
+        userAvatar.style.display = "none";
       }
     }
   } else {
@@ -891,48 +950,49 @@ function updateUserUI() {
 }
 
 // Hàm global để refresh toàn bộ dữ liệu user ở mọi nơi
-window.refreshUserData = function() {
+window.refreshUserData = function () {
   const user = JSON.parse(localStorage.getItem("loggedInUser"));
   if (!user) return;
-  
+
   // 1. Cập nhật header navigation
   updateUserUI();
-  
+
   // 2. Cập nhật account detail page (nếu đang mở)
-  const accountDetailView = document.getElementById('view-account-detail');
-  if (accountDetailView && accountDetailView.classList.contains('active')) {
+  const accountDetailView = document.getElementById("view-account-detail");
+  if (accountDetailView && accountDetailView.classList.contains("active")) {
     // Cập nhật avatar trong account detail
-    const avatarImg = document.querySelector('.account-detail-top-avatar-img img');
+    const avatarImg = document.querySelector(
+      ".account-detail-top-avatar-img img"
+    );
     if (avatarImg && user.avatar) {
       avatarImg.src = user.avatar;
     }
-    
+
     // Cập nhật tên trong header
-    const headerName = document.querySelector('.account-detail-top-info h1');
+    const headerName = document.querySelector(".account-detail-top-info h1");
     if (headerName) {
-      headerName.textContent = user.name || user.email.split('@')[0];
+      headerName.textContent = user.name || user.email.split("@")[0];
     }
-    
+
     // Cập nhật mô tả
-    const headerDesc = document.querySelector('.account-detail-top-info p');
+    const headerDesc = document.querySelector(".account-detail-top-info p");
     if (headerDesc && user.bio) {
       headerDesc.textContent = user.bio;
     }
-    
+
     // Cập nhật các input fields (không cần vì đã được xử lý trong saveChanges)
   }
-  
+
   console.log("✅ User data refreshed globally");
 };
-
 
 // Cho phép mở giỏ hàng nếu đã login
 function allowCartAccess(e) {
   e.preventDefault();
   // Bỏ kiểm tra đăng nhập
   const modalContainer = document.getElementById("modal-container");
-  const cartModal = document.getElementById("cart-modal"); 
-  
+  const cartModal = document.getElementById("cart-modal");
+
   if (modalContainer && cartModal) {
     modalContainer.classList.add("active");
     cartModal.classList.add("active");
@@ -949,10 +1009,10 @@ function setupLogout() {
     localStorage.removeItem("loggedInUser");
     alert("Đã đăng xuất!");
     updateUserUI();
-    
+
     // Chuyển về trang home sau khi đăng xuất
-    if (window.router && typeof window.router.navigateToView === 'function') {
-      window.router.navigateToView('home');
+    if (window.router && typeof window.router.navigateToView === "function") {
+      window.router.navigateToView("home");
     }
   });
 }
@@ -1028,28 +1088,28 @@ function checkPendingBuyNow() {
 // === 1 DOMCONTENTLOADED DUY NHẤT — chèn ở cuối file, xóa 3 listener cũ ===
 document.addEventListener("DOMContentLoaded", () => {
   // 1.1) Xử lý hash trong URL TRƯỚC KHI khởi tạo - để tránh flash
-  const hash = window.location.hash.replace('#', '') || 'home';
-  
-  if (hash !== 'home') {
+  const hash = window.location.hash.replace("#", "") || "home";
+
+  if (hash !== "home") {
     // Ẩn view home và hiển thị view được chọn NGAY LẬP TỨC
-    const homeView = document.getElementById('view-home');
-    const targetView = document.getElementById('view-' + hash);
+    const homeView = document.getElementById("view-home");
+    const targetView = document.getElementById("view-" + hash);
     if (homeView && targetView) {
-      homeView.classList.remove('active');
-      targetView.classList.add('active');
+      homeView.classList.remove("active");
+      targetView.classList.add("active");
     }
   } else {
     // Đảm bảo view-home có class active khi refresh homepage
-    const homeView = document.getElementById('view-home');
-    if (homeView && !homeView.classList.contains('active')) {
-      homeView.classList.add('active');
+    const homeView = document.getElementById("view-home");
+    if (homeView && !homeView.classList.contains("active")) {
+      homeView.classList.add("active");
     }
   }
-  
+
   // 1.2) Khởi tạo router SPA sau
   window.router = new SPARouter();
   window.spaRouter = window.router;
-  
+
   // 2) Khởi tạo các module liên quan tới giỏ hàng / đơn hàng
   renderCart();
   renderCheckout();
@@ -1084,32 +1144,31 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Gắn handler cho cartLink an toàn (1 lần)
     if (cartLink) {
-  safeReplaceHandler(cartLink, "click", (e) => {
-    e.preventDefault();
-    // Bỏ phần kiểm tra user đăng nhập 
-    if (window.router && typeof window.router.openModal === "function") {
-      window.router.openModal("cart-modal"); 
+      safeReplaceHandler(cartLink, "click", (e) => {
+        e.preventDefault();
+        // Bỏ phần kiểm tra user đăng nhập
+        if (window.router && typeof window.router.openModal === "function") {
+          window.router.openModal("cart-modal");
 
-      if (typeof showPage === "function") {
-        showPage("cart-page");
-      }
+          if (typeof showPage === "function") {
+            showPage("cart-page");
+          }
+        } else {
+          // fallback: show modal directly
+          const modalContainer = document.getElementById("modal-container");
+          const cartModal = document.getElementById("cart-modal");
+          if (modalContainer && cartModal) {
+            modalContainer.classList.add("active");
+            cartModal.classList.add("active");
+            document.body.style.overflow = "hidden";
 
-    } else {
-      // fallback: show modal directly
-      const modalContainer = document.getElementById("modal-container");
-      const cartModal = document.getElementById("cart-modal");
-      if (modalContainer && cartModal) {
-        modalContainer.classList.add("active");
-        cartModal.classList.add("active");
-        document.body.style.overflow = "hidden";
-
-        if (typeof showPage === "function") {
-          showPage("cart-page");
+            if (typeof showPage === "function") {
+              showPage("cart-page");
+            }
+          }
         }
-      }
+      });
     }
-  });
-}
     if (typeof updateUserUI === "function") {
       updateUserUI();
     }
@@ -1130,7 +1189,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // 6) Cuộn lên đầu an toàn 1 lần
   requestAnimationFrame(() => window.scrollTo(0, 0));
-  
+
   // 7) Lắng nghe sự thay đổi localStorage từ tab/page khác
   window.addEventListener("storage", (e) => {
     if (e.key === "loggedInUser") {
@@ -1140,7 +1199,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   console.log("✅ App initialized (single DOMContentLoaded).");
 });
-
 
 window.addToCart = addToCart;
 window.showPage = showPage;
