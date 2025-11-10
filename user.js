@@ -198,6 +198,93 @@ window.getCart = function () {
   return cart;
 };
 
+// ================= NOTIFICATION SYSTEM =================
+/**
+ * Hệ thống thông báo đẹp thay thế alert()
+ * @param {string} message - Nội dung thông báo
+ * @param {string} type - Loại thông báo: 'error', 'success', 'warning', 'info'
+ * @param {number} duration - Thời gian hiển thị (ms), mặc định 4000ms
+ */
+function showNotification(message, type = 'info', duration = 4000) {
+  // Tạo container nếu chưa có
+  let container = document.querySelector('.notification-container');
+  if (!container) {
+    container = document.createElement('div');
+    container.className = 'notification-container';
+    document.body.appendChild(container);
+  }
+
+  // Tạo notification element
+  const notification = document.createElement('div');
+  notification.className = `notification ${type}`;
+
+  // Icon dựa trên type
+  const icons = {
+    error: '✕',
+    success: '✓',
+    warning: '⚠',
+    info: 'ℹ'
+  };
+
+  // Tiêu đề dựa trên type
+  const titles = {
+    error: 'Lỗi',
+    success: 'Thành công',
+    warning: 'Cảnh báo',
+    info: 'Thông báo'
+  };
+
+  notification.innerHTML = `
+    <div class="notification-icon">${icons[type]}</div>
+    <div class="notification-content">
+      <div class="notification-title">${titles[type]}</div>
+      <div class="notification-message">${message}</div>
+    </div>
+    <button class="notification-close" aria-label="Đóng">×</button>
+  `;
+
+  // Thêm vào container
+  container.appendChild(notification);
+
+  // Xử lý nút đóng
+  const closeBtn = notification.querySelector('.notification-close');
+  closeBtn.addEventListener('click', () => {
+    closeNotification(notification);
+  });
+
+  // Tự động đóng sau duration
+  const timeoutId = setTimeout(() => {
+    closeNotification(notification);
+  }, duration);
+
+  // Lưu timeoutId để có thể cancel nếu đóng manual
+  notification.dataset.timeoutId = timeoutId;
+}
+
+/**
+ * Đóng notification với animation
+ */
+function closeNotification(notification) {
+  // Clear timeout nếu có
+  if (notification.dataset.timeoutId) {
+    clearTimeout(parseInt(notification.dataset.timeoutId));
+  }
+
+  // Thêm class closing để chạy animation
+  notification.classList.add('closing');
+
+  // Xóa element sau khi animation xong
+  setTimeout(() => {
+    notification.remove();
+
+    // Xóa container nếu không còn notification nào
+    const container = document.querySelector('.notification-container');
+    if (container && container.children.length === 0) {
+      container.remove();
+    }
+  }, 300);
+}
+
 window.setCart = function (newCart) {
   cart = newCart;
   localStorage.setItem("cart", JSON.stringify(cart));
@@ -487,7 +574,7 @@ function checkoutOrder() {
   // Kiểm tra đăng nhập
   const user = JSON.parse(localStorage.getItem("loggedInUser"));
   if (!user) {
-    alert("Vui lòng đăng nhập để tiếp tục thanh toán!");
+    showNotification("Vui lòng đăng nhập để tiếp tục thanh toán!", "warning");
     if (window.router && typeof window.router.openModal === "function") {
       router.openModal("login-modal");
     }
@@ -495,7 +582,7 @@ function checkoutOrder() {
   }
 
   if (cart.length === 0) {
-    alert("Giỏ hàng trống!");
+    showNotification("Giỏ hàng của bạn đang trống!", "warning");
     return;
   }
 
@@ -533,46 +620,40 @@ function checkoutOrder() {
     !city ||
     !payMethod
   ) {
-    alert("Vui lòng điền đầy đủ thông tin giao hàng!");
+    showNotification("Vui lòng điền đầy đủ thông tin giao hàng!", "error");
     return;
   }
 
   // 2. Validate tên (ít nhất 2 ký tự, không chứa số hoặc ký tự đặc biệt)
   const nameRegex = /^[a-zA-ZÀ-ỹ\s]{2,50}$/;
   if (!nameRegex.test(name)) {
-    alert("Tên không hợp lệ! Vui lòng nhập từ 2-50 ký tự, không chứa số.");
+    showNotification("Tên không hợp lệ! Vui lòng nhập từ 2-50 ký tự, không chứa số hoặc ký tự đặc biệt.", "error");
     return;
   }
 
   // 3. Validate email
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) {
-    alert(
-      "Email không hợp lệ! Vui lòng nhập đúng định dạng (vd: example@gmail.com)"
-    );
+    showNotification("Email không hợp lệ! Vui lòng nhập đúng định dạng (ví dụ: example@gmail.com)", "error");
     return;
   }
 
   // 4. Validate số điện thoại Việt Nam (10 số, bắt đầu bằng 0)
   const phoneRegex = /^0[0-9]{9}$/;
   if (!phoneRegex.test(phone)) {
-    alert(
-      "Số điện thoại không hợp lệ! Vui lòng nhập đúng 10 số (vd: 0912345678)"
-    );
+    showNotification("Số điện thoại không hợp lệ! Vui lòng nhập đúng 10 số (ví dụ: 0912345678)", "error");
     return;
   }
 
   // 5. Validate độ dài địa chỉ (tối thiểu 10 ký tự)
   if (address.length < 10) {
-    alert(
-      "Địa chỉ quá ngắn! Vui lòng nhập địa chỉ chi tiết (tối thiểu 10 ký tự)"
-    );
+    showNotification("Địa chỉ quá ngắn! Vui lòng nhập địa chỉ chi tiết (tối thiểu 10 ký tự)", "error");
     return;
   }
 
   // 6. Validate phường/xã, quận/huyện, tỉnh/thành (tối thiểu 2 ký tự)
   if (ward.length < 2 || district.length < 2 || city.length < 2) {
-    alert("Thông tin Phường/Xã, Quận/Huyện, Tỉnh/Thành không hợp lệ!");
+    showNotification("Thông tin Phường/Xã, Quận/Huyện, Tỉnh/Thành không hợp lệ!", "error");
     return;
   }
 
@@ -603,7 +684,7 @@ function checkoutOrder() {
   });
 
   if (stockWarnings.length > 0) {
-    alert("Không thể thanh toán:\n" + stockWarnings.join("\n"));
+    showNotification("Không thể thanh toán:\n" + stockWarnings.join("\n"), "error", 6000);
     return;
   }
 
@@ -629,7 +710,7 @@ function checkoutOrder() {
 
   orders.push(order);
   localStorage.setItem("orders", JSON.stringify(orders));
-  alert("Đặt hàng thành công!");
+  showNotification("Đặt hàng thành công! Cảm ơn bạn đã mua hàng.", "success", 5000);
 
   if (typeof loadOrderHistory === "function") {
     loadOrderHistory();

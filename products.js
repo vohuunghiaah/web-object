@@ -369,6 +369,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // HIỂN THỊ DANH SÁCH SẢN PHẨM
     const existingItems = productsList.querySelectorAll(".products__list__item");
+    // Xóa các item cũ
     existingItems.forEach((item) => item.remove());
 
     productsForThisPage.forEach((product) => {
@@ -408,9 +409,10 @@ document.addEventListener("DOMContentLoaded", function () {
           e.preventDefault();
           e.stopPropagation();
           try {
+            // product ở đây là sản phẩm hiện tại trong vòng lặp
             const productName = product.name;
-            const priceText = product.currentPrice;
-            const price = parseInt(String(priceText).replace(/[^\d]/g, "")) || 0;
+            const priceText = product.currentPrice; // lấy trung gian, cần được xử lý chuyển đổi ở dưới
+            const price = parseInt(String(priceText).replace(/[^\d]/g, "")) || 0; // Chuyển đổi priceText thành String nếu không phải String, và .replace(/[^\d]/g, "")) tìm và thay thế kí tự không thuộc chữ số = chuỗi rỗng, vd: 1000đ = 1000
             const image = product.imgSrc;
             if (typeof addToCart === "function") {
               addToCart(productName, price, image, 1);
@@ -420,7 +422,7 @@ document.addEventListener("DOMContentLoaded", function () {
           }
         });
       }
-
+      // Thêm product đó vào cuối productsList
       productsList.appendChild(clone);
     });
 
