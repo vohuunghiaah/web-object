@@ -1,3 +1,23 @@
 {
-    "liveServer.settings.port": 5502
-}
+    "liveServer.settings.port": 5502,
+    
+  // Tắt Microsoft Edge Tools (webhint) - Nguyên nhân chính của lỗi
+  "vscode-edge-devtools.webhint": false,
+  
+  // Tắt cảnh báo inline CSS
+  "css.validate": false,
+  "scss.validate": false,
+  "less.validate": false,
+  
+  // Tắt validation HTML embedded styles và scripts
+  "html.validate.styles": false,
+  "html.validate.scripts": false,
+  
+  // Tắt accessibility hints (tùy chọn)
+  "editor.accessibilitySupport": "off",
+    
+  // Tắt HTML validation hoàn toàn (nếu cần)
+  "html.validate.enabled": false
+
+
+}   
