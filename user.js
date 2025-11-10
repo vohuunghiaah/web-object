@@ -54,6 +54,9 @@ class SPARouter {
       targetView.classList.add("active");
       this.currentView = viewName;
 
+      // Cập nhật navigation active state
+      this.updateNavActive(viewName);
+
       // Khởi tạo account-detail nếu cần
       if (
         viewName === "account-detail" &&
@@ -70,6 +73,30 @@ class SPARouter {
       // Cập nhật URL (optional - không reload trang)
       history.pushState({ view: viewName }, "", `#${viewName}`);
     }
+  }
+
+  // Hàm cập nhật active state cho navigation
+  updateNavActive(viewName) {
+    // Lấy tất cả navigation links (chỉ lấy ở header__bottom__nav, không lấy dropdown)
+    const navLinks = document.querySelectorAll('.header__bottom__nav > ul > li > a');
+    
+    navLinks.forEach(link => {
+      const linkView = link.getAttribute('data-view');
+      
+      // Xóa active khỏi tất cả
+      link.classList.remove('active');
+      
+      // Thêm active cho link tương ứng với view hiện tại
+      if (linkView === viewName) {
+        link.classList.add('active');
+      }
+      
+      // Trường hợp đặc biệt: 
+      // - Nếu view là product-details hoặc products thì active "products"
+      if ((viewName === 'product-details' || viewName === 'products') && linkView === 'products') {
+        link.classList.add('active');
+      }
+    });
   }
 
   // Xử lý modal (popup)
@@ -1278,6 +1305,11 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
+  // 8) Cập nhật active state ban đầu cho navigation (trang home)
+  if (window.router && typeof window.router.updateNavActive === "function") {
+    window.router.updateNavActive('home');
+  }
+
   console.log("✅ App initialized (single DOMContentLoaded).");
 });
 
@@ -1285,3 +1317,4 @@ window.addToCart = addToCart;
 window.showPage = showPage;
 window.goToCheckout = goToCheckout;
 window.checkoutOrder = checkoutOrder;
+

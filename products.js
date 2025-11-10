@@ -41,6 +41,13 @@ window.showView = function (viewId) {
     viewToShow.classList.add("active");
   }
 
+  // Cập nhật navigation active state
+  // Chuyển đổi viewId từ "view-products" thành "products"
+  const viewName = viewId.replace('view-', '');
+  if (window.router && typeof window.router.updateNavActive === "function") {
+    window.router.updateNavActive(viewName);
+  }
+
   // Cập nhật URL hash để hỗ trợ điều hướng
   window.location.hash = viewId;
 };
@@ -437,6 +444,7 @@ document.addEventListener("DOMContentLoaded", function () {
   /**
    * Lọc và hiển thị sản phẩm dựa trên các category đang được chọn
    */
+  // Hàm này sẽ được gọi khi cần thiết, nó là 1 hàm độc lập
   function filterProductsFromActiveCategories() {
     const activeCategories = [];
     const activeLinks = document.querySelectorAll(".products__category__items--details.active");
@@ -496,6 +504,7 @@ document.addEventListener("DOMContentLoaded", function () {
       let endPage = Math.min(totalPages - 1, currentPage + 1);
 
       // Điều chỉnh nếu currentPage ở gần đầu hoặc cuối
+      // nếu gần đầu thì cho nhiều nút ở đầu chút, nếu gần cuối cũng vậy
       if (currentPage <= 3) {
         endPage = Math.min(4, totalPages - 1);
       } else if (currentPage >= totalPages - 2) {
@@ -503,7 +512,7 @@ document.addEventListener("DOMContentLoaded", function () {
       }
 
       // Thêm ellipsis đầu nếu cần
-      if (startPage > 2) {
+      if  (startPage > 2) {
         pages.push("...");
       }
 
@@ -546,7 +555,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       paginationLinksContainer.appendChild(pageLinkWrapper);
     });
-
+    // thoát khỏi vòng lặp từng page rồi
     // Cập nhật trạng thái cho các nút mũi tên
     if (prevButton) {
       if (currentPage === 1) prevButton.classList.add("disabled");
@@ -566,6 +575,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const allCategoriesLink = document.querySelector('[data-category="all"]');
 
   // Mặc định kích hoạt "Tất cả" khi tải trang
+  // Độc lập luôn, nó chỉ trong function DOM gì kia thôi
   if (allCategoriesLink) {
     allCategoriesLink.classList.add("active");
   }
@@ -580,8 +590,9 @@ document.addEventListener("DOMContentLoaded", function () {
       const isAllCategory = clickedLink === allCategoriesLink;
 
       if (isAllCategory) {
-        // Click vào "Tất cả"
+        // Nếu click vào "Tất cả"
         clickedLink.classList.add("active");
+        // Bỏ chọn tất cả các danh mục khác
         categoryLink.forEach((otherLink) => {
           if (otherLink !== allCategoriesLink) {
             otherLink.classList.remove("active");
@@ -595,8 +606,8 @@ document.addEventListener("DOMContentLoaded", function () {
         clickedLink.classList.toggle("active");
       }
 
-      // Xóa trạng thái focus
-      if (document.activeElement === clickedLink) {
+      // Xóa trạng thái focus, nếu đang focus thì nhấn vào nó sẽ biến mất luôn, bây giờ nó đang duyệt qua từng danh mục 
+      if(document.activeElement === clickedLink) {
         clickedLink.blur();
       }
 

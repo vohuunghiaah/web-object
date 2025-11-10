@@ -86,16 +86,18 @@ header {
 }
 header .header__top nav a {
   padding: 1rem;
-  border: 0.1rem solid rgb(116 116 64);
-  border-radius: 0.3rem;
+  border: 1px solid rgb(116 116 64);
+  border-radius: 0.6rem;
   color: yellow;
   font-family: "McLaren", sans-serif;
   font-size: 1.2rem;
+  transition: all 0.3s ease;
 }
 header .header__top nav a:hover {
-  background-image: linear-gradient(to right, yellow, #7ed56f);
+  background-color: yellow;
   color: #000;
-  border-color: yellow;
+  border-color: rgba(255, 215, 0, 0.5);
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
 }
 header .header__top nav a:not(:last-child) {
   margin-right: 1rem;
@@ -141,9 +143,29 @@ header
 }
 header .header__bottom .header__bottom__nav ul li a {
   color: #000;
+  position: relative;
 }
+header .header__bottom .header__bottom__nav ul li a::before {
+  content: "";
+  display: block;
+  width: 0%;
+  height: 0.22rem;
+  background-color: #000;
+  transition: width 0.3s ease;
+  position: absolute;
+  bottom: -0.2rem;
+}
+header .header__bottom .header__bottom__nav ul li a:hover::before {
+  width: 100%;
+}
+/* Active state - underline luôn hiển thị cho trang hiện tại */
+header .header__bottom .header__bottom__nav ul li a.active::before {
+  width: 100%;
+}
+
 header .header__bottom .header__bottom__dropdown {
   display: none;
+  transition: all 0.5s ease;
 }
 /* Điều chỉnh vị trí của dropdown */
 header
@@ -161,7 +183,7 @@ header
   background-color: yellow;
   border-radius: 0.3rem;
   z-index: 1001; /* Nằm trên header (1000) */
-  box-shadow: 0 0.3rem 0.5rem rgba(0, 0, 0, 0.2); /* Thêm bóng đổ */
+  box-shadow: 0 0 0.2rem rgba(0, 0, 0, 0.2); /* Thêm bóng đổ */
 }
 header .header__bottom .header__bottom__nav .header__bottom__dropdown ul {
   width: 100%;
@@ -182,6 +204,12 @@ header .header__bottom .header__bottom__nav .header__bottom__dropdown ul li a {
   color: #000;
   margin-left: 1rem;
 }
+header .header__bottom .header__bottom__nav .header__bottom__dropdown ul li a:hover::before {
+  width: 0%;
+}
+header .header__bottom .header__bottom__nav .header__bottom__dropdown ul li:hover {
+  background-color: #f0e68c;
+}
 header
   .header__bottom
   .header__bottom__nav
@@ -190,7 +218,7 @@ header
   .header__bottom__dropdown
   ul
   li:not(:last-child) {
-  border-bottom: 0.1rem solid #333;
+  border-bottom: 0.1rem solid #c1c1c1;
 }
 
 #app-content {
@@ -247,20 +275,17 @@ header
 .hero .hero__wrapper .hero--btn {
   display: inline-block;
   font-size: 2rem;
-  padding: 1.1rem 1.5rem;
+  padding: 0.8rem 1.5rem;
   border: 0.1rem solid yellow;
   border-radius: 1.7rem;
   background-color: transparent;
   color: white;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
 }
 .hero .hero__wrapper .hero--btn:hover {
-  transform: translateY(-0.15rem);
-  background-image: linear-gradient(to right, yellow, #7ed56f);
+  background-color: yellow;
   color: #171717;
-}
-.hero .hero__wrapper .hero--btn:active {
-  transform: translate(0);
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
 }
 /* Main section css*/
 .main-section {
@@ -757,12 +782,18 @@ header
   justify-content: center;
   row-gap: 1rem;
   background-color: rgba(24, 24, 27, 0.5);
-  transition: all 0.5s ease;
+  transition: all 0.7s ease;
+  user-select: none;
 }
-
+.why-choose .why-choose-container .why-choose-item:hover {
+  background-color: rgba(255, 215, 0, 0.1);
+  border: 1px solid rgba(255, 215, 0, 0.4);
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+}
 .why-choose .why-choose-container .why-choose-item:hover i {
   background-color: rgba(255, 215, 0, 0.2);
   border: 1px solid rgba(255, 215, 0, 0.4);
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
 }
 .why-choose .why-choose-container .why-choose-item:hover p {
   color: #ffd700;
