@@ -651,7 +651,7 @@ function loadOrderHistory() {
         if (index !== -1) {
           orders[index].status = "Đã hủy";
           localStorage.setItem("orders", JSON.stringify(orders));
-          alert("✅ Đơn hàng đã được hủy!");
+          alert(" Đơn hàng đã được hủy!");
           loadOrderHistory();
         }
       }
