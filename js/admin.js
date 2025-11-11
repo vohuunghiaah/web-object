@@ -391,7 +391,7 @@ function initOrdersPage() {
                   <tr class="order-row" data-order-id="${o.id}" style="cursor: pointer;">
                     <td>#${o.id}</td>
                     <td>${formatDate(o.date)}</td>
-                    <td>${o.user}</td>
+                    <td>${o.address?.name || o.user || o.userEmail || 'Không rõ'}</td>
                     <td>${formatCurrency(o.total)}</td>
                     <td><strong style="color: ${getStatusColor(o.status)}">${o.status}</strong></td>
                     <td style="text-align: center;">
@@ -417,7 +417,13 @@ function initOrdersPage() {
             const orderDate = new Date(o.date).getTime();
             const statusMatch = status === "all" || o.status === status;
             const dateMatch = orderDate >= start && orderDate <= end;
-            const searchMatch = !searchTerm || o.user.toLowerCase().includes(searchTerm) || String(o.id).includes(searchTerm);
+            
+            //Tìm kiếm theo tên khách hàng
+            const customerName = o.address?.name || o.user || o.userEmail || '';
+            const searchMatch = !searchTerm || 
+              customerName.toLowerCase().includes(searchTerm) || 
+              String(o.id).includes(searchTerm);
+            
             return statusMatch && dateMatch && searchMatch;
           });
 
@@ -532,7 +538,7 @@ function initOrdersPage() {
               }
 
               return `
-                <p style="color: #ccc;">Khách hàng: <strong>${order.user}</strong></p>
+                <p style="color: #ccc;">Khách hàng: <strong>${order.address?.name || order.user || order.userEmail || 'Không rõ'}</strong></p>
                 <div style="color: #ccc; border: 1px solid #555; padding: 5px; margin-top: 12px; border-radius: 4px; max-height: 150px; overflow-y: auto;">
                   <strong>Sản phẩm:</strong>
                   ${order.products.map((p) => `<p style="margin: 2px 0 2px 10px;">- ${p.name} (SL: ${p.quantity})</p>`).join("")}

@@ -716,6 +716,39 @@ function checkoutOrder() {
     return;
   }
 
+  // ✅ 7. VALIDATE THÔNG TIN NGÂN HÀNG NẾU CHỌN THANH TOÁN QUA NGÂN HÀNG
+  if (payMethod === "bank") {
+    const bankName = document.getElementById("bank-name")?.value.trim();
+    const bankAccount = document.getElementById("bank-account")?.value.trim();
+    const bankOwner = document.getElementById("bank-owner")?.value.trim();
+
+    // Kiểm tra các trường bắt buộc
+    if (!bankName || !bankAccount || !bankOwner) {
+      showNotification("Vui lòng điền đầy đủ thông tin chuyển khoản ngân hàng!", "error");
+      return;
+    }
+
+    // Validate tên ngân hàng (tối thiểu 3 ký tự)
+    if (bankName.length < 3) {
+      showNotification("Tên ngân hàng không hợp lệ! Vui lòng nhập tối thiểu 3 ký tự.", "error");
+      return;
+    }
+
+    // Validate số tài khoản (chỉ chứa số, độ dài từ 8-20 ký tự)
+    const accountRegex = /^[0-9]{8,20}$/;
+    if (!accountRegex.test(bankAccount)) {
+      showNotification("Số tài khoản không hợp lệ! Vui lòng nhập từ 8-20 chữ số.", "error");
+      return;
+    }
+
+    // Validate tên chủ tài khoản (ít nhất 2 ký tự, không chứa số)
+    const ownerRegex = /^[a-zA-ZÀ-ỹ\s]{2,50}$/;
+    if (!ownerRegex.test(bankOwner)) {
+      showNotification("Tên chủ tài khoản không hợp lệ! Vui lòng nhập từ 2-50 ký tự, không chứa số.", "error");
+      return;
+    }
+  }
+
   // ===== TIẾP TỤC LOGIC CŨ =====
 
   let total =
@@ -756,6 +789,16 @@ function checkoutOrder() {
     };
   });
 
+  // ✅ Lấy thông tin ngân hàng nếu thanh toán qua ngân hàng
+  let bankInfo = null;
+  if (payMethod === "bank") {
+    bankInfo = {
+      bankName: document.getElementById("bank-name")?.value.trim(),
+      bankAccount: document.getElementById("bank-account")?.value.trim(),
+      bankOwner: document.getElementById("bank-owner")?.value.trim(),
+    };
+  }
+
   const order = {
     id: Date.now(),
     date: new Date().toISOString(),
@@ -765,6 +808,7 @@ function checkoutOrder() {
     status: "Mới đặt",
     payMethod,
     address: { name, email, phone, address, ward, district, city },
+    bankInfo: bankInfo, // ✅ Thêm thông tin ngân hàng vào đơn hàng
   };
 
   orders.push(order);
@@ -820,11 +864,39 @@ function checkoutOrder() {
     <p><strong>SĐT:</strong> ${phone}</p>
   `;
 
+  // ✅ Hiển thị thông tin ngân hàng nếu có
+  if (order.bankInfo) {
+    billAddress.innerHTML += `
+      <hr style="margin: 10px 0; border: none; border-top: 1px solid #ddd;">
+      <p style="color: #2563eb;"><strong>📱 Thông tin chuyển khoản:</strong></p>
+      <p><strong>Ngân hàng:</strong> ${order.bankInfo.bankName}</p>
+      <p><strong>Số TK:</strong> ${order.bankInfo.bankAccount}</p>
+      <p><strong>Chủ TK:</strong> ${order.bankInfo.bankOwner}</p>
+    `;
+  }
+
   // Xóa giỏ hàng
   cart = [];
   localStorage.removeItem("cart");
   renderCart();
   renderCheckout();
+  
+  // ✅ Reset form ngân hàng (ẩn và xóa dữ liệu)
+  const bankInfoDiv = document.getElementById("bank-info");
+  if (bankInfoDiv) {
+    bankInfoDiv.style.display = "none";
+    const bankNameInput = document.getElementById("bank-name");
+    const bankAccountInput = document.getElementById("bank-account");
+    const bankOwnerInput = document.getElementById("bank-owner");
+    if (bankNameInput) bankNameInput.value = "";
+    if (bankAccountInput) bankAccountInput.value = "";
+    if (bankOwnerInput) bankOwnerInput.value = "";
+  }
+  
+  // Reset radio button về COD
+  const codRadio = document.querySelector('input[name="pay"][value="cod"]');
+  if (codRadio) codRadio.checked = true;
+  
   showPage("donmua-page");
 }
 
