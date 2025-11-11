@@ -642,22 +642,43 @@ document.addEventListener("DOMContentLoaded", function () {
   // ============================================================================
   
   priceCheckboxes.forEach((checkbox) => {
-    checkbox.addEventListener("change", () => {
-      currentPriceFilters = [];
-      priceCheckboxes.forEach((box) => {
-        if (box.checked) {
-          currentPriceFilters.push(box.value);
+    checkbox.addEventListener("change", (e) => {
+      const clickedCheckbox = e.target;
+      
+      // Nếu click vào checkbox "Tất cả"
+      if (clickedCheckbox.value === "all") {
+        if (clickedCheckbox.checked) {
+          // Nếu "Tất cả" được check, uncheck tất cả các checkbox khác
+          priceCheckboxes.forEach((box) => {
+            if (box.value !== "all") box.checked = false;
+          });
+          currentPriceFilters = ["all"];
+        } else {
+          // Nếu "Tất cả" bị uncheck, không làm gì (để user tự chọn)
+          currentPriceFilters = [];
         }
-      });
-
-      // Logic cho checkbox "Tất cả"
-      if (currentPriceFilters.includes("all")) {
-        currentPriceFilters = ["all"];
-        priceCheckboxes.forEach((box) => {
-          if (box.value !== "all") box.checked = false;
-        });
       } else {
-        document.getElementById("all").checked = false;
+        // Nếu click vào một mức giá cụ thể
+        if (clickedCheckbox.checked) {
+          // Uncheck "Tất cả" khi chọn mức giá cụ thể
+          const allCheckbox = document.getElementById("all");
+          if (allCheckbox) allCheckbox.checked = false;
+        }
+        
+        // Cập nhật lại currentPriceFilters từ tất cả checkbox (trừ "all")
+        currentPriceFilters = [];
+        priceCheckboxes.forEach((box) => {
+          if (box.checked && box.value !== "all") {
+            currentPriceFilters.push(box.value);
+          }
+        });
+        
+        // Nếu không có mức giá nào được chọn, tự động check lại "Tất cả"
+        if (currentPriceFilters.length === 0) {
+          const allCheckbox = document.getElementById("all");
+          if (allCheckbox) allCheckbox.checked = true;
+          currentPriceFilters = ["all"];
+        }
       }
 
       currentPage = 1;
