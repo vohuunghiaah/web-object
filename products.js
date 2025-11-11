@@ -765,7 +765,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Chuyển đến trang sản phẩm
     showView("view-products");
 
-    // Cập nhật state
+    // Cập nhật trạng thái tìm kiếm
     currentSearchQuery = query;
     currentPage = 1;
     currentCategory = "all";
@@ -803,7 +803,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // ============================================================================
-  // 7.13. XỬ LÝ CLICK VÀO CATEGORY TILES TRÊN TRANG CHỦ
+  // 7.13. XỬ LÝ CLICK VÀO CATEGORY TILES TRÊN TRANG CHỦ**
   // ============================================================================
   
   document.addEventListener("click", (e) => {
@@ -826,7 +826,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (searchInput) searchInput.value = "";
 
-    updateTitle(category);
     filterProductsFromActiveCategories();
     window.scrollTo({ top: 0, behavior: "smooth" });
   });
@@ -1022,10 +1021,6 @@ function displayProductDetails(productId) {
     productInfo.insertAdjacentHTML("beforeend", stockHTML);
   }
 
-  // Ẩn breadcrumb "Tất cả sản phẩm"
-  if (breadcrumbCategory) {
-    breadcrumbCategory.innerHTML = ``;
-  }
   if (breadcrumbProductName) {
     breadcrumbProductName.textContent = product.name;
   }
@@ -1039,7 +1034,7 @@ function displayProductDetails(productId) {
   } else if (typeof window.showView === "function") {
     window.showView("view-product-details");
   } else {
-    // Fallback
+    // Fallback - Xử lý thủ công nếu như không có hàm showView()
     document.querySelectorAll(".spa-view").forEach((view) => {
       view.classList.remove("active");
     });
@@ -1120,18 +1115,9 @@ function setupQuantityControls() {
     updateQuantity(this.value);
   });
 
-  // Xử lý realtime validation
+  // Chỉ cho phép nhập số
   quantityInput.addEventListener("input", function () {
     this.value = this.value.replace(/[^\d]/g, "");
-  });
-
-  // Xử lý phím Enter
-  quantityInput.addEventListener("keydown", function (e) {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      updateQuantity(this.value);
-      this.blur();
-    }
   });
 }
 
@@ -1144,8 +1130,9 @@ function setupQuantityControls() {
  * @param {object} product - Object sản phẩm
  */
 function setupAddToCartButton(product) {
+  // Làm gì thì làm, đầu tiên phải lấy phần tử trước đã rồi tính
   const addToCartBtn = document.getElementById("product-add-to-cart");
-
+  // Nếu không tìm thấy thì thoát sớm, tránh lỗi không mong muốn
   if (!addToCartBtn) {
     console.warn("Add to cart button not found");
     return;
@@ -1242,8 +1229,10 @@ function setupBuyNowButton(product) {
 
       console.log("Buy Now - Adding to cart:", newCartItem);
 
+      // Lấy giỏ hàng hiện tại từ localStorage, nếu chưa thì tạo mảng rỗng
       let currentCart = JSON.parse(localStorage.getItem("cart")) || [];
 
+      // Kiểm tra nếu sản phẩm đã có trong giỏ hàng
       const existingItemIndex = currentCart.findIndex((item) => item.name === newCartItem.name);
 
       if (existingItemIndex !== -1) {
@@ -1267,6 +1256,7 @@ function setupBuyNowButton(product) {
       console.log("Cart in localStorage:", localStorage.getItem("cart"));
 
       // Mở modal giỏ hàng
+      // Chuyển người dùng đến trang thanh toán khi nhấn mua ngay và đã đăng nhập
       if (window.router && typeof window.router.openModal === "function") {
         window.router.openModal("cart-modal");
         setTimeout(() => {
@@ -1359,6 +1349,33 @@ function init() {
 
 // Chạy hàm init khi HTML đã được tải xong (cho trang riêng biệt)
 window.addEventListener("DOMContentLoaded", init);
+
+// ================================================================================
+// HÀM GLOBAL - CẬP NHẬT LẠI CHI TIẾT SẢN PHẨM
+// ================================================================================
+
+/**
+ * Hàm toàn cục để cập nhật lại trang chi tiết sản phẩm
+ * Được gọi từ user.js sau khi thanh toán hoặc thay đổi tồn kho
+ */
+window.refreshProductDetails = function() {
+  const detailView = document.getElementById("view-product-details");
+  
+  // Chỉ refresh nếu đang ở trang chi tiết sản phẩm
+  if (detailView && detailView.classList.contains("active")) {
+    const productNameEl = detailView.querySelector("#product-detail-name");
+    
+    if (productNameEl && typeof allProduct !== "undefined") {
+      const productName = productNameEl.textContent;
+      const currentProduct = allProduct.find((p) => p.name === productName);
+      
+      if (currentProduct) {
+        console.log("🔄 Đang cập nhật lại chi tiết sản phẩm:", currentProduct.name);
+        displayProductDetails(currentProduct.id);
+      }
+    }
+  }
+};
 
 // ================================================================================
 // KẾT THÚC FILE PRODUCTS.JS
