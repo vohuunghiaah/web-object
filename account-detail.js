@@ -513,70 +513,6 @@ class PasswordManager {
     }, 3000);
   }
 }
-
-
-// === HÀM MỚI: TẢI LỊCH SỬ ĐƠN HÀNG ===
-/**
- * Tải và hiển thị lịch sử đơn hàng từ localStorage
- */
-function loadOrderHistory() {
-  const orderListContainer = document.getElementById("account-order-list");
-  if (!orderListContainer) return;
-
-  const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser"));
-  const allOrders = JSON.parse(localStorage.getItem("orders")) || [];
-
-  if (!loggedInUser) {
-    orderListContainer.innerHTML = `<p class="order-empty-message">Vui lòng đăng nhập để xem lịch sử đơn hàng.</p>`;
-    return;
-  }
-
-  // Lọc các đơn hàng của người dùng hiện tại (dựa trên email)
-  const userOrders = allOrders.filter(order => 
-    order.userEmail === loggedInUser.email
-  );
-
-  if (userOrders.length === 0) {
-    orderListContainer.innerHTML = `<p class="order-empty-message">Bạn chưa có đơn hàng nào.</p>`;
-    return;
-  }
-
-  // Sắp xếp đơn hàng mới nhất lên đầu
-  userOrders.sort((a, b) => b.id - a.id); 
-
-  // Render các đơn hàng
-  orderListContainer.innerHTML = userOrders.map(order => {
-    // Tạo danh sách sản phẩm cho đơn hàng
-    const productsHTML = order.products.map(product => `
-      <div class="order-product-item">
-        <img src="${product.image}" alt="${product.name}">
-        <span>${product.name} (x${product.quantity})</span>
-      </div>
-    `).join("");
-
-    // Định dạng trạng thái (bạn có thể mở rộng)
-    let statusClass = "status-new";
-    if (order.status === "Đã hủy") statusClass = "status-cancelled";
-    if (order.status === "Hoàn thành") statusClass = "status-completed";
-
-    return `
-      <div class="order-card">
-        <div class="order-card-header">
-          <div><strong>Ngày đặt:</strong> ${new Date(order.date).toLocaleString('vi-VN')}</div>
-          <div><strong>Tổng tiền:</strong> <span class="order-total">${order.total.toLocaleString('vi-VN')} đ</span></div>
-          <div><strong>Trạng thái:</strong> <span class="order-status ${statusClass}">${order.status}</span></div>
-        </div>
-        <div class="order-card-body">
-          <p><strong>Các sản phẩm:</strong></p>
-          ${productsHTML}
-        </div>
-      </div>
-    `;
-  }).join("");
-}
-// ======================================
-
-
 // Initialize Account Detail when user is logged in
 function initAccountDetail() {
   const user = JSON.parse(localStorage.getItem("loggedInUser"));
@@ -640,10 +576,8 @@ function loadOrderHistory() {
     return;
   }
 
-  // Lọc các đơn hàng của người dùng hiện tại (dựa trên email)
-  const userOrders = allOrders.filter(order => 
-    order.userEmail === loggedInUser.email
-  );
+  // Lọc đơn hàng theo người dùng hiện tại
+  const userOrders = allOrders.filter(order => order.userEmail === loggedInUser.email);
 
   if (userOrders.length === 0) {
     orderListContainer.innerHTML = `<p class="order-empty-message">Bạn chưa có đơn hàng nào.</p>`;
@@ -651,65 +585,76 @@ function loadOrderHistory() {
   }
 
   // Sắp xếp đơn hàng mới nhất lên đầu
-  userOrders.sort((a, b) => b.id - a.id); 
+  userOrders.sort((a, b) => b.id - a.id);
 
-  // Render các đơn hàng
+  // Render đơn hàng
   orderListContainer.innerHTML = userOrders.map(order => {
-    // Tạo danh sách sản phẩm cho đơn hàng
-    const productsHTML = order.products.map(product => `
+    // Sản phẩm trong đơn
+    const productsHTML = order.products.map(p => `
       <div class="order-product-item">
-        <img src="${product.image}" alt="${product.name}">
-        <span>${product.name} (x${product.quantity})</span>
+        <img src="${p.image}" alt="${p.name}">
+        <span>${p.name} (x${p.quantity})</span>
       </div>
     `).join("");
 
-    // Định dạng trạng thái (bạn có thể mở rộng)
+    // Phân loại trạng thái
     let statusClass = "status-new";
     if (order.status === "Đã hủy") statusClass = "status-cancelled";
     if (order.status === "Hoàn thành") statusClass = "status-completed";
 
-    // === PHẦN MỚI: Lấy thông tin giao hàng ===
-    const shippingInfo = order.address || {}; // Đảm bảo an toàn nếu order.address không tồn tại
-    const fullName = shippingInfo.name || 'Không có tên';
-    const phone = shippingInfo.phone || 'Không có SĐT';
-    
-    // Ghép các thành phần địa chỉ lại, bỏ qua các phần bị trống
-    const fullAddress = [
-      shippingInfo.address,
-      shippingInfo.ward,
-      shippingInfo.district,
-      shippingInfo.city
-    ].filter(Boolean).join(', ') || 'Không có địa chỉ';
-    // ======================================
+    // Lấy thông tin giao hàng
+    const shipping = order.address || {};
+    const fullName = shipping.name || loggedInUser.name || "Không có tên";
+    const phone = shipping.phone || loggedInUser.phone || "Không có SĐT";
+    const fullAddress = [shipping.address, shipping.ward, shipping.district, shipping.city]
+      .filter(Boolean)
+      .join(', ') || "Không có địa chỉ";
 
+    // Giao diện hiển thị
     return `
-      <div class="order-card">
+      <div class="order-card" data-order-id="${order.id}">
         <div class="order-card-header">
           <div><strong>Ngày đặt:</strong> ${new Date(order.date).toLocaleString('vi-VN')}</div>
-          <div><strong>Tổng tiền:</strong> <span class="order-total">${order.total.toLocaleString('vi-VN')} đ</span></div>
-          <div><strong>Trạng thái:</strong> <span class="order-status ${statusClass}">${order.status}</span></div>
+          <div><strong>Tổng tiền:</strong> 
+            <span class="order-total">${order.total.toLocaleString('vi-VN')} đ</span>
+          </div>
+          <div>
+            <strong>Trạng thái:</strong> 
+            <span class="order-status ${statusClass}">${order.status}</span>
+            ${order.status !== "Đã hủy" && order.status !== "Hoàn thành"
+              ? `<button class="btn-cancel-order">Hủy đơn hàng</button>`
+              : ""}
+          </div>
         </div>
+
         <div class="order-card-body">
+          <p><strong>Người đặt hàng:</strong> ${fullName}</p>
+          <p><strong>Số điện thoại:</strong> ${phone}</p>
+          <p><strong>Địa chỉ giao hàng:</strong> ${fullAddress}</p>
+          <hr style="margin: 10px 0; opacity: 0.3;">
           <p><strong>Các sản phẩm:</strong></p>
           ${productsHTML}
-          
-          <div class="order-shipping-details">
-            <p><strong>Thông tin giao hàng:</strong></p>
-            <div class="shipping-info-item">
-              <i class="ri-user-line"></i>
-              <span><strong>Người nhận:</strong> ${fullName}</span>
-            </div>
-            <div class="shipping-info-item">
-              <i class="ri-phone-line"></i>
-              <span><strong>SĐT:</strong> ${phone}</span>
-            </div>
-            <div class="shipping-info-item">
-              <i class="ri-map-pin-line"></i>
-              <span><strong>Địa chỉ:</strong> ${fullAddress}</span>
-            </div>
-          </div>
-          </div>
+        </div>
       </div>
     `;
   }).join("");
+
+  // Sự kiện nút hủy
+  orderListContainer.querySelectorAll(".btn-cancel-order").forEach(btn => {
+    btn.addEventListener("click", e => {
+      const orderCard = e.target.closest(".order-card");
+      const orderId = parseInt(orderCard.dataset.orderId);
+
+      if (confirm("Bạn có chắc muốn hủy đơn hàng này không?")) {
+        const orders = JSON.parse(localStorage.getItem("orders")) || [];
+        const index = orders.findIndex(o => o.id === orderId);
+        if (index !== -1) {
+          orders[index].status = "Đã hủy";
+          localStorage.setItem("orders", JSON.stringify(orders));
+          alert("✅ Đơn hàng đã được hủy!");
+          loadOrderHistory();
+        }
+      }
+    });
+  });
 }
