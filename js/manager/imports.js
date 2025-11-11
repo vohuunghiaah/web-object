@@ -25,6 +25,12 @@ export const importHtml = `
     <form class="form-box" id="importForm" style="width: 600px;">
         <h3 id="importFormTitle">Tạo phiếu nhập</h3>
         
+        <div style="margin-bottom: 15px;">
+          <label>🔍 Tìm sản phẩm theo ID:</label>
+          <input type="text" id="search-product-input" placeholder="Nhập ID sản phẩm..." style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; margin-bottom: 5px;">
+          <div id="search-result-info" style="font-size: 12px; color: #666; margin-top: 3px;"></div>
+        </div>
+        
         <div style="display: flex; gap: 10px; align-items: flex-end; margin-bottom: 15px;">
           <div style="flex-grow: 1;">
             <label>Chọn sản phẩm:</label>
@@ -64,6 +70,8 @@ export function initImportPage() {
   const addToSlipBtn = document.getElementById("add-to-slip-btn");
   const tempProductListEl = document.getElementById("temp-product-list");
   const searchInput = document.getElementById("search-import");
+  const searchProductInput = document.getElementById("search-product-input");
+  const searchResultInfo = document.getElementById("search-result-info");
 
   // Lấy dữ liệu
   if (!getData("importSlips")) {
@@ -74,6 +82,50 @@ export function initImportPage() {
 
   let tempProducts = []; // Mảng chứa các SP trong phiếu đang tạo
   let editIndex = null;
+
+  // Hàm render dropdown sản phẩm
+  function renderProductSelect(products = allProducts) {
+    productSelect.innerHTML = products
+      .map(
+        (p) =>
+          `<option value="${p.id}">${p.name} (ID: ${p.id}, Tồn kho: ${p.quantity})</option>`
+      )
+      .join("");
+    
+    // Cập nhật thông tin kết quả tìm kiếm
+    if (searchProductInput && searchProductInput.value.trim()) {
+      searchResultInfo.textContent = `Tìm thấy ${products.length} sản phẩm`;
+      searchResultInfo.style.color = products.length > 0 ? '#27ae60' : '#e74c3c';
+    } else {
+      searchResultInfo.textContent = `Hiển thị ${products.length} sản phẩm`;
+      searchResultInfo.style.color = '#666';
+    }
+  }
+
+  // Xử lý tìm kiếm sản phẩm theo ID
+  if (searchProductInput) {
+    searchProductInput.addEventListener('input', (e) => {
+      const searchValue = e.target.value.trim();
+      
+      if (!searchValue) {
+        // Nếu không có từ khóa, hiển thị tất cả
+        renderProductSelect(allProducts);
+        return;
+      }
+
+      // Tìm kiếm chỉ theo ID
+      const filteredProducts = allProducts.filter(p => {
+        return p.id.toString().includes(searchValue);
+      });
+
+      renderProductSelect(filteredProducts);
+
+      // Nếu tìm thấy chính xác 1 sản phẩm theo ID, tự động chọn
+      if (filteredProducts.length === 1) {
+        productSelect.value = filteredProducts[0].id;
+      }
+    });
+  }
 
   // 1. Render danh sách phiếu nhập
   function renderSlips(list) {
@@ -129,13 +181,11 @@ export function initImportPage() {
   }
 
   function openForm(isView = false) {
-    // Nạp danh sách sản phẩm vào <select>
-    productSelect.innerHTML = allProducts
-      .map(
-        (p) =>
-          `<option value="${p.id}">${p.name} (Tồn kho: ${p.quantity})</option>`
-      )
-      .join("");
+    // Nạp danh sách sản phẩm vào <select> và reset ô tìm kiếm
+    if (searchProductInput) {
+      searchProductInput.value = '';
+    }
+    renderProductSelect(allProducts);
 
     // Nếu là chế độ xem, vô hiệu hóa các nút
     document.getElementById("add-to-slip-btn").style.display = isView
