@@ -363,7 +363,7 @@ function showPage(id) {
   if (id === "thanhtoan-page") renderCheckout();
   if (id === "donmua-page") renderOrderHistory();
 }
-// ✅ Hiển thị dấu tích khi thêm vào giỏ
+// Hiển thị dấu tích khi thêm vào giỏ
 function showAddToCartSuccess(name) {
   const popup = document.getElementById("cart-success");
   if (!popup) {
@@ -379,7 +379,7 @@ function showAddToCartSuccess(name) {
 // ================= Thêm sản phẩm vào giỏ =================
 // Thay vì kiểm tra theo name, nên kiểm tra theo ID hoặc làm mềm điều kiện
 function addToCart(name, price, image, quantity = 1) {
-  // ✅ CẢI TIẾN: Kiểm tra tồn kho với điều kiện linh hoạt hơn
+  // Kiểm tra tồn kho với điều kiện linh hoạt hơn
   const products = JSON.parse(localStorage.getItem("products")) || [];
   const productInStock = products.find(
     (p) => p.name.trim().toLowerCase() === name.trim().toLowerCase()
@@ -422,7 +422,7 @@ function addToCart(name, price, image, quantity = 1) {
   renderCheckout();
   showAddToCartSuccess(name);
 
-  // ✅ CẬP NHẬT LẠI CHI TIẾT SẢN PHẨM NẾU ĐANG MỞ
+  // CẬP NHẬT LẠI CHI TIẾT SẢN PHẨM NẾU ĐANG MỞ
   if (typeof window.refreshProductDetails === "function") {
     window.refreshProductDetails();
   }
@@ -484,7 +484,7 @@ function renderCart() {
           renderCheckout();
           if (cart.length === 0) emptyMsg.style.display = "block";
           
-          // ✅ Refresh chi tiết sản phẩm
+          // Refresh chi tiết sản phẩm
           if (typeof window.refreshProductDetails === "function") {
             window.refreshProductDetails();
           }
@@ -498,7 +498,7 @@ function renderCart() {
         qtySpan.textContent = item.quantity;
         renderCheckout();
         
-        // ✅ Refresh chi tiết sản phẩm
+        //  Refresh chi tiết sản phẩm
         if (typeof window.refreshProductDetails === "function") {
           window.refreshProductDetails();
         }
@@ -517,7 +517,7 @@ function renderCart() {
             renderCheckout();
             if (cart.length === 0) emptyMsg.style.display = "block";
             
-            // ✅ Refresh chi tiết sản phẩm
+            // Refresh chi tiết sản phẩm
             if (typeof window.refreshProductDetails === "function") {
               window.refreshProductDetails();
             }
@@ -526,7 +526,7 @@ function renderCart() {
           qtySpan.textContent = item.quantity;
           renderCheckout();
           
-          // ✅ Refresh chi tiết sản phẩm
+          //  Refresh chi tiết sản phẩm
           if (typeof window.refreshProductDetails === "function") {
             window.refreshProductDetails();
           }
@@ -536,7 +536,7 @@ function renderCart() {
     });
   }
 
-  // ✅ Nút quay lại luôn được gắn sự kiện, dù giỏ hàng có trống hay không
+  //  Nút quay lại luôn được gắn sự kiện, dù giỏ hàng có trống hay không
   const backBtn = document.getElementById("back-to-shop");
   if (backBtn) {
     safeReplaceHandler(backBtn, "click", () => {
@@ -546,7 +546,7 @@ function renderCart() {
       }
     });
   }
-  // ✅ Gắn sự kiện cho nút XEM LỊCH SỬ MUA HÀNG
+  // Gắn sự kiện cho nút XEM LỊCH SỬ MUA HÀNG
   const historyBtn = document.getElementById("view-order-history");
   if (historyBtn) {
     safeReplaceHandler(historyBtn, "click", (e) => {
@@ -599,7 +599,7 @@ function renderCheckout() {
       renderCart();
       renderCheckout();
       
-      // ✅ Refresh chi tiết sản phẩm
+      //  Refresh chi tiết sản phẩm
       if (typeof window.refreshProductDetails === "function") {
         window.refreshProductDetails();
       }
@@ -610,7 +610,7 @@ function renderCheckout() {
   shippingEl.innerText = shippingFee + " đ";
   totalEl.innerHTML = `<strong>Tổng cộng:</strong> ${subtotal + shippingFee} đ`;
 
-  // ✅ THÊM: Gắn sự kiện cho nút quay lại trong trang thanh toán
+  // THÊM: Gắn sự kiện cho nút quay lại trong trang thanh toán
   const backBtnCheckout = document.querySelector(
     "#thanhtoan-page #back-to-shop"
   );
@@ -704,7 +704,7 @@ function checkoutOrder() {
     return;
   }
 
-  // ✅ 5. VALIDATE THÔNG TIN NGÂN HÀNG NẾU CHỌN THANH TOÁN QUA NGÂN HÀNG
+  // 5. VALIDATE THÔNG TIN NGÂN HÀNG NẾU CHỌN THANH TOÁN QUA NGÂN HÀNG
   if (payMethod === "bank") {
     const bankName = document.getElementById("bank-name")?.value.trim();
     const bankAccount = document.getElementById("bank-account")?.value.trim();
@@ -777,7 +777,7 @@ function checkoutOrder() {
     };
   });
 
-  // ✅ Lấy thông tin ngân hàng nếu thanh toán qua ngân hàng
+  //  Lấy thông tin ngân hàng nếu thanh toán qua ngân hàng
   let bankInfo = null;
   if (payMethod === "bank") {
     bankInfo = {
@@ -796,13 +796,13 @@ function checkoutOrder() {
     status: "Mới đặt",
     payMethod,
     address: { name, email, phone, address, ward, district, city },
-    bankInfo: bankInfo, // ✅ Thêm thông tin ngân hàng vào đơn hàng
+    bankInfo: bankInfo, //  Thêm thông tin ngân hàng vào đơn hàng
   };
 
   orders.push(order);
   localStorage.setItem("orders", JSON.stringify(orders));
 
-  // ✅ CẬP NHẬT TỒN KHO SAU KHI ĐẶT HÀNG THÀNH CÔNG
+  // CẬP NHẬT TỒN KHO SAU KHI ĐẶT HÀNG THÀNH CÔNG
   cart.forEach((cartItem) => {
     const productIndex = products.findIndex((p) => p.name === cartItem.name);
     if (productIndex !== -1) {
@@ -822,7 +822,7 @@ function checkoutOrder() {
     loadOrderHistory();
   }
 
-  // ✅ CẬP NHẬT LẠI TRANG CHI TIẾT SẢN PHẨM NẾU ĐANG MỞ
+  //  CẬP NHẬT LẠI TRANG CHI TIẾT SẢN PHẨM NẾU ĐANG MỞ
   if (typeof window.refreshProductDetails === "function") {
     window.refreshProductDetails();
   }
@@ -852,7 +852,7 @@ function checkoutOrder() {
     <p><strong>SĐT:</strong> ${phone}</p>
   `;
 
-  // ✅ Hiển thị thông tin ngân hàng nếu có
+  //  Hiển thị thông tin ngân hàng nếu có
   if (order.bankInfo) {
     billAddress.innerHTML += `
       <hr style="margin: 10px 0; border: none; border-top: 1px solid #ddd;">
@@ -869,7 +869,7 @@ function checkoutOrder() {
   renderCart();
   renderCheckout();
   
-  // ✅ Reset form ngân hàng (ẩn và xóa dữ liệu)
+  //  Reset form ngân hàng (ẩn và xóa dữ liệu)
   const bankInfoDiv = document.getElementById("bank-info");
   if (bankInfoDiv) {
     bankInfoDiv.style.display = "none";
@@ -1203,7 +1203,7 @@ window.refreshUserData = function () {
     // Cập nhật các input fields (không cần vì đã được xử lý trong saveChanges)
   }
 
-  console.log("✅ User data refreshed globally");
+  console.log(" User data refreshed globally");
 };
 
 // Cho phép mở giỏ hàng nếu đã login
@@ -1304,7 +1304,6 @@ function checkPendingBuyNow() {
     }
   }
 }
-//Hàm
 // === 1 DOMCONTENTLOADED DUY NHẤT — chèn ở cuối file, xóa 3 listener cũ ===
 document.addEventListener("DOMContentLoaded", () => {
   // 1.1) Xử lý hash trong URL TRƯỚC KHI khởi tạo - để tránh flash
@@ -1422,7 +1421,7 @@ document.addEventListener("DOMContentLoaded", () => {
     window.router.updateNavActive('home');
   }
 
-  console.log("✅ App initialized (single DOMContentLoaded).");
+  console.log(" App initialized (single DOMContentLoaded).");
 });
 
 window.addToCart = addToCart;
