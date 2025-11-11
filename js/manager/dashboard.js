@@ -427,7 +427,7 @@ export function initDashboardPage() {
 
   // Chuyển đến trang Products để thêm sản phẩm
   document.getElementById("quick-add-product").addEventListener("click", () => {
-    navigateToPage("products");
+    navigateToPage("product");
   });
 
   // Chuyển đến trang Orders để tạo đơn hàng
@@ -471,20 +471,34 @@ export function initDashboardPage() {
  * @param {string} pageName - Tên trang: 'products', 'orders', 'imports', etc.
  */
 function navigateToPage(pageName) {
-  // Tìm menu item tương ứng và click (giả sử menu có data-page attribute)
+  // 1) Thử tìm menu item theo data-page (nếu có)
   const menuItem = document.querySelector(`[data-page="${pageName}"]`);
   if (menuItem) {
     menuItem.click();
-  } else {
-    // Fallback: sử dụng function global nếu có
-    if (window.loadPage && typeof window.loadPage === "function") {
-      window.loadPage(pageName);
-    } else {
-      console.warn(`Không tìm thấy cách navigate đến trang: ${pageName}`);
-    }
+    return;
   }
-}
 
+  // 2) Thử tìm nút menu theo id "menu-<pageName>" (structure trong admin/index.html)
+  const menuBtn = document.getElementById(`menu-${pageName}`);
+  if (menuBtn) {
+    menuBtn.click();
+    return;
+  }
+
+  // 3) Fallback: gọi hàm SPA chính nếu được gán lên window (admin.js gán window.navigateSPA)
+  if (window.navigateSPA && typeof window.navigateSPA === "function") {
+    window.navigateSPA(pageName);
+    return;
+  }
+
+  // 4) Fallback cũ (nếu project có dùng window.loadPage)
+  if (window.loadPage && typeof window.loadPage === "function") {
+    window.loadPage(pageName);
+    return;
+  }
+
+  console.warn(`Không tìm thấy cách navigate đến trang: ${pageName}`);
+}
 // ============================================
 // RENDER DASHBOARD - TỔNG HỢP
 // ============================================
@@ -888,51 +902,100 @@ function renderRecentOrders() {
 /**
  * Render cảnh báo các sản phẩm sắp hết hàng
  */
+/**
+ * Render cảnh báo tồn kho thấp với event delegation
+ */
 function renderLowStockAlerts() {
   const alerts = DashboardAPI.getLowStockAlerts(10);
   const container = document.getElementById("low-stock-list");
 
   if (alerts.length === 0) {
-    container.innerHTML =
-      '<p style="color: #10b981; text-align: center; padding: 20px;"><i class="fas fa-check-circle"></i> Tất cả sản phẩm đều đủ hàng!</p>';
+    container.innerHTML = `
+      <p style="color: #10b981; text-align: center; padding: 20px;">
+        <i class="fas fa-check-circle"></i> Tất cả sản phẩm đều đủ hàng!
+      </p>
+    `;
     return;
   }
 
-  // Render grid các sản phẩm cảnh báo
+  // Render grid các sản phẩm cảnh báo - KHÔNG dùng onclick inline
   container.innerHTML = `
-        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px;">
-            ${alerts
-              .map(
-                (alert) => `
-                <div style="background: #333; padding: 15px; border-radius: 8px; border: 2px solid #f59e0b; transition: all 0.3s;" onmouseover="this.style.borderColor='#fbbf24'" onmouseout="this.style.borderColor='#f59e0b'">
-                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
-                        ${
-                          alert.image
-                            ? `<img src="${alert.image}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px;">`
-                            : '<div style="width: 50px; height: 50px; background: #555; border-radius: 8px; display: flex; align-items: center; justify-content: center;"><i class="fas fa-box" style="color: #888;"></i></div>'
-                        }
-                        <div style="flex: 1;">
-                            <div style="color: white; font-weight: bold; margin-bottom: 5px;">${
-                              alert.name
-                            }</div>
-                            <div style="color: #f59e0b; font-size: 13px;">
-                                <i class="fas fa-exclamation-triangle"></i> Chỉ còn: <strong>${
-                                  alert.stock
-                                }</strong>
-                            </div>
-                        </div>
-                    </div>
-                    <button onclick="navigateToPage('imports')" style="width: 100%; padding: 8px; background: #10b981; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; transition: background 0.3s;" onmouseover="this.style.background='#059669'" onmouseout="this.style.background='#10b981'">
-                        <i class="fas fa-plus"></i> Nhập hàng ngay
-                    </button>
-                </div>
-            `
-              )
-              .join("")}
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px;">
+      ${alerts
+        .map(
+          (alert) => `
+        <div style="background: #333; padding: 15px; border-radius: 8px; border: 2px solid #f59e0b; transition: all 0.3s;" 
+             onmouseover="this.style.borderColor='#fbbf24'" 
+             onmouseout="this.style.borderColor='#f59e0b'">
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+            ${
+              alert.image
+                ? `<img src="${alert.image}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px;">`
+                : '<div style="width: 50px; height: 50px; background: #555; border-radius: 8px; display: flex; align-items: center; justify-content: center;"><i class="fas fa-box" style="color: #888;"></i></div>'
+            }
+            <div style="flex: 1;">
+              <div style="color: white; font-weight: bold; margin-bottom: 5px;">
+                ${alert.name}
+              </div>
+              <div style="color: #f59e0b; font-size: 13px;">
+                <i class="fas fa-exclamation-triangle"></i> Chỉ còn: <strong>${
+                  alert.stock
+                }</strong>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Thêm data-product-id và class để event delegation -->
+          <button 
+            class="btn-restock" 
+            data-product-id="${alert.productId}"
+            style="width: 100%; padding: 8px; background: #10b981; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; transition: background 0.3s;" 
+            onmouseover="this.style.background='#059669'" 
+            onmouseout="this.style.background='#10b981'">
+            <i class="fas fa-plus"></i> Nhập hàng ngay
+          </button>
         </div>
-    `;
-}
+      `
+        )
+        .join("")}
+    </div>
+  `;
 
+  // ========================================
+  // EVENT DELEGATION - Gắn sự kiện SAU KHI render HTML
+  // ========================================
+
+  // Xóa event listener cũ nếu có (tránh duplicate listeners)
+  const oldListener = container._restockListener;
+  if (oldListener) {
+    container.removeEventListener("click", oldListener);
+  }
+
+  // Tạo event listener mới
+  const restockListener = (event) => {
+    // Kiểm tra xem element được click có phải button restock không
+    const button = event.target.closest(".btn-restock");
+
+    if (button) {
+      const productId = button.dataset.productId;
+      console.log(`Nhập hàng cho sản phẩm: ${productId}`);
+
+      // Navigate đến trang imports
+      if (typeof window.navigateToPage === "function") {
+        window.navigateToPage("imports");
+      } else {
+        console.error("navigateToPage function not found");
+        alert("Chức năng điều hướng chưa sẵn sàng");
+      }
+    }
+  };
+
+  // Gắn event listener vào container (parent element)
+  container.addEventListener("click", restockListener);
+
+  // Lưu reference để có thể remove sau này
+  container._restockListener = restockListener;
+}
 // ============================================
 // HELPER FUNCTIONS
 // ============================================
