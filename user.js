@@ -19,7 +19,7 @@ class SPARouter {
   // Xử lý điều hướng giữa các view
   setupViewNavigation() {
     // Lấy tất cả các link có data-view
-    const viewLinks = document.querySelectorAll("[data-view]");
+    const viewLinks = document.querySelectorAll("[data-view]");   
 
     viewLinks.forEach((link) => {
       link.addEventListener("click", (e) => {
