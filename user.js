@@ -668,16 +668,16 @@ function checkoutOrder() {
 
   // ===== THÊM VALIDATION CHI TIẾT =====
 
-  // 1. Kiểm tra rỗng
+  // 1. Kiểm tra rỗng (chỉ bắt buộc: tên, email, phone, địa chỉ)
   if (
     !name ||
     !email ||
     !phone ||
     !address ||
+    !payMethod ||
     !ward ||
     !district ||
-    !city ||
-    !payMethod
+    !city
   ) {
     showNotification("Vui lòng điền đầy đủ thông tin giao hàng!", "error");
     return;
@@ -704,19 +704,7 @@ function checkoutOrder() {
     return;
   }
 
-  // 5. Validate độ dài địa chỉ (tối thiểu 10 ký tự)
-  if (address.length < 10) {
-    showNotification("Địa chỉ quá ngắn! Vui lòng nhập địa chỉ chi tiết (tối thiểu 10 ký tự)", "error");
-    return;
-  }
-
-  // 6. Validate phường/xã, quận/huyện, tỉnh/thành (tối thiểu 2 ký tự)
-  if (ward.length < 2 || district.length < 2 || city.length < 2) {
-    showNotification("Thông tin Phường/Xã, Quận/Huyện, Tỉnh/Thành không hợp lệ!", "error");
-    return;
-  }
-
-  // ✅ 7. VALIDATE THÔNG TIN NGÂN HÀNG NẾU CHỌN THANH TOÁN QUA NGÂN HÀNG
+  // ✅ 5. VALIDATE THÔNG TIN NGÂN HÀNG NẾU CHỌN THANH TOÁN QUA NGÂN HÀNG
   if (payMethod === "bank") {
     const bankName = document.getElementById("bank-name")?.value.trim();
     const bankAccount = document.getElementById("bank-account")?.value.trim();
