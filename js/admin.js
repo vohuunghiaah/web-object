@@ -1,15 +1,25 @@
+// ============================================================================
+// ADMIN PAGE - Quản lý users, products, orders
+// ============================================================================
+
 import { inventoryHtml, initInventoryPage } from "./manager/inventory.js";
 import { productHtml } from "./manager/product.js";
 import { initProductPage } from "./manager/product_list.js";
 import { orders as initialOrders } from "./data/orders.js";
 import { importHtml, initImportPage } from "./manager/imports.js";
 import { dashboardHtml, initDashboardPage } from "./manager/dashboard.js";
-import "../database.js";
 import { reportHtml, initReportPage } from "./manager/report.js";
+import {
+  normalizeOrderStructure,
+  getSafeOrderTotal,
+} from "./utils/orderUtils.js";
+import "../database.js";
 
+// ============================================================================
+// SPA NAVIGATION
+// ============================================================================
 
 async function navigateSPA(pageId, isInitialLoad = false) {
-
   const content = document.getElementById("content");
   const sidebar = document.getElementById("sidebar");
 
@@ -19,8 +29,7 @@ async function navigateSPA(pageId, isInitialLoad = false) {
     await new Promise((res) => setTimeout(res, 400));
   }
 
-  const pages = document.querySelectorAll("#content .page");
-  pages.forEach((page) => {
+  document.querySelectorAll("#content .page").forEach((page) => {
     page.style.display = "none";
     page.classList.remove("active");
   });
@@ -29,19 +38,12 @@ async function navigateSPA(pageId, isInitialLoad = false) {
   if (targetPage) {
     targetPage.style.display = "block";
     targetPage.classList.add("active");
-  } else {
-    console.error("Lỗi: Không tìm thấy trang với ID: ", pageId);
   }
 
-  const menuButtons = document.querySelectorAll("#sidebar button");
-  menuButtons.forEach((button) => {
-    button.classList.remove("active");
-  });
-
-  const activeButton = document.getElementById(`menu-${pageId}`);
-  if (activeButton) {
-    activeButton.classList.add("active");
-  }
+  document
+    .querySelectorAll("#sidebar button")
+    .forEach((btn) => btn.classList.remove("active"));
+  document.getElementById(`menu-${pageId}`)?.classList.add("active");
 
   if (!isInitialLoad && content && sidebar) {
     content.classList.remove("fade");
@@ -50,98 +52,85 @@ async function navigateSPA(pageId, isInitialLoad = false) {
 }
 window.navigateSPA = navigateSPA;
 
+// ============================================================================
+// PAGE INITIALIZATION
+// ============================================================================
+
 document.addEventListener("DOMContentLoaded", function () {
   const toggleBtn = document.getElementById("toggle-sidebar-btn");
   const closeBtn = document.getElementById("close-btn");
   const wrapper = document.getElementById("admin-wrapper");
 
-  if (toggleBtn && closeBtn && wrapper) {
-    toggleBtn.onclick = function () {
-      wrapper.classList.toggle("sidebar-hidden");
-    };
-    closeBtn.onclick = function () {
-      wrapper.classList.add("sidebar-hidden");
-    };
-  }
-  const inventoryPageDiv = document.getElementById("inventory");
-  if (inventoryPageDiv) {
-    inventoryPageDiv.innerHTML = inventoryHtml;
-    initInventoryPage();
-  } else {
-    console.error("Lỗi: Không thể khởi tạo <div id='inventory'>!");
-  }
+  toggleBtn?.addEventListener("click", () =>
+    wrapper.classList.toggle("sidebar-hidden")
+  );
+  closeBtn?.addEventListener("click", () =>
+    wrapper.classList.add("sidebar-hidden")
+  );
 
-  const dashboardPageDiv = document.getElementById("dashboard");
-  if (dashboardPageDiv) {
-    dashboardPageDiv.innerHTML = dashboardHtml;
-    initDashboardPage();
-  } else {
-    console.error("Lỗi: Không thể khởi tạo <div id='dashboard'>!");
-  }
+  // Initialize all pages
+  const pages = [
+    { id: "inventory", html: inventoryHtml, init: initInventoryPage },
+    { id: "dashboard", html: dashboardHtml, init: initDashboardPage },
+    { id: "products", html: productHtml, init: initProductPage },
+    { id: "imports", html: importHtml, init: initImportPage },
+    { id: "reports", html: reportHtml, init: initReportPage },
+  ];
 
-  const productsPageDiv = document.getElementById("products");
-  if (productsPageDiv) {
-    productsPageDiv.innerHTML = productHtml;
-    initProductPage();
-  } else {
-    console.error("Lỗi: Không thể khởi tạo <div id='products'> để nạp trang!");
-  }
-
-  const importPageDiv = document.getElementById("imports");
-  if (importPageDiv) {
-    importPageDiv.innerHTML = importHtml;
-    initImportPage();
-  } else {
-    console.error("Lỗi: Không thể khởi tạo <div id='imports'> để nạp trang!");
-  }
-
-  const reportPageDiv = document.getElementById("reports");
-  if (reportPageDiv) {
-    reportPageDiv.innerHTML = reportHtml;
-    initReportPage();
-  } else {
-    console.error("Lỗi: Không thể khởi tạo <div id='reports'> để nạp trang!");
-  }
+  pages.forEach(({ id, html, init }) => {
+    const div = document.getElementById(id);
+    if (div) {
+      div.innerHTML = html;
+      init();
+    } else {
+      console.error(`❌ Cannot initialize <div id='${id}'>`);
+    }
+  });
 
   initOrdersPage();
 
-  const defaultActiveButton = document.querySelector("#sidebar button.active");
-  if (defaultActiveButton) {
-    const defaultPageId = defaultActiveButton.id.replace("menu-", "");
-    navigateSPA(defaultPageId, true);
-  } else {
-    navigateSPA("dashboard", true);
-  }
+  // Navigate to default page
+  const defaultBtn = document.querySelector("#sidebar button.active");
+  const defaultPageId = defaultBtn
+    ? defaultBtn.id.replace("menu-", "")
+    : "dashboard";
+  navigateSPA(defaultPageId, true);
 
-  const logoutBtn = document.getElementById("logout-btn");
-  if (logoutBtn) {
-    logoutBtn.onclick = function () {
-      if (confirm("Bạn có chắc muốn đăng xuất không?")) {
-        localStorage.removeItem("currentAdmin");
-        window.location.href = "login.html";
-      }
-    };
-  }
+  // Logout
+  document.getElementById("logout-btn")?.addEventListener("click", () => {
+    if (confirm("Bạn có chắc muốn đăng xuất?")) {
+      localStorage.removeItem("currentAdmin");
+      window.location.href = "login.html";
+    }
+  });
 });
 
-function initOrdersPage() {
-  function migrateOrderData() {
-    const getData = (key) => JSON.parse(localStorage.getItem(key));
-    const setData = (key, val) => localStorage.setItem(key, JSON.stringify(val));
+// ============================================================================
+// ORDERS PAGE - Quản lý đơn hàng
+// ============================================================================
 
+function initOrdersPage() {
+  const getData = (key) => JSON.parse(localStorage.getItem(key) || "null");
+  const setData = (key, val) => localStorage.setItem(key, JSON.stringify(val));
+
+  // ✅ FIX: Define BroadcastChannel NGAY ĐẦU để có thể dùng trong các function
+  const channel = new BroadcastChannel("data_update");
+  console.log("✅ Admin: BroadcastChannel đã được khởi tạo");
+
+  // Migrate old data structure
+  function migrateOrderData() {
     let orders = getData("orders");
     if (!orders || orders.length === 0) return;
 
-    if (typeof orders[0].date === "undefined") {
-      console.warn("Phát hiện dữ liệu đơn hàng cũ, đang nâng cấp...");
-      orders.forEach((o) => {
-        if (!o.date) o.date = new Date(o.id).toISOString();
-      });
+    if (!orders[0].date) {
+      orders.forEach((o) => (o.date = o.date || new Date(o.id).toISOString()));
       setData("orders", orders);
-      console.log("Nâng cấp dữ liệu đơn hàng thành công!");
+      console.log("✅ Migrated order dates");
     }
   }
+
   migrateOrderData();
+  normalizeOrderStructure();
 
   const sidebar1 = document.getElementById("sidebar1");
   const content1 = document.getElementById("content1");
@@ -152,42 +141,40 @@ function initOrdersPage() {
   const saveBtn = document.getElementById("saveBtn");
   const cancelBtn1 = document.getElementById("cancelBtn1");
 
+  // Show popup modal
   function showPopup(title, fieldsHTML, onSave) {
     popupTitle.textContent = title;
-    // Hỗ trợ cả HTML string và Function trả về HTML string
-    if (typeof fieldsHTML === "function") {
-      popupFields.innerHTML = fieldsHTML();
-    } else {
-      popupFields.innerHTML = fieldsHTML;
-    }
+    popupFields.innerHTML =
+      typeof fieldsHTML === "function" ? fieldsHTML() : fieldsHTML;
     popup.classList.add("active");
+
     saveBtn.onclick = () => {
-      const inputs = popupFields.querySelectorAll("input, select");
       const values = {};
-      inputs.forEach((i) => (values[i.name] = i.value));
+      popupFields
+        .querySelectorAll("input, select")
+        .forEach((i) => (values[i.name] = i.value));
       onSave(values);
     };
     cancelBtn1.onclick = () => popup.classList.remove("active");
   }
 
-  const getData = (key) => JSON.parse(localStorage.getItem(key));
-  const setData = (key, val) => localStorage.setItem(key, JSON.stringify(val));
-
-  const currentOrders = getData("orders");
-  if (!currentOrders || currentOrders.length === 0) {
+  // Initialize orders if empty
+  if (!getData("orders")?.length) {
     setData("orders", initialOrders);
   }
 
-  async function animateSidebarChange(newHTML, newContentHTML) {
+  // Animate sidebar change
+  async function animateSidebarChange(newSidebarHTML, newContentHTML) {
     sidebar1.classList.add("hide");
     content1.classList.add("fade");
     await new Promise((res) => setTimeout(res, 400));
-    sidebar1.innerHTML = newHTML;
+    sidebar1.innerHTML = newSidebarHTML;
     content1.innerHTML = newContentHTML;
     sidebar1.classList.remove("hide");
     content1.classList.remove("fade");
   }
 
+  // Menu navigation
   menuButtons.forEach((btn) =>
     btn.addEventListener("click", () => {
       menuButtons.forEach((b) => b.classList.remove("active-mode"));
@@ -196,319 +183,352 @@ function initOrdersPage() {
     })
   );
 
+  // ============================================================================
+  // LOAD MODE
+  // ============================================================================
+
   function loadMode(mode) {
     if (mode === "users") {
-      const users = JSON.parse(localStorage.getItem("users")) || [];
-      
-      function renderUserTable(userToRender) {
-        const container = document.getElementById("user-table-container");
-        if (!container) {
-          console.error("Lỗi. Không tìm thấy #user-table-container");
-          return;
-        }
-        container.innerHTML = `<table class="table_content">
-              <tr>
-                <th>ID</th>
-                <th>Tên</th>
-                <th>Email</th>
-                <th>Mật khẩu</th>
-                <th>Vai trò</th>
-                <th>Trạng thái</th>
-                <th>Chỉnh sửa</th>
-              </tr>
-              ${
-                userToRender.length === 0
-                  ? `<tr><td colspan="7" style="text-align:center; padding: 20px; color: #999;">Không tìm thấy người dùng.</td></tr>`
-                  : userToRender
-                      .map(
-                        (u) => `
-                  <tr>
-                    <td>${u.id}</td>
-                    <td>${u.name}</td>
-                    <td>${u.email}</td>
-                    <td>${u.password}</td>
-                    <td>${u.role}</td>
-                    <td>${u.state} ${
-                          u.state === "Off"
-                            ? `<i class="fa-solid fa-lock" style="color:red"></i>`
-                            : `<i class="fa-solid fa-unlock" style="color:green"></i>`
-                        }</td>
-                    <td>
-                      <button class="edit-btn" id="${u.id}">Sửa</button>
-                      <button class="delete-btn" id="${u.id}">Xóa</button>
-                    </td> 
-                  </tr>`
-                      )
-                      .join("")
-              }
-            </table>`;
-            
-        container.querySelectorAll(".edit-btn").forEach((btn) => {
-          btn.addEventListener("click", () => {
-            const id = btn.id;
-            const u = users.find((u) => u.id == id);
-            showPopup(
-              "Sửa người dùng",
-              `
-              <label>Tên:</label>
-              <input name="name" value="${u.name}">
-              <label>Email:</label>
-              <input name="email" value="${u.email}">
-              <label>Mật khẩu:</label>
-              <input name="password" type="password" value="${u.password}">
-              <label>Vai trò:</label>
-              <select name="role">
-                <option ${u.role === "Khách hàng" ? "selected" : ""}>Khách hàng</option>
-                <option ${u.role === "Nhân viên" ? "selected" : ""}>Nhân viên</option>
-              </select>
-              <label>Trạng thái:</label>
-              <select name="state">
-                <option ${u.state === "On" ? "selected" : ""}> On </option>
-                <option ${u.state === "Off" ? "selected" : ""}> Off </option>
-              </select>`,
-              (val) => {
-                Object.assign(u, val);
-                setData("users", users);
-                renderUserTable(users); 
-                popup.classList.remove("active");
-              }
-            );
-          });
-        });
-
-        container.querySelectorAll(".delete-btn").forEach((btn) => {
-          btn.addEventListener("click", () => {
-            const id = btn.id;
-            const userIndex = users.findIndex((u) => u.id == id);
-            if (userIndex === -1) return alert("Lỗi: Không tìm thấy người dùng!");
-            showPopup(
-              `Bạn có chắc chắn muốn xóa ${users[userIndex].name}?`,
-              ``,
-              (val) => {
-                users.splice(userIndex, 1);
-                setData("users", users);
-                renderUserTable(users);
-                popup.classList.remove("active");
-              }
-            );
-          });
-        });
-      }
-
-      animateSidebarChange(
-        `
-        <button class="list_scrollbar" data-act="add">➕ Thêm người dùng</button>
-        <input id="user-search-input" class="list-list_scrollbar" placeholder="Tìm theo tên hoặc email..." 
-          style="width: 90%; padding: 5px; margin-top: 10px; background: #3a3a3a; color: white; border: 1px solid #555; border-radius: 4px;">
-        `,
-        `
-        <h2>Quản lý người dùng</h2>
-        <div id="user-table-container"></div>
-        `
-      ).then(() => {
-        renderUserTable(users);
-        document.getElementById("user-search-input").addEventListener("input", (e) => {
-            const searchTerm = e.target.value.toLowerCase().trim();
-            const filterUsers = users.filter(
-              (u) =>
-                u.name.toLowerCase().includes(searchTerm) ||
-                u.email.toLowerCase().includes(searchTerm)
-            );
-            renderUserTable(filterUsers);
-          });
-
-        document.querySelectorAll(".list_scrollbar").forEach((btn) => {
-          btn.addEventListener("click", (e) => {
-            const act = e.target.dataset.act;
-            if (act === "add") {
-              showPopup(
-                "Thêm người dùng",
-                `
-                <input name="name" placeholder="Tên người dùng">
-                <input name="email" placeholder="Email">
-                <input name="password" placeholder="Mật khẩu" type="password">
-                <select name="role">
-                  <option>Khách hàng</option>
-                  <option>Nhân viên</option>
-                </select>
-                <select name="state">
-                  <option> On </option>
-                  <option> Off </option>
-                </select>
-              `,
-                (vals) => {
-                  users.push({ id: Date.now(), ...vals });
-                  setData("users", users);
-                  renderUserTable(users);
-                  popup.classList.remove("active");
-                }
-              );
-            }
-          });
-        });
-      });
+      loadUsersMode();
     } else if (mode === "products") {
-        console.log("Điều hướng đến trang Products chính...");
-        navigateSPA("products");
+      navigateSPA("products");
     } else if (mode === "orders") {
-        let allOrders = getData("orders") || [];
-        let allProducts = getData("products") || [];
+      loadOrdersMode();
+    }
+  }
 
-        if (allOrders.length > 0 && typeof allOrders[0].productId === "undefined") {
-          console.warn("Đang nâng cấp đơn hàng cũ...");
-          allOrders.forEach((o) => {
-            if (!o.productId) {
-              const foundProduct = allProducts.find((p) => p.name === o.product);
-              if (foundProduct) o.productId = foundProduct.id;
-              else o.productId = null;
+  // --------------------------------------------------------------------------
+  // USERS MODE
+  // --------------------------------------------------------------------------
+
+  function loadUsersMode() {
+    const users = getData("users") || [];
+
+    function renderUserTable(userList) {
+      const container = document.getElementById("user-table-container");
+      if (!container) return;
+
+      container.innerHTML = `
+        <table class="table_content">
+          <tr>
+            <th>ID</th><th>Tên</th><th>Email</th><th>Vai trò</th><th>Trạng thái</th><th>Hành động</th>
+          </tr>
+          ${
+            userList.length === 0
+              ? `<tr><td colspan="6" style="text-align:center; color: #999;">Không có người dùng</td></tr>`
+              : userList
+                  .map(
+                    (u) => `
+              <tr>
+                <td>${u.id}</td>
+                <td>${u.name}</td>
+                <td>${u.email}</td>
+                <td>${u.role}</td>
+                <td>${u.state}</td>
+                <td>
+                  <button class="edit-btn" data-id="${u.id}">Sửa</button>
+                  <button class="delete-btn" data-id="${u.id}">Xóa</button>
+                </td>
+              </tr>
+            `
+                  )
+                  .join("")
+          }
+        </table>
+      `;
+
+      // Edit user
+      container.querySelectorAll(".edit-btn").forEach((btn) => {
+        btn.onclick = () => {
+          const user = users.find((u) => u.id == btn.dataset.id);
+          if (!user) return;
+
+          showPopup(
+            "Sửa người dùng",
+            `
+            <input name="name" value="${user.name}" placeholder="Tên">
+            <input name="email" value="${user.email}" placeholder="Email">
+            <input name="password" type="password" value="${
+              user.password
+            }" placeholder="Mật khẩu">
+            <select name="role">
+              <option ${
+                user.role === "Khách hàng" ? "selected" : ""
+              }>Khách hàng</option>
+              <option ${
+                user.role === "Nhân viên" ? "selected" : ""
+              }>Nhân viên</option>
+            </select>
+            <select name="state">
+              <option ${user.state === "On" ? "selected" : ""}>On</option>
+              <option ${user.state === "Off" ? "selected" : ""}>Off</option>
+            </select>
+          `,
+            (vals) => {
+              Object.assign(user, vals);
+              setData("users", users);
+              renderUserTable(users);
+              popup.classList.remove("active");
             }
-          });
-          setData("orders", allOrders);
+          );
+        };
+      });
+
+      // Delete user
+      container.querySelectorAll(".delete-btn").forEach((btn) => {
+        btn.onclick = () => {
+          const idx = users.findIndex((u) => u.id == btn.dataset.id);
+          if (idx === -1) return;
+          if (confirm(`Xóa ${users[idx].name}?`)) {
+            users.splice(idx, 1);
+            setData("users", users);
+            renderUserTable(users);
+          }
+        };
+      });
+    }
+
+    animateSidebarChange(
+      `<button class="list_scrollbar" data-act="add">➕ Thêm người dùng</button>
+       <input id="user-search-input" class="list-list_scrollbar" placeholder="Tìm người dùng..." 
+         style="width: 90%; padding: 5px; margin-top: 10px; background: #3a3a3a; color: white; border: 1px solid #555; border-radius: 4px;">`,
+      `<h2>Quản lý người dùng</h2><div id="user-table-container"></div>`
+    ).then(() => {
+      renderUserTable(users);
+
+      // Search
+      document.getElementById("user-search-input").oninput = (e) => {
+        const term = e.target.value.toLowerCase();
+        const filtered = users.filter(
+          (u) =>
+            u.name.toLowerCase().includes(term) ||
+            u.email.toLowerCase().includes(term)
+        );
+        renderUserTable(filtered);
+      };
+
+      // Add user
+      document.querySelector('[data-act="add"]').onclick = () => {
+        showPopup(
+          "Thêm người dùng",
+          `
+          <input name="name" placeholder="Tên">
+          <input name="email" placeholder="Email">
+          <input name="password" type="password" placeholder="Mật khẩu">
+          <select name="role">
+            <option>Khách hàng</option>
+            <option>Nhân viên</option>
+          </select>
+          <select name="state">
+            <option>On</option>
+            <option>Off</option>
+          </select>
+        `,
+          (vals) => {
+            users.push({ id: Date.now(), ...vals });
+            setData("users", users);
+            renderUserTable(users);
+            popup.classList.remove("active");
+          }
+        );
+      };
+    });
+  }
+
+  // --------------------------------------------------------------------------
+  // ORDERS MODE
+  // --------------------------------------------------------------------------
+
+  function loadOrdersMode() {
+    let allOrders = getData("orders") || [];
+    let allProducts = getData("products") || [];
+
+    const formatCurrency = (val) =>
+      (val || 0).toLocaleString("vi-VN", {
+        style: "currency",
+        currency: "VND",
+      });
+    const formatDate = (dateStr) =>
+      new Date(dateStr).toLocaleDateString("vi-VN");
+    const getStatusColor = (status) =>
+      ({
+        "Chờ xác nhận": "#808080",
+        "Đang xử lý": "#fd7e14",
+        "Đang vận chuyển": "#0000FF",
+        "Giao hàng thành công": "#008000",
+        "Đã hủy": "#FF0000",
+      }[status] || "#ccc");
+
+    // Render order table
+    function renderOrderTable(ordersList) {
+      const container = document.getElementById("order-table-container");
+      if (!container) return;
+
+      if (ordersList.length === 0) {
+        container.innerHTML = `<p style="text-align: center; color: #999;">Không tìm thấy đơn hàng</p>`;
+        return;
       }
 
-        const formatCurrency = (val) => (val || 0).toLocaleString("vi-VN", { style: "currency", currency: "VND" });
-        const formatDate = (dateString) => new Date(dateString).toLocaleDateString("vi-VN");
+      container.innerHTML = `
+        <table class="table_content">
+          <tr>
+            <th>ID</th><th>Ngày</th><th>Khách hàng</th><th>Tổng tiền</th><th>Trạng thái</th><th>Hành động</th>
+          </tr>
+          ${ordersList
+            .map((o) => {
+              const total = getSafeOrderTotal(o);
+              const hasError = !o.products?.length || total === 0;
+              return `
+              <tr class="order-row" data-order-id="${
+                o.id
+              }" style="cursor: pointer; ${
+                hasError ? "background: #4a2020;" : ""
+              }">
+                <td>#${o.id}</td>
+                <td>${formatDate(o.date)}</td>
+                <td>${o.address?.name || o.user || "N/A"}</td>
+                <td>${formatCurrency(total)} ${hasError ? "⚠️" : ""}</td>
+                <td><strong style="color: ${getStatusColor(o.status)}">${
+                o.status
+              }</strong></td>
+                <td>
+                  <button class="delete-order-btn" data-order-id="${o.id}" 
+                    style="background: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">
+                    🗑️ Xóa
+                  </button>
+                </td>
+              </tr>
+            `;
+            })
+            .join("")}
+        </table>
+      `;
+    }
 
-        function renderOrderTable(ordersToRender) {
-          const tableContainer = document.getElementById("order-table-container");
-          if (!tableContainer) return;
+    // Filter and render
+    function applyFiltersAndRender() {
+      allOrders = getData("orders") || [];
+      const dateFrom = document.getElementById("date-from").value;
+      const dateTo = document.getElementById("date-to").value;
+      const status = document.getElementById("status-filter").value;
+      const searchTerm =
+        document.getElementById("order-search-input")?.value.toLowerCase() ||
+        "";
 
-          if (ordersToRender.length === 0) {
-            tableContainer.innerHTML = `<p style="text-align: center; color: #999; padding-top: 20px;">Không tìm thấy đơn hàng nào.</p>`;
-            return;
-          }
-          tableContainer.innerHTML = `
-              <table class="table_content">
-                <tr>
-                  <th>ID Đơn hàng</th>
-                  <th>Ngày đặt</th>
-                  <th>Khách hàng</th>
-                  <th>Tổng tiền</th>
-                  <th>Trạng thái</th>
-                  <th>Hành động</th>
-                </tr>
-                ${ordersToRender.map((o) => `
-                  <tr class="order-row" data-order-id="${o.id}" style="cursor: pointer;">
-                    <td>#${o.id}</td>
-                    <td>${formatDate(o.date)}</td>
-                    <td>${o.address?.name || o.user || o.userEmail || 'Không rõ'}</td>
-                    <td>${formatCurrency(o.total)}</td>
-                    <td><strong style="color: ${getStatusColor(o.status)}">${o.status}</strong></td>
-                    <td style="text-align: center;">
-                      <button class="delete-order-btn" data-order-id="${o.id}" style="background-color: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">🗑️ Xóa
-                      </button>
-                    </td>
-                  </tr>`).join("")}
-              </table>`;
-        }
+      const startTime = dateFrom ? new Date(dateFrom).getTime() : 0;
+      const endTime = dateTo ? new Date(dateTo).getTime() + 86400000 : Infinity;
 
-        function applyFiltersAndRender() {
-          allOrders = getData("orders") || [];
-          const dateFrom = document.getElementById("date-from").value;
-          const dateTo = document.getElementById("date-to").value;
-          const status = document.getElementById("status-filter").value;
-          const searchInput = document.getElementById("order-search-input");
-          const searchTerm = searchInput ? searchInput.value.toLowerCase().trim() : "";
+      const filtered = allOrders.filter((o) => {
+        const orderTime = new Date(o.date).getTime();
+        const statusMatch = status === "all" || o.status === status;
+        const dateMatch = orderTime >= startTime && orderTime <= endTime;
+        const customerName = o.address?.name || o.user || "";
+        const searchMatch =
+          !searchTerm ||
+          customerName.toLowerCase().includes(searchTerm) ||
+          String(o.id).includes(searchTerm);
+        return statusMatch && dateMatch && searchMatch;
+      });
 
-          const start = dateFrom ? new Date(dateFrom).getTime() : 0;
-          const end = dateTo ? new Date(dateTo).getTime() + 86400000 : Infinity;
+      filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+      renderOrderTable(filtered);
+    }
 
-          const filtered = allOrders.filter((o) => {
-            const orderDate = new Date(o.date).getTime();
-            const statusMatch = status === "all" || o.status === status;
-            const dateMatch = orderDate >= start && orderDate <= end;
-            
-            //Tìm kiếm theo tên khách hàng
-            const customerName = o.address?.name || o.user || o.userEmail || '';
-            const searchMatch = !searchTerm || 
-              customerName.toLowerCase().includes(searchTerm) || 
-              String(o.id).includes(searchTerm);
-            
-            return statusMatch && dateMatch && searchMatch;
-          });
+    // Render UI
+    animateSidebarChange(
+      `<button class="list_scrollbar" data-act="add">➕ Thêm đơn hàng</button>
+       <input id="order-search-input" class="list-list_scrollbar" placeholder="Tìm đơn hàng..." 
+         style="width: 90%; padding: 5px; margin-top: 10px; background: #3a3a3a; color: white; border: 1px solid #555; border-radius: 4px;">
+       <p style="padding: 10px; color: #777; font-size: 0.9em;">💡 Click vào đơn để xem chi tiết</p>`,
+      `<h2>Quản lý đơn hàng</h2>
+       <div class="order-filters" style="display: flex; gap: 15px; padding: 15px; background: #2a2a2a; border-radius: 8px; margin-bottom: 20px;">
+         <div style="flex: 1;">
+           <label style="color: #ccc; font-size: 0.9em;">Từ ngày:</label>
+           <input type="date" id="date-from" style="width: 100%; padding: 8px; border-radius: 4px; border: none; background: #3a3a3a; color: white;">
+         </div>
+         <div style="flex: 1;">
+           <label style="color: #ccc; font-size: 0.9em;">Đến ngày:</label>
+           <input type="date" id="date-to" style="width: 100%; padding: 8px; border-radius: 4px; border: none; background: #3a3a3a; color: white;">
+         </div>
+         <div style="flex: 1;">
+           <label style="color: #ccc; font-size: 0.9em;">Trạng thái:</label>
+           <select id="status-filter" style="width: 100%; padding: 8px; border-radius: 4px; border: none; background: #3a3a3a; color: white;">
+             <option value="all">Tất cả</option>
+             <option value="Chờ xác nhận">Chờ xác nhận</option>
+             <option value="Đang xử lý">Đang xử lý</option>
+             <option value="Đang vận chuyển">Đang vận chuyển</option>
+             <option value="Giao hàng thành công">Giao hàng thành công</option>
+             <option value="Đã hủy">Đã hủy</option>
+           </select>
+         </div>
+         <button id="filter-btn" style="align-self: flex-end; padding: 8px 15px;">Lọc</button>
+       </div>
+       <div id="order-table-container"></div>`
+    ).then(() => {
+      document.getElementById("filter-btn").onclick = applyFiltersAndRender;
+      document.getElementById("status-filter").onchange = applyFiltersAndRender;
+      document.getElementById("date-from").onchange = applyFiltersAndRender;
+      document.getElementById("date-to").onchange = applyFiltersAndRender;
+      document.getElementById("order-search-input").oninput =
+        applyFiltersAndRender;
 
-          filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
-          renderOrderTable(filtered);
-        }
-
-        function getStatusColor(status) {
-          switch (status) {
-            case "Chờ xử lý": return "#808080";
-            case "Chờ xác nhận": return "#808080";
-            case "Đang xử lý": return "#fd7e14";
-            case "Đang vận chuyển": return "#0000FF";
-            case "Giao hàng thành công": return "#008000";
-            case "Đã hủy": return "#FF0000";
-            default: return "#ccc";
-          }
-        }
-
-      animateSidebarChange(
-        `
-        <button class="list_scrollbar" data-act="add">➕ Thêm đơn hàng</button>
-        <button class="list_scrollbar" data-act="del">🗑️ Xóa đơn hàng</button>
-        <input id="order-search-input" class="list-list_scrollbar" placeholder="Tìm theo Tên hoặc ID Đơn..." 
-            style="width: 90%; padding: 5px; margin-top: 10px; background: #3a3a3a; color: white; border: 1px solid #555; border-radius: 4px;">
-        <p style="padding: 10px; color: #777; font-size: 0.9em;">Click vào một đơn hàng trong bảng để xem chi tiết và cập nhật trạng thái.</p>
-        `,
-        `
-        <h2>Quản lý đơn hàng</h2>
-        <div class="order-filters" style="display: flex; gap: 15px; align-items: center; padding: 15px; background: #2a2a2a; border-radius: 8px; margin-bottom: 20px;">
-            <div style="flex-grow: 1;">
-              <label style="color: #ccc; font-size: 0.9em;">Từ ngày:</label>
-              <input type="date" id="date-from" style="width: 100%; padding: 8px; border-radius: 4px; border: none; background: #3a3a3a; color: white;">
-            </div>
-            <div style="flex-grow: 1;">
-              <label style="color: #ccc; font-size: 0.9em;">Đến ngày:</label>
-              <input type="date" id="date-to" style="width: 100%; padding: 8px; border-radius: 4px; border: none; background: #3a3a3a; color: white;">
-            </div>
-            <div style="flex-grow: 1;">
-              <label style="color: #ccc; font-size: 0.9em;">Trạng thái:</label>
-              <select id="status-filter" style="width: 100%; padding: 8px; border-radius: 4px; border: none; background: #3a3a3a; color: white;">
-                <option value="all">Tất cả</option>
-                <option value="Chờ xác nhận">Chờ xác nhận</option>
-                <option value="Đang xử lý">Đang xử lý</option>
-                <option value="Đang vận chuyển">Đang vận chuyển</option>
-                <option value="Giao hàng thành công">Giao hàng thành công</option>
-                <option value="Đã hủy">Đã hủy</option>
-              </select>
-            </div>
-            <button id="filter-btn" class="button_linear" style="align-self: flex-end; padding: 8px 15px;">Lọc</button>
-          </div>
-          <div id="order-table-container"></div>
-        `
-      ).then(() => {
-        document.getElementById("filter-btn").onclick = applyFiltersAndRender;
-        document.getElementById("status-filter").onchange = applyFiltersAndRender;
-        document.getElementById("date-from").onchange = applyFiltersAndRender;
-        document.getElementById("date-to").onchange = applyFiltersAndRender;
-        document.getElementById("order-search-input").addEventListener("input", applyFiltersAndRender);
-
-        document.getElementById("order-table-container").addEventListener("click", (e) => {
+      // Click handlers
+      document
+        .getElementById("order-table-container")
+        .addEventListener("click", (e) => {
+          // Delete button
           const deleteBtn = e.target.closest(".delete-order-btn");
-          if(deleteBtn){
+          if (deleteBtn) {
             const orderId = deleteBtn.dataset.orderId;
             const idx = allOrders.findIndex((o) => o.id == orderId);
-            if(idx >= 0){
-              if(confirm(`Bạn có chắc chắn muốn xóa vĩnh viễn đơn hàng không #${orderId}`)){
-                allOrders.splice(idx, 1);
-                setData("orders", allOrders);
-                applyFiltersAndRender();//Vẽ lại bảng 
-              }
+            if (idx >= 0 && confirm(`Xóa đơn #${orderId}?`)) {
+              allOrders.splice(idx, 1);
+              setData("orders", allOrders);
+
+              // ✅ Broadcast orders_updated khi xóa
+              setTimeout(() => {
+                channel.postMessage({
+                  type: "orders_updated",
+                  action: "deleted",
+                  orderId: orderId,
+                });
+                console.log(
+                  `✅ Admin: Đã broadcast orders_updated (deleted) for order #${orderId}`
+                );
+              }, 50);
+
+              applyFiltersAndRender();
             }
-              return;
-            }
-          const row = e.target.closest(".order-row");
-          if (!row)
             return;
-          const orderId = row.dataset.orderId;
-          allOrders = getData("orders") || [];
-          const order = allOrders.find((o) => o.id == orderId);
-          if (!order) return alert("Không tìm thấy đơn hàng!");
+          }
+
+          // Row click - show detail
+          const row = e.target.closest(".order-row");
+          if (!row) return;
+
+          const order = allOrders.find((o) => o.id == row.dataset.orderId);
+          if (!order) return alert("❌ Không tìm thấy đơn hàng");
 
           const oldStatus = order.status;
 
-          showPopup(`Chi tiết đơn hàng #${order.id}`, () => {
+          showPopup(
+            `Chi tiết đơn hàng #${order.id}`,
+            () => {
+              const products = order.products || [];
+              const total = getSafeOrderTotal(order);
+
+              let productsHtml =
+                products.length === 0
+                  ? '<p style="color: #ff6b6b;">⚠️ Đơn hàng không có sản phẩm</p>'
+                  : products
+                      .map(
+                        (p) =>
+                          `<p>• ${p.name || "N/A"} (SL: ${
+                            p.quantity || 0
+                          }) - ${formatCurrency(p.price || 0)}</p>`
+                      )
+                      .join("");
+
               const STATUS_RANKS = {
                 "Chờ xác nhận": 1,
                 "Đang xử lý": 2,
@@ -516,79 +536,89 @@ function initOrdersPage() {
                 "Giao hàng thành công": 4,
                 "Đã hủy": 5,
               };
-              const allStatuses = ["Chờ xác nhận", "Đang xử lý", "Đang vận chuyển", "Giao hàng thành công", "Đã hủy"];
+              const ALL_STATUSES = Object.keys(STATUS_RANKS);
               const oldRank = STATUS_RANKS[oldStatus] || 0;
-              let statusDropdownHTML = "";
 
-              if (oldStatus === "Giao hàng thành công" || oldStatus === "Đã hủy") {
-                statusDropdownHTML = `
-                  <strong style="color: ${getStatusColor(oldStatus)}; font-size: 1.1em;">${oldStatus}</strong>
-                  <p style="color: #999; font-size: 0.9em; margin-top: 5px;">(Trạng thái cuối, không thể thay đổi)</p>
-                  <select name="status" style="display: none;"><option value="${oldStatus}" selected></option></select>
-                `;
+              let statusHTML = "";
+              if (
+                oldStatus === "Giao hàng thành công" ||
+                oldStatus === "Đã hủy"
+              ) {
+                statusHTML = `<strong style="color: ${getStatusColor(
+                  oldStatus
+                )}">${oldStatus}</strong>
+              <p style="color: #999; font-size: 0.9em;">(Không thể thay đổi)</p>
+              <select name="status" style="display:none;"><option value="${oldStatus}"></option></select>`;
               } else {
-                const availableStatuses = allStatuses.filter((status) => {
-                  if (status === "Đã hủy") return true; // Luôn cho phép hủy
-                  return (STATUS_RANKS[status] || 0) >= oldRank; // Chỉ cho phép đi tới
-                });
-                statusDropdownHTML = `
-                    <select name="status" style="width: 100%; padding: 8px; border-radius: 4px; border: none; background: #3a3a3a; color: white;">
-                      ${availableStatuses.map((status) => `<option value="${status}" ${oldStatus === status ? "selected" : ""}>${status}</option>`).join("")}
-                    </select>`;
+                const availableStatuses = ALL_STATUSES.filter(
+                  (s) => s === "Đã hủy" || STATUS_RANKS[s] >= oldRank
+                );
+                statusHTML = `<select name="status" style="width: 100%; padding: 8px; border-radius: 4px; background: #3a3a3a; color: white;">
+              ${availableStatuses
+                .map(
+                  (s) =>
+                    `<option value="${s}" ${
+                      s === oldStatus ? "selected" : ""
+                    }>${s}</option>`
+                )
+                .join("")}
+            </select>`;
               }
 
               return `
-                <p style="color: #ccc;">Khách hàng: <strong>${order.address?.name || order.user || order.userEmail || 'Không rõ'}</strong></p>
-                <div style="color: #ccc; border: 1px solid #555; padding: 5px; margin-top: 12px; border-radius: 4px; max-height: 150px; overflow-y: auto;">
-                  <strong>Sản phẩm:</strong>
-                  ${order.products.map((p) => `<p style="margin: 2px 0 2px 10px;">- ${p.name} (SL: ${p.quantity})</p>`).join("")}
-                </div>
-                <p style="color: #ccc; margin-top: 12px;">Tổng tiền: <strong>${formatCurrency(order.total)}</strong></p>
-                <hr style="border-color: #444; margin: 15px 0;">
-                <label style="color: #fff; display: block; margin-top: 15px; margin-bottom: 5px;">Cập nhật trạng thái:</label>
-                ${statusDropdownHTML}
-                `;
+            <p style="color: #ccc;">Khách hàng: <strong>${
+              order.address?.name || order.user || "N/A"
+            }</strong></p>
+            <div style="border: 1px solid #555; padding: 10px; margin: 12px 0; border-radius: 4px; max-height: 150px; overflow-y: auto; background: #2a2a2a;">
+              <strong>Sản phẩm:</strong>${productsHtml}
+            </div>
+            <p style="color: #ccc;">Tổng tiền: <strong style="color: ${
+              total > 0 ? "#4CAF50" : "#ff6b6b"
+            };">
+              ${formatCurrency(total)}${total === 0 ? " ⚠️ Lỗi dữ liệu" : ""}
+            </strong></p>
+            <hr style="border-color: #444; margin: 15px 0;">
+            <label style="color: #fff; display: block; margin-bottom: 5px;">Cập nhật trạng thái:</label>
+            ${statusHTML}
+          `;
             },
             (vals) => {
-              const newStatus = vals.status;
-              // Nếu trạng thái không đổi thì không làm gì cả
-              if (newStatus === order.status) {
-                  popup.classList.remove("active");
-                  return;
+              if (vals.status === order.status) {
+                popup.classList.remove("active");
+                return;
               }
-              const SOLD_STATUSES = ["Đang vận chuyển", "Giao hàng thành công"];
-              const oldIsSold = SOLD_STATUSES.includes(order.status);
-              const newIsSold = SOLD_STATUSES.includes(newStatus);
 
-              order.status = newStatus;
+              const SOLD_STATUSES = ["Đang vận chuyển", "Giao hàng thành công"];
+              const oldSold = SOLD_STATUSES.includes(order.status);
+              const newSold = SOLD_STATUSES.includes(vals.status);
+
+              order.status = vals.status;
               allProducts = getData("products") || [];
               let canProcess = true;
-              let stockUpdates = [];
 
-              if (!oldIsSold && newIsSold) {
-                //Chuyển từ "Chưa trừ" -> "Đã trừ"
+              // Update stock
+              if (!oldSold && newSold) {
                 order.products.forEach((p) => {
-                  const productInStock = allProducts.find((item) => item.id == p.productId);
-                  if (!productInStock) {
-                    alert(`Lỗi: Không tìm thấy sản phẩm "${p.name}" trong kho.`);
-                    canProcess = false;
-                  } else if (productInStock.quantity < p.quantity) {
-                    alert(`Không đủ hàng: "${p.name}" (còn ${productInStock.quantity}).`);
+                  const prod = allProducts.find(
+                    (item) => item.id == p.productId
+                  );
+                  if (!prod || prod.quantity < p.quantity) {
+                    alert(`❌ Không đủ hàng: ${p.name}`);
                     canProcess = false;
                   } else {
-                    stockUpdates.push({ product: productInStock, change: -p.quantity });
+                    prod.quantity -= p.quantity;
                   }
                 });
                 if (canProcess) {
-                  stockUpdates.forEach((u) => (u.product.quantity += u.change));
                   setData("products", allProducts);
                   channel.postMessage({ type: "products_updated" });
                 }
-              } else if (oldIsSold && !newIsSold) {
-                //Chuyển từ "Đã trừ" -> "Chưa trừ"
-                 order.products.forEach((p) => {
-                  const productInStock = allProducts.find((item) => item.id == p.productId);
-                  if (productInStock) productInStock.quantity += p.quantity;
+              } else if (oldSold && !newSold) {
+                order.products.forEach((p) => {
+                  const prod = allProducts.find(
+                    (item) => item.id == p.productId
+                  );
+                  if (prod) prod.quantity += p.quantity;
                 });
                 setData("products", allProducts);
                 channel.postMessage({ type: "products_updated" });
@@ -596,6 +626,21 @@ function initOrdersPage() {
 
               if (canProcess) {
                 setData("orders", allOrders);
+
+                // ✅ Broadcast orders_updated khi thay đổi trạng thái
+                setTimeout(() => {
+                  channel.postMessage({
+                    type: "orders_updated",
+                    action: "status_changed",
+                    orderId: order.id,
+                    newStatus: vals.status,
+                    oldStatus: oldStatus,
+                  });
+                  console.log(
+                    `✅ Admin: Đã broadcast orders_updated (status_changed) for order #${order.id}`
+                  );
+                }, 50);
+
                 applyFiltersAndRender();
                 popup.classList.remove("active");
               }
@@ -603,110 +648,125 @@ function initOrdersPage() {
           );
         });
 
-        document.querySelectorAll(".list_scrollbar").forEach((btn) => {
-          btn.addEventListener("click", (e) => {
-            const act = e.target.dataset.act;
-            if (act === "add") {
-              allProducts = getData("products") || [];
-              const productOptions = allProducts
-                .filter((p) => p.quantity > 0)
-                .map((p) => `<option value="${p.id}">${p.name} (Tồn: ${p.quantity})</option>`)
-                .join("");
+      // Add order button
+      document
+        .querySelector('[data-act="add"]')
+        ?.addEventListener("click", () => {
+          allProducts = getData("products") || [];
+          const productOpts = allProducts
+            .filter((p) => p.quantity > 0)
+            .map(
+              (p) =>
+                `<option value="${p.id}">${p.name} (Tồn: ${p.quantity})</option>`
+            )
+            .join("");
 
-              showPopup(
-                "Thêm đơn hàng",
-                `
-                  <input name="user" placeholder="Tên khách hàng">
-                  <label style="color: #ccc; display:block; margin-top:10px;">Sản phẩm:</label>
-                  <select name="productId" style="width: 100%; padding: 8px; border-radius: 4px; border: none; background: #3a3a3a; color: white;">${productOptions}</select>
-                  <label style="color: #ccc; display:block; margin-top:10px;">Số lượng bán:</label>
-                  <input name="quantity" placeholder="Số lượng" type="number" min="1">
-                  <label style="color: #ccc; display:block; margin-top:10px;">Trạng thái:</label>
-                  <select name="status">
-                      <option value="Chờ xác nhận" selected>Chờ xác nhận</option>
-                      <option value="Đang xử lý">Đang xử lý</option>
-                      <option value="Đang vận chuyển">Đang vận chuyển</option>
-                      <option value="Giao hàng thành công">Giao hàng thành công</option>
-                  </select>
-                `,
-                (vals) => {
-                  allProducts = getData("products") || [];
-                  const product = allProducts.find((p) => p.id == vals.productId);
-                  const quantity = parseInt(vals.quantity);
+          showPopup(
+            "Thêm đơn hàng",
+            `
+          <input name="user" placeholder="Tên khách hàng" required>
+          <label style="color: #ccc; display:block; margin-top:10px;">Sản phẩm:</label>
+          <select name="productId" style="width: 100%; padding: 8px; background: #3a3a3a; color: white;">${productOpts}</select>
+          <label style="color: #ccc; display:block; margin-top:10px;">Số lượng:</label>
+          <input name="quantity" type="number" min="1" required>
+          <label style="color: #ccc; display:block; margin-top:10px;">Trạng thái:</label>
+          <select name="status">
+            <option value="Chờ xác nhận">Chờ xác nhận</option>
+            <option value="Đang xử lý">Đang xử lý</option>
+            <option value="Đang vận chuyển">Đang vận chuyển</option>
+            <option value="Giao hàng thành công">Giao hàng thành công</option>
+          </select>
+        `,
+            (vals) => {
+              const product = allProducts.find((p) => p.id == vals.productId);
+              const qty = parseInt(vals.quantity);
 
-                  if (!product || !quantity || quantity <= 0) return alert("Dữ liệu không hợp lệ!");
-                  if (product.quantity < quantity) return alert("Không đủ hàng trong kho!");
+              if (!product || !qty || qty <= 0)
+                return alert("❌ Dữ liệu không hợp lệ");
+              if (product.quantity < qty) return alert("❌ Không đủ hàng");
 
-                  if (vals.status === "Giao hàng thành công") {
-                    product.quantity -= quantity;
-                    setData("products", allProducts);
-                    channel.postMessage({ type: "products_updated" });
-                  }
+              if (SOLD_STATUSES.includes(vals.status)) {
+                product.quantity -= qty;
+                setData("products", allProducts);
+                channel.postMessage({ type: "products_updated" });
+              }
 
-                  const newOrder = {
-                    id: Date.now(),
-                    date: new Date().toISOString(),
-                    user: vals.user || "Khách lẻ",
-                    status: vals.status,
-                    payMethod: "Admin",
-                    total: product.price * quantity,
-                    address: { name: vals.user || "Khách lẻ" },
-                    products: [{ productId: product.id, name: product.name, price: product.price, image: product.img, quantity: quantity }],
-                  };
+              const newOrder = {
+                id: Date.now(),
+                date: new Date().toISOString(),
+                user: vals.user || "Khách lẻ",
+                status: vals.status,
+                payMethod: "Admin",
+                total: product.price * qty,
+                address: { name: vals.user || "Khách lẻ" },
+                products: [
+                  {
+                    productId: product.id,
+                    name: product.name,
+                    price: product.price,
+                    image: product.img,
+                    quantity: qty,
+                  },
+                ],
+              };
 
-                  allOrders = getData("orders") || [];
-                  allOrders.push(newOrder);
-                  setData("orders", allOrders);
-                  applyFiltersAndRender();
-                  popup.classList.remove("active");
-                }
-              );
+              allOrders = getData("orders") || [];
+              allOrders.push(newOrder);
+              setData("orders", allOrders);
+
+              // ✅ Broadcast orders_updated khi thêm mới
+              setTimeout(() => {
+                channel.postMessage({
+                  type: "orders_updated",
+                  action: "created",
+                  orderId: newOrder.id,
+                });
+                console.log(
+                  `✅ Admin: Đã broadcast orders_updated (created) for order #${newOrder.id}`
+                );
+              }, 50);
+
+              applyFiltersAndRender();
+              popup.classList.remove("active");
             }
-            if (act === "del") {
-                // ... (giữ nguyên logic xóa của bạn nếu cần)
-                 const id = prompt("Nhập ID đơn hàng muốn xóa:");
-                 if (!id) return;
-                 allOrders = getData("orders") || [];
-                 const idx = allOrders.findIndex(o => o.id == id);
-                 if(idx !== -1 && confirm("Xóa vĩnh viễn đơn này?")) {
-                     allOrders.splice(idx, 1);
-                     setData("orders", allOrders);
-                     applyFiltersAndRender();
-                 } else if (idx === -1) {
-                     alert("Không tìm thấy đơn hàng!");
-                 }
-            }
-          });
+          );
         });
-        applyFiltersAndRender();
-      });
-    }
+
+      applyFiltersAndRender();
+    });
   }
 
-  const channel = new BroadcastChannel("data_update");
+  // ============================================================================
+  // BROADCAST CHANNEL LISTENER - Sync across tabs
+  // ============================================================================
+
   channel.onmessage = (event) => {
-    if (event.data.type !== "products_updated") return;
-    console.log("Phát hiện cập nhật sản phẩm...");
-    // Reload các trang nếu đang mở
+    const { type } = event.data;
+
+    // Listen cho cả products_updated và orders_updated
+    if (type !== "products_updated" && type !== "orders_updated") return;
+
+    console.log(`📡 Admin: Nhận được ${type} từ tab khác`);
+
     const activePage = document.querySelector(".page.active");
-    if (activePage && activePage.id === "dashboard") {
-        document.getElementById("dashboard").innerHTML = dashboardHtml;
-        initDashboardPage();
+
+    if (activePage?.id === "dashboard") {
+      document.getElementById("dashboard").innerHTML = dashboardHtml;
+      initDashboardPage();
     }
-    if (activePage && activePage.id === "products") {
-         document.getElementById("products").innerHTML = productHtml;
-         initProductPage();
+    if (activePage?.id === "products") {
+      document.getElementById("products").innerHTML = productHtml;
+      initProductPage();
     }
-    if (activePage && activePage.id === "imports") {
-        document.getElementById("imports").innerHTML = importHtml;
-        initImportPage();
+    if (activePage?.id === "imports") {
+      document.getElementById("imports").innerHTML = importHtml;
+      initImportPage();
     }
-    // Nếu đang ở tab Orders, reload lại danh sách
-    if (activePage && activePage.id === "orders") {
-      const activeModeBtn = document.getElementById("orders").querySelector(".button_linear.active-mode");
-      if (activeModeBtn && activeModeBtn.dataset.mode === "orders") {
-        loadMode("orders");
-      }
+    if (activePage?.id === "orders") {
+      const activeBtn = document
+        .getElementById("orders")
+        .querySelector(".button_linear.active-mode");
+      if (activeBtn?.dataset.mode === "orders") loadOrdersMode();
     }
   };
 }

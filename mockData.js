@@ -3617,7 +3617,7 @@ export const mockOrders = [
     id: 3003,
     customerId: 2006,
     customerName: "Vũ Lan Dung",
-    orderDate: "2025-08-20",
+    orderDate: "2025-11-12",
     products: [
       {
         productId: 32,
