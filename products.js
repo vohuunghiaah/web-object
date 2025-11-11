@@ -93,6 +93,8 @@ function getCategoryName(category) {
  * @param {string} rangeValue - Giá trị range (vd: "under500k", "1m-2m")
  * @returns {object} Object chứa min và max price
  */
+
+ // Chuyển đổi khoảng giá sang đối tượng có thuộc tính max, min
 function parsePriceRange(rangeValue) {
   switch (rangeValue) {
     case "under500k":
@@ -311,9 +313,11 @@ document.addEventListener("DOMContentLoaded", function () {
    * Hiển thị danh sách sản phẩm với các filter đã chọn
    * @param {array} selectedCategories - Mảng các category được chọn
    */
+  // Đây là hàm chức năng thôi
+  // Nó hiển thị từng sản phẩm 1 rồi bỏ vào productList
   function displayProducts(selectedCategories) {
     let filteredProduct = [...allProduct];
-
+    // Cho nhiều trường hợp xảy ra cùng lúc luôn
     // LỌC THEO TÌM KIẾM (ưu tiên cao nhất)
     if (currentSearchQuery.trim() !== "") {
       const query = currentSearchQuery.toLowerCase().trim();
@@ -353,6 +357,8 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // PHÂN TRANG - đảm bảo currentPage nằm trong khoảng hợp lệ
+
+    // Can thiệp giá trị biến cho hợp lý thôi, chả làm gì cả
     const computedTotalPages = Math.ceil(filteredProduct.length / productsPerPage) || 0;
     if (computedTotalPages === 0) {
       currentPage = 1;
@@ -378,8 +384,9 @@ document.addEventListener("DOMContentLoaded", function () {
     const existingItems = productsList.querySelectorAll(".products__list__item");
     // Xóa các item cũ
     existingItems.forEach((item) => item.remove());
-
-    productsForThisPage.forEach((product) => {
+    
+    // Vẽ từng sản phẩm lên
+    productsForThisPage.forEach((product) => { // productsForThisPage là mảng sản phẩm sau khi phân trang
       const clone = productTemplate.content.cloneNode(true);
 
       // Lưu product id vào data attribute
@@ -454,7 +461,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     const allCategoriesLink = document.querySelector('[data-category="all"]');
-    if (activeCategories.length === 0 && allCategoriesLink) {
+    if (activeCategories.length === 0 && allCategoriesLink) { // Nếu không có danh mục nào được chọn thì sẽ hiện danh mục tất cả
       allCategoriesLink.classList.add("active");
       activeCategories.push("all");
     }
@@ -470,6 +477,9 @@ document.addEventListener("DOMContentLoaded", function () {
    * Hiển thị pagination với ellipsis cho nhiều trang
    * @param {number} totalFilteredProducts - Tổng số sản phẩm sau khi filter
    */
+
+  // Hàm này đi kèm với hàm displayProducts
+  // displayPagination(filteredProduct.length) // Tổng số lượng sản phẩm sau khi lọc ra
   function displayPagination(totalFilteredProducts) {
     if (!paginationLinksContainer) return;
 
@@ -483,12 +493,12 @@ document.addEventListener("DOMContentLoaded", function () {
     if (totalPages === 0) {
       if (prevButton) prevButton.classList.add("disabled");
       if (nextButton) nextButton.classList.add("disabled");
-      return;
+      return; // Thoát không vẽ nữa thôi
     }
 
-    // Tạo các nút số trang mới với Ellipsis
+    // Tạo các nút số trang mới với ELLIPSIS
     const maxPagesToShow = 5;
-    const pages = [];
+    const pages = []; // Mảng lưu số trang và chấm chấm chấm thôi, mỗi lần gọi hàm thì yên tâm, nó luôn rỗng
 
     if (totalPages <= maxPagesToShow + 2) {
       // Nếu tổng số trang ít, hiển thị tất cả
@@ -497,6 +507,7 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     } else {
       // Luôn hiển thị trang đầu
+      // Có nhiều trang
       pages.push(1);
 
       // Tính toán các trang ở giữa
