@@ -1,7 +1,6 @@
-
-const getData = key => JSON.parse(localStorage.getItem(key));
+const getData = (key) => JSON.parse(localStorage.getItem(key));
 const setData = (key, val) => localStorage.setItem(key, JSON.stringify(val));
-const channel = new BroadcastChannel('data_update');
+const channel = new BroadcastChannel("data_update");
 
 // HTML cho trang Quản lý Nhập hàng
 export const importHtml = `
@@ -54,18 +53,17 @@ export const importHtml = `
   </div>
 `;
 
-
 export function initImportPage() {
   // Lấy các DOM element
-  const importListEl = document.getElementById('importList');
-  const addImportBtn = document.getElementById('add-import-btn');
-  const overlay = document.getElementById('importOverlay');
-  const form = document.getElementById('importForm');
-  const cancelBtn = document.getElementById('cancelImportBtn');
-  const productSelect = document.getElementById('import-product-select');
-  const addToSlipBtn = document.getElementById('add-to-slip-btn');
-  const tempProductListEl = document.getElementById('temp-product-list');
-  const searchInput = document.getElementById('search-import');
+  const importListEl = document.getElementById("importList");
+  const addImportBtn = document.getElementById("add-import-btn");
+  const overlay = document.getElementById("importOverlay");
+  const form = document.getElementById("importForm");
+  const cancelBtn = document.getElementById("cancelImportBtn");
+  const productSelect = document.getElementById("import-product-select");
+  const addToSlipBtn = document.getElementById("add-to-slip-btn");
+  const tempProductListEl = document.getElementById("temp-product-list");
+  const searchInput = document.getElementById("search-import");
 
   // Lấy dữ liệu
   if (!getData("importSlips")) {
@@ -77,7 +75,6 @@ export function initImportPage() {
   let tempProducts = []; // Mảng chứa các SP trong phiếu đang tạo
   let editIndex = null;
 
-
   // 1. Render danh sách phiếu nhập
   function renderSlips(list) {
     importListEl.innerHTML = "";
@@ -85,23 +82,29 @@ export function initImportPage() {
       const item = document.createElement("div");
       item.className = "product-item"; // Tái sử dụng CSS từ trang product
       item.style.gridTemplateColumns = "1fr 1fr 1fr 1fr";
-      
+
       const isCompleted = slip.status === "Hoàn thành";
-      
+
       item.innerHTML = `
         <div>#${slip.id}</div>
-        <div>${new Date(slip.date).toLocaleDateString('vi-VN')}</div>
-        <div style="color: ${isCompleted ? 'green' : 'orange'}; font-weight: bold;">
+        <div>${new Date(slip.date).toLocaleDateString("vi-VN")}</div>
+        <div style="color: ${
+          isCompleted ? "green" : "orange"
+        }; font-weight: bold;">
           ${slip.status}
         </div>
         <div class="actions">
-          ${!isCompleted ? `
+          ${
+            !isCompleted
+              ? `
             <button class="edit" onclick="editSlip(${index})">Sửa</button>
             <button class="delete" onclick="deleteSlip(${index})">Xóa</button>
             <button class="complete-btn" onclick="completeSlip(${index})" style="background: green;">Hoàn thành</button>
-          ` : `
+          `
+              : `
             <button class="view" onclick="viewSlip(${index})" style="background: #3498db;">Xem</button>
-          `}
+          `
+          }
         </div>
       `;
       importListEl.appendChild(item);
@@ -111,7 +114,8 @@ export function initImportPage() {
   function renderTempProducts() {
     tempProductListEl.innerHTML = "";
     if (tempProducts.length === 0) {
-      tempProductListEl.innerHTML = "<p style='color: #888; text-align: center;'>Chưa có sản phẩm nào.</p>";
+      tempProductListEl.innerHTML =
+        "<p style='color: #888; text-align: center;'>Chưa có sản phẩm nào.</p>";
       return;
     }
     tempProducts.forEach((p, index) => {
@@ -126,13 +130,21 @@ export function initImportPage() {
 
   function openForm(isView = false) {
     // Nạp danh sách sản phẩm vào <select>
-    productSelect.innerHTML = allProducts.map(p => 
-      `<option value="${p.id}">${p.name} (Tồn kho: ${p.quantity})</option>`).join('');
-    
+    productSelect.innerHTML = allProducts
+      .map(
+        (p) =>
+          `<option value="${p.id}">${p.name} (Tồn kho: ${p.quantity})</option>`
+      )
+      .join("");
+
     // Nếu là chế độ xem, vô hiệu hóa các nút
-    document.getElementById('add-to-slip-btn').style.display = isView ? 'none' : 'block';
-    form.querySelector('button[type="submit"]').style.display = isView ? 'none' : 'block';
-    
+    document.getElementById("add-to-slip-btn").style.display = isView
+      ? "none"
+      : "block";
+    form.querySelector('button[type="submit"]').style.display = isView
+      ? "none"
+      : "block";
+
     overlay.style.display = "flex";
   }
 
@@ -145,10 +157,12 @@ export function initImportPage() {
   }
 
   addToSlipBtn.onclick = () => {
-    const productId = parseInt(document.getElementById('import-product-select').value);
-    const product = allProducts.find(p => p.id === productId);
-    const quantity = parseInt(document.getElementById('import-quantity').value);
-    const importPrice = document.getElementById('import-price').value;
+    const productId = parseInt(
+      document.getElementById("import-product-select").value
+    );
+    const product = allProducts.find((p) => p.id === productId);
+    const quantity = parseInt(document.getElementById("import-quantity").value);
+    const importPrice = document.getElementById("import-price").value;
 
     if (!quantity || quantity <= 0 || !importPrice) {
       alert("Vui lòng nhập đủ Số lượng và Giá nhập!");
@@ -159,19 +173,19 @@ export function initImportPage() {
       productId: product.id,
       name: product.name,
       quantity: quantity,
-      importPrice: importPrice
+      importPrice: importPrice,
     });
 
     renderTempProducts();
     // Reset ô nhập
-    document.getElementById('import-quantity').value = '';
-    document.getElementById('import-price').value = '';
+    document.getElementById("import-quantity").value = "";
+    document.getElementById("import-price").value = "";
   };
-  
+
   window.removeTempProduct = (index) => {
     tempProducts.splice(index, 1);
     renderTempProducts();
-  }
+  };
 
   form.onsubmit = (e) => {
     e.preventDefault();
@@ -184,7 +198,7 @@ export function initImportPage() {
       id: editIndex !== null ? currentSlips[editIndex].id : Date.now(),
       date: new Date().toISOString(),
       status: "Đang xử lý",
-      products: tempProducts 
+      products: tempProducts,
     };
 
     if (editIndex !== null) {
@@ -199,7 +213,7 @@ export function initImportPage() {
     renderSlips(currentSlips);
     closeForm();
   };
-  
+
   // Sửa phiếu
   window.editSlip = (index) => {
     const slip = currentSlips[index];
@@ -209,31 +223,41 @@ export function initImportPage() {
     }
     editIndex = index;
     tempProducts = [...slip.products]; // Copy sản phẩm từ phiếu vào mảng tạm
-    document.getElementById("importFormTitle").textContent = "Sửa phiếu nhập #" + slip.id;
+    document.getElementById("importFormTitle").textContent =
+      "Sửa phiếu nhập #" + slip.id;
     openForm();
     renderTempProducts();
   };
-  
+
   // Xem phiếu (khi đã hoàn thành)
   window.viewSlip = (index) => {
     const slip = currentSlips[index];
     editIndex = index; // Chỉ để nhận dạng
     tempProducts = [...slip.products];
-    document.getElementById("importFormTitle").textContent = "Xem phiếu nhập #" + slip.id;
+    document.getElementById("importFormTitle").textContent =
+      "Xem phiếu nhập #" + slip.id;
     openForm(true); // Mở ở chế độ "view only"
     renderTempProducts();
-  }
+  };
 
   // Xóa phiếu
   window.deleteSlip = (index) => {
     const slip = currentSlips[index];
-    if (slip.status === "Đang xử lý" && !confirm(`Bạn có chắc muốn xóa phiếu #${slip.id} (Đang xử lý)?`)) {
+    if (
+      slip.status === "Đang xử lý" &&
+      !confirm(`Bạn có chắc muốn xóa phiếu #${slip.id} (Đang xử lý)?`)
+    ) {
       return;
     }
-    if (slip.status === "Hoàn thành" && !confirm(`Bạn có chắc muốn xóa phiếu #${slip.id} (ĐÃ HOÀN THÀNH)?\n(Hành động này KHÔNG khôi phục lại tồn kho)`)) {
+    if (
+      slip.status === "Hoàn thành" &&
+      !confirm(
+        `Bạn có chắc muốn xóa phiếu #${slip.id} (ĐÃ HOÀN THÀNH)?\n(Hành động này KHÔNG khôi phục lại tồn kho)`
+      )
+    ) {
       return;
     }
-    
+
     currentSlips.splice(index, 1);
     setData("importSlips", currentSlips);
     renderSlips(currentSlips);
@@ -242,7 +266,11 @@ export function initImportPage() {
   //Hoàn thành phiếu (Cập nhật tồn kho) !!
   window.completeSlip = (index) => {
     const slip = currentSlips[index];
-    if (!confirm(`Bạn có chắc muốn HOÀN THÀNH phiếu #${slip.id}?\nSố lượng tồn kho và Giá Vốn sẽ được cập nhật. Không thể hoàn tác.`)) {
+    if (
+      !confirm(
+        `Bạn có chắc muốn HOÀN THÀNH phiếu #${slip.id}?\nSố lượng tồn kho và Giá Vốn sẽ được cập nhật. Không thể hoàn tác.`
+      )
+    ) {
       return;
     }
 
@@ -250,20 +278,19 @@ export function initImportPage() {
     let currentProductStorage = getData("products");
 
     // Cập nhật số lượng cho từng sản phẩm trong phiếu
-    slip.products.forEach(slipProduct => {
-      const productInStorage = currentProductStorage.find(p => p.id === slipProduct.productId);
+    slip.products.forEach((slipProduct) => {
+      const productInStorage = currentProductStorage.find(
+        (p) => p.id === slipProduct.productId
+      );
       if (productInStorage) {
-        
-
         const newCostPrice = parseFloat(slipProduct.importPrice);
         productInStorage.costPrice = newCostPrice;
-        
+
         productInStorage.quantity += slipProduct.quantity;
-        
-        const margin = productInStorage.profitMargin || 0; 
+
+        const margin = productInStorage.profitMargin || 0;
         // Tính giá bán mới
         productInStorage.price = newCostPrice * (1 + margin);
-
       }
     });
 
@@ -273,18 +300,19 @@ export function initImportPage() {
     // Lưu lại cả 2
     setData("products", currentProductStorage);
     setData("importSlips", currentSlips);
-    
+
     // Tải lại giao diện
     renderSlips(currentSlips);
-    
+
     // Gửi tín hiệu cho các tab khác (ví dụ: trang Products) cập nhật
-    channel.postMessage({ type: 'products_updated' });
+    channel.postMessage({ type: "products_updated" });
   };
-  
+
   // 8. Tìm kiếm
   searchInput.addEventListener("input", () => {
     const keyword = searchInput.value.toLowerCase().trim();
-    const filtered = currentSlips.filter(s => 
+    const filtered = currentSlips.filter(
+      (s) =>
         String(s.id).includes(keyword) ||
         s.date.includes(keyword) ||
         s.status.toLowerCase().includes(keyword)
@@ -302,3 +330,56 @@ export function initImportPage() {
   // Chạy lần đầu
   renderSlips(currentSlips);
 }
+// Thêm hàm mở form nhập hàng từ dashboard (exposed trên window)
+// Đặt đoạn này vào imports.js nơi overlay/form và các element đã được khởi tạo (hoặc sau khi initImportPage chạy)
+window.openImportForm = function (productId, suggestedQty = 1) {
+  try {
+    // Lấy hoặc cập nhật dữ liệu sản phẩm mới nhất
+    const allProducts = getData("products") || [];
+
+    // Kiểm tra DOM element tồn tại
+    const overlayEl = document.getElementById("importOverlay");
+    const formEl = document.getElementById("importForm");
+    const selectEl = document.getElementById("import-product-select");
+    const qtyEl = document.getElementById("import-quantity");
+    const priceEl = document.getElementById("import-price"); // nếu có trường giá
+
+    if (!overlayEl || !formEl || !selectEl) {
+      console.error(
+        "openImportForm: importOverlay / importForm / import-product-select chưa có trong DOM."
+      );
+      // Nếu không có DOM, thử navigate đến trang imports để người dùng thao tác thủ công
+      if (window.navigateSPA && typeof window.navigateSPA === "function") {
+        window.navigateSPA("imports");
+      }
+      return;
+    }
+
+    // Nạp danh sách sản phẩm vào select (giúp đảm bảo option tồn tại)
+    selectEl.innerHTML = allProducts
+      .map(
+        (p) => `<option value="${p.id}">${p.name} (Tồn: ${p.quantity})</option>`
+      )
+      .join("");
+
+    // Chọn sản phẩm nếu tìm thấy
+    if (!isNaN(productId)) {
+      const found = allProducts.find((p) => p.id === productId);
+      if (found) {
+        selectEl.value = found.id;
+        if (priceEl) priceEl.value = found.costPrice ?? found.price ?? "";
+      }
+    }
+
+    // Điền số lượng gợi ý
+    if (qtyEl) qtyEl.value = Math.max(1, parseInt(suggestedQty, 10) || 1);
+
+    // Hiển thị overlay
+    overlayEl.style.display = "flex";
+
+    // Nếu module maintain một state editIndex/tempProducts, bạn có thể reset ở đây:
+    // if (typeof window.__imports_resetState === "function") window.__imports_resetState();
+  } catch (err) {
+    console.error("openImportForm error:", err);
+  }
+};
